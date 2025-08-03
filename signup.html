@@ -9,6 +9,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
   <style>
     .swal2-timer-progress-bar {
       background: #facc15 !important;
@@ -102,14 +103,14 @@
     import { getFirestore, doc, setDoc, getDocs, collection, query, where, updateDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
-  apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
-  authDomain: "dlstournament-31ac1.firebaseapp.com",
-  projectId: "dlstournament-31ac1",
-  storageBucket: "dlstournament-31ac1.firebasestorage.app",
-  messagingSenderId: "874377019055",
-  appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
-  measurementId: "G-0DGFJEV6GL"
-};
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.appspot.com",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL"
+    };
 
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
@@ -161,6 +162,8 @@
       }
 
       try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const uid = userCredential.user.uid;
 
@@ -179,11 +182,12 @@
           username,
           phone,
           email,
+          password: hashedPassword,
+          photoUrl: "",
           balance: 0,
           role: "user",
           referCode: uid,
           referredBy: inputReferCode || null,
-          verified: "not verified",  // Default value for verification
           createdAt: serverTimestamp()
         });
 
@@ -212,7 +216,7 @@
         });
 
         setTimeout(() => {
-          window.location.href = "verified.html";  // Redirect to the verified page
+          window.location.href = "index.html";
         }, 2000);
 
       } catch (error) {
