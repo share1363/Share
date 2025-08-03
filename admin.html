@@ -47,7 +47,7 @@
 
       <div class="bg-white shadow rounded p-4" id="usersContainer">
         <!-- Search input -->
-        <div class="mb-4">
+        <div class="mb-4" id="searchInputContainer">
           <input id="searchInput" type="text" placeholder="Search by User ID" class="w-full p-2 border rounded" />
         </div>
 
@@ -136,6 +136,7 @@
     const saveEditBtn = document.getElementById("saveEditBtn");
 
     const searchInput = document.getElementById("searchInput");
+    const searchInputContainer = document.getElementById("searchInputContainer");
 
     let allUsers = [];
     let currentEditUserDocId = "";
@@ -237,6 +238,7 @@
 
           usersTableBody.classList.add("hidden");
           inlineEditForm.classList.remove("hidden");
+          searchInputContainer.classList.add("hidden"); // Hide search input
         });
       });
     }
@@ -244,7 +246,10 @@
     cancelEditBtn.addEventListener("click", () => {
       inlineEditForm.classList.add("hidden");
       usersTableBody.classList.remove("hidden");
+      searchInput.value = ""; // Clear search
+      searchInputContainer.classList.remove("hidden"); // Show search input
       currentEditUserDocId = "";
+      renderUsers(allUsers); // Reset list
     });
 
     saveEditBtn.addEventListener("click", async () => {
@@ -268,7 +273,9 @@
         });
         inlineEditForm.classList.add("hidden");
         usersTableBody.classList.remove("hidden");
-        loadUsers();
+        searchInput.value = ""; // Clear search
+        searchInputContainer.classList.remove("hidden"); // Show search input
+        loadUsers(); // Refresh data
       } catch (err) {
         alert("Failed to update user.");
         console.error(err);
