@@ -8,6 +8,8 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col lg:flex-row">
 
@@ -83,7 +85,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </main>
   </div>
@@ -289,6 +290,17 @@
           photoUrl: updatedPhotoUrl,
           password: updatedPassword
         });
+
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Update Successful',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true
+        });
+
         inlineEditForm.classList.add("hidden");
         usersTableBody.classList.remove("hidden");
         searchInput.value = "";
