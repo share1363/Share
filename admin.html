@@ -52,13 +52,17 @@
 
         <!-- Inline Edit Form (Hidden by Default) -->
         <div id="inlineEditForm" class="hidden">
-          <h2 class="text-lg font-bold mb-4">Edit User</h2>
+          <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-bold">Edit User</h2>
+        <button id="cancelEditBtn" class="text-gray-500 hover:text-black px-2 py-1 rounded">
+          <i class="fas fa-xmark text-xl"></i>
+        </button>
+          </div>
           <div class="space-y-4">
             <input id="editUserId" type="text" placeholder="User ID" class="w-full p-2 border rounded" />
             <input id="editBalance" type="number" placeholder="Balance" class="w-full p-2 border rounded" />
-            <div class="flex justify-between">
-              <button id="cancelEditBtn" class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
-              <button id="saveEditBtn" class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+            <div class="flex justify-center">
+              <button id="saveEditBtn" class="px-4 py-2 bg-blue-600 text-white rounded">Update</button>
             </div>
           </div>
         </div>
