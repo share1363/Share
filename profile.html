@@ -64,12 +64,12 @@
     <!-- Profile Info -->
     <section class="bg-gray-900 bg-opacity-50 border border-gray-700 rounded-xl p-3 flex items-center gap-4 card-glow">
       <div id="profileImageContainer" class="w-14 h-14 rounded-full bg-yellow-500 bg-opacity-20 flex items-center justify-center border-2 border-yellow-400 shadow-inner">
-        <!-- Image will be loaded dynamically -->
         <img id="profileImage" class="w-full h-full rounded-full object-cover" alt="Profile Image" />
       </div>
       <div>
         <h3 id="username" class="text-lg font-bold text-yellow-400">Username</h3>
         <p id="email" class="text-sm text-yellow-300">user@example.com</p>
+        <p id="userIdDisplay" class="text-xs text-gray-400 mt-1">ID: loading...</p>
       </div>
     </section>
 
@@ -124,40 +124,33 @@
   </main>
 
   <!-- Bottom Nav -->
-  <nav
-    class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-40">
+  <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-40">
     <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
       </div>
       Home
     </a>
     <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-gamepad text-lg text-gray-300 hover:text-yellow-400"></i>
       </div>
       Matches
     </a>
     <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-trophy text-lg text-gray-300 hover:text-yellow-400"></i>
       </div>
       League
     </a>
     <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-ranking-star text-lg text-gray-300 hover:text-yellow-400"></i>
       </div>
-         Ranking
-      </a>
-
+      Ranking
+    </a>
     <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
         <i class="fa-solid fa-user text-lg text-gray-400 hover:text-yellow-400"></i>
       </div>
       Profile
@@ -196,21 +189,18 @@
     const referralLink = `${window.location.origin}/signup.html?ref=${user.uid}`;
     document.getElementById("referLink").value = referralLink;
 
-    // Query to get user document by uid field, because doc id is NOT uid
     const q = query(collection(db, "users"), where("uid", "==", user.uid));
-
     onSnapshot(q, (querySnapshot) => {
       if (!querySnapshot.empty) {
         const userData = querySnapshot.docs[0].data();
         document.getElementById("username").textContent = userData.username || "No Name";
         document.getElementById("mainBalance").textContent = userData.balance ?? 0;
-        const profileImage = userData.photoUrl || '';
-        document.getElementById("profileImage").src = profileImage || 'default-avatar.png';
+        document.getElementById("profileImage").src = userData.photoUrl || 'default-avatar.png';
+        document.getElementById("userIdDisplay").textContent = `ID: ${userData.userId || 'Unavailable'}`;
       }
       hideLoader();
     });
 
-    // Real-time listener for referral count
     const referralQuery = query(collection(db, "users"), where("referredBy", "==", user.uid));
     onSnapshot(referralQuery, (querySnapshot) => {
       document.getElementById("totalRefers").textContent = querySnapshot.size;
