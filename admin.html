@@ -20,7 +20,6 @@
       </button>
     </div>
     <nav class="flex flex-col space-y-4 text-sm">
-      <!-- Navigation links here -->
       <button id="logoutBtn" class="flex items-center space-x-3 hover:bg-red-600 p-2 rounded mt-10 transition">
         <i class="fas fa-sign-out-alt"></i><span>Logout</span>
       </button>
@@ -42,18 +41,29 @@
     </header>
 
     <main class="p-4 md:p-6 space-y-6 overflow-auto flex-grow">
-      <!-- Total Users Section -->
       <div class="bg-white shadow rounded p-4">
         <div class="text-xl font-semibold text-blue-700 mb-2" id="totalUsersCount">Total Users: ...</div>
       </div>
 
-      <!-- Users Card Section -->
       <div class="bg-white shadow rounded p-4">
         <div id="usersTableBody" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <div class="text-center text-gray-500 col-span-full">Loading users...</div>
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg p-6 w-full max-w-sm space-y-4">
+      <h2 class="text-lg font-bold mb-2">Edit User</h2>
+      <input id="editUserId" type="text" placeholder="User ID" class="w-full p-2 border rounded" />
+      <input id="editBalance" type="number" placeholder="Balance" class="w-full p-2 border rounded" />
+      <div class="flex justify-end space-x-2">
+        <button id="cancelEditBtn" class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
+        <button id="saveEditBtn" class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+      </div>
+    </div>
   </div>
 
   <!-- Firebase and Logic -->
@@ -91,6 +101,14 @@
     const usersTableBody = document.getElementById("usersTableBody");
     const logoutBtn = document.getElementById("logoutBtn");
     const totalUsersCountElem = document.getElementById("totalUsersCount");
+
+    const editModal = document.getElementById("editModal");
+    const editUserIdInput = document.getElementById("editUserId");
+    const editBalanceInput = document.getElementById("editBalance");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+    const saveEditBtn = document.getElementById("saveEditBtn");
+
+    let currentEditUserDocId = "";
 
     logoutBtn.addEventListener("click", async () => {
       await signOut(auth);
@@ -130,23 +148,28 @@
         const users = [];
         usersSnapshot.forEach((docSnap) => {
           const user = docSnap.data();
-          users.push({ id: docSnap.id, ...user });
+          users.push({ docId: docSnap.id, ...user });
         });
 
         let cardsHtml = "";
         users.forEach((user) => {
           cardsHtml += `
             <div class="bg-gray-50 border border-gray-200 rounded-lg shadow p-4 flex flex-col space-y-3">
-              <div class="flex items-center space-x-4">
-                <img src="${user.photoUrl || 'https://via.placeholder.com/50'}" alt="Profile" class="rounded-full w-12 h-12 object-cover border" />
-                <div>
-                  <p class="text-sm text-gray-800 font-semibold">${user.username || "N/A"}</p>
-                  <p class="text-xs text-gray-500 break-words max-w-[150px]">${user.email || "N/A"}</p>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                  <img src="${user.photoUrl || 'https://via.placeholder.com/50'}" alt="Profile" class="rounded-full w-12 h-12 object-cover border" />
+                  <div>
+                    <p class="text-sm text-gray-800 font-semibold">${user.username || "N/A"}</p>
+                    <p class="text-xs text-gray-500 break-words max-w-[150px]">${user.email || "N/A"}</p>
+                  </div>
                 </div>
+                <button class="text-blue-600 hover:text-blue-800 editUserBtn" data-docid="${user.docId}" data-userid="${user.userId}" data-balance="${user.balance}">
+                  <i class="fas fa-pen"></i>
+                </button>
               </div>
               <div class="flex justify-between text-sm text-gray-700">
                 <p><strong>User ID:</strong> ${user.userId || "N/A"}</p>
-                <p><strong>Balance:</strong> ৳${user.balance != null ? user.balance.toFixed(2) : "0.00"}</p>
+                <p><strong>Balance:</strong> ৳${user.balance != null ? Number(user.balance).toFixed(2) : "0.00"}</p>
               </div>
             </div>
           `;
@@ -154,11 +177,48 @@
 
         usersTableBody.innerHTML = cardsHtml;
 
+        document.querySelectorAll(".editUserBtn").forEach(button => {
+          button.addEventListener("click", () => {
+            currentEditUserDocId = button.dataset.docid;
+            editUserIdInput.value = button.dataset.userid || "";
+            editBalanceInput.value = button.dataset.balance || "0.00";
+            editModal.classList.remove("hidden");
+          });
+        });
+
       } catch (error) {
         usersTableBody.innerHTML = `<div class="col-span-full text-center p-4 text-red-600">Error loading users: ${error.message}</div>`;
         console.error("Error loading users:", error);
       }
     }
+
+    cancelEditBtn.addEventListener("click", () => {
+      editModal.classList.add("hidden");
+      currentEditUserDocId = "";
+    });
+
+    saveEditBtn.addEventListener("click", async () => {
+      const updatedUserId = editUserIdInput.value.trim();
+      const updatedBalance = parseFloat(editBalanceInput.value);
+
+      if (!currentEditUserDocId || isNaN(updatedBalance)) {
+        alert("Invalid input.");
+        return;
+      }
+
+      try {
+        const userDocRef = doc(db, "users", currentEditUserDocId);
+        await updateDoc(userDocRef, {
+          userId: updatedUserId,
+          balance: updatedBalance
+        });
+        editModal.classList.add("hidden");
+        loadUsers();
+      } catch (err) {
+        alert("Failed to update user.");
+        console.error(err);
+      }
+    });
 
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("overlay");
