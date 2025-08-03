@@ -144,10 +144,10 @@
                   <p class="text-xs text-gray-500 break-words max-w-[150px]">${user.email || "N/A"}</p>
                 </div>
               </div>
-              <div class="text-sm text-gray-700">
-                <strong>User ID:</strong> ${user.userId || "N/A"}
+              <div class="flex justify-between text-sm text-gray-700">
+                <p><strong>User ID:</strong> ${user.userId || "N/A"}</p>
+                <p><strong>Balance:</strong> $${user.balance != null ? user.balance.toFixed(2) : "0.00"}</p>
               </div>
-              <p class="text-sm text-gray-700"><strong>Balance:</strong> $${user.balance != null ? user.balance.toFixed(2) : "0.00"}</p>
             </div>
           `;
         });
