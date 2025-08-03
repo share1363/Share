@@ -25,7 +25,6 @@
     <h2 class="text-md font-semibold text-white mb-6">Please Create Your New Account</h2>
 
     <form id="signupForm" onsubmit="signup(event)">
-      <!-- Username -->
       <div class="mb-4">
         <label for="username" class="block text-sm font-medium text-gray-300 mb-1">Username</label>
         <div class="relative">
@@ -35,7 +34,6 @@
         </div>
       </div>
 
-      <!-- Email -->
       <div class="mb-4">
         <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
         <div class="relative">
@@ -45,7 +43,6 @@
         </div>
       </div>
 
-      <!-- Password -->
       <div class="mb-4">
         <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Password</label>
         <div class="relative">
@@ -55,7 +52,6 @@
         </div>
       </div>
 
-      <!-- Referral -->
       <div class="mb-6 hidden">
         <label for="referCodeInput" class="block text-sm font-medium text-gray-300 mb-1">Sponsor Code</label>
         <div class="relative">
@@ -82,12 +78,11 @@
     </div>
   </div>
 
-  <!-- Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDocs, collection, query, where, updateDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
@@ -124,23 +119,21 @@
       document.getElementById("referCodeInput").value = refCode;
     }
 
-    // ৬ ডিজিট ইউনিক ইউজারআইডি জেনারেট ও চেক করার ফাংশন
-    async function generateUniqueUserId() {
-      const min = 100000;
-      const max = 999999;
-      let uniqueId;
-      let isUnique = false;
+    // 🔢 সিরিয়াল userId তৈরি (DCL101, DCL102, ...)
+    async function generateDCLUserId() {
+      const counterRef = doc(db, "counters", "users");
+      const counterSnap = await getDoc(counterRef);
 
-      while (!isUnique) {
-        uniqueId = Math.floor(Math.random() * (max - min + 1)) + min;
-        // Firestore এ userId এর জন্য চেক
-        const q = query(collection(db, "users"), where("userId", "==", uniqueId));
-        const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) {
-          isUnique = true;
-        }
+      let newNumber = 101; // default
+      if (counterSnap.exists()) {
+        const data = counterSnap.data();
+        newNumber = (data.lastUserId || 100) + 1;
+        await updateDoc(counterRef, { lastUserId: increment(1) });
+      } else {
+        await setDoc(counterRef, { lastUserId: 101 });
       }
-      return uniqueId;
+
+      return `DCL${newNumber}`;
     }
 
     window.signup = async function (event) {
@@ -150,7 +143,6 @@
       const spinner = document.getElementById("loadingSpinner");
       const btnText = document.getElementById("btnText");
 
-      // লোডিং শুরু: বাটনের টেক্সট হাইড, স্পিনার দেখানো, বাটন ডিসেবল করা
       btn.disabled = true;
       btnText.classList.add("hidden");
       spinner.classList.remove("hidden");
@@ -180,22 +172,11 @@
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const uid = userCredential.user.uid;
 
-        // ৬ ডিজিট ইউনিক userId জেনারেট করা
-        const userId = await generateUniqueUserId();
-
-        let referBonus = 0;
-        try {
-          const rewardsDoc = await getDoc(doc(db, "referSettings", "rewards"));
-          if (rewardsDoc.exists()) {
-            referBonus = rewardsDoc.data().referBonus || 0;
-          }
-        } catch (e) {
-          console.error("Failed to fetch refer bonus config:", e);
-        }
+        const userId = await generateDCLUserId();
 
         await setDoc(doc(db, "users", uid), {
           uid,
-          userId,
+          userId, // DCL format
           username,
           email,
           password,
@@ -206,18 +187,6 @@
           referredBy: inputReferCode || null,
           createdAt: serverTimestamp()
         });
-
-        if (inputReferCode && inputReferCode !== uid && referBonus > 0) {
-          const q = query(collection(db, "users"), where("uid", "==", inputReferCode));
-          const querySnapshot = await getDocs(q);
-
-          if (!querySnapshot.empty) {
-            const referrerDoc = querySnapshot.docs[0];
-            const referrerRef = doc(db, "users", referrerDoc.id);
-            const currentBalance = referrerDoc.data().balance || 0;
-            await updateDoc(referrerRef, { balance: currentBalance + referBonus });
-          }
-        }
 
         Swal.fire({
           toast: true,
@@ -238,7 +207,6 @@
       } catch (error) {
         showError("Signup failed: " + error.message);
       } finally {
-        // লোডিং শেষ: বাটনের টেক্সট দেখানো, স্পিনার হাইড, বাটন এনেবল
         spinner.classList.add("hidden");
         btnText.classList.remove("hidden");
         btn.disabled = false;
