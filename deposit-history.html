@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Deposit History</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+
+  <style>
+    .glow-yellow {
+      box-shadow: 0 0 5px rgb(246,201,0);
+    }
+  </style>
+</head>
+<body class="bg-black min-h-screen font-sans text-white">
+
+  <!-- Header Section -->
+  <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
+    <div class="flex items-center gap-2">
+      <div class="bg-yellow-600 bg-opacity-50 border border-yellow-500 text-yellow-300 w-8 h-8 flex items-center justify-center font-bold rounded-full shadow" style="font-family: 'Audiowide', cursive;">KD</div>
+      <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent" style="font-family: 'Audiowide', cursive;">Khelo Dls</h2>
+    </div>
+    <div style="height: 30px;" class="flex items-center gap-1 bg-black px-1 py-1 rounded-full shadow-lg border border-gray-600 ml-8">
+      <div class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
+        <i class="fa-solid fa-bangladeshi-taka-sign text-white text-sm"></i>
+      </div>
+      <p id="mainBalance" class="text-sm font-bold text-yellow-300">0</p>
+      <button class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center shadow-md">
+        <i class="fa-solid fa-plus text-gray-100 text-sm"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="p-4 max-w-3xl mx-auto">
+    <section>
+      <div id="historyContainer" class="space-y-4">
+        <div class="bg-black p-6 rounded-lg shadow text-center text-white">
+          Loading...
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Nav -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-40">
+    <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      Home
+    </a>
+    <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-gamepad text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      Matches
+    </a>
+    <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-trophy text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      League
+    </a>
+    <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-ranking-star text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      Ranking
+    </a>
+
+    <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
+        <i class="fa-solid fa-user text-lg text-gray-400 hover:text-yellow-400"></i>
+      </div>
+      Profile
+    </a>
+  </nav>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      where,
+      orderBy,
+      getDocs,
+      doc,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBscFHFPGGsWYNe91JO5meCzueVcDg4gFw",
+      authDomain: "dls12364.firebaseapp.com",
+      projectId: "dls12364",
+      storageBucket: "dls12364.firebasestorage.app",
+      messagingSenderId: "431397971734",
+      appId: "1:431397971734:web:0cb1a8b53ee09157425237",
+      measurementId: "G-B75EB4GGRV"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const historyContainer = document.getElementById("historyContainer");
+
+    let currentUser = null;
+    let userBalance = 0;
+
+    function formatBalance(amount) {
+      return (+amount.toFixed(2)).toString();
+    }
+
+    // Realtime balance listener
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentUser = user;
+
+      // Listen for real-time balance changes
+      const userRef = doc(db, "users", user.uid);
+      onSnapshot(userRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          userBalance = data.balance || 0;
+          document.getElementById("mainBalance").innerText = formatBalance(userBalance);
+        }
+      });
+
+      try {
+        const depositsRef = collection(db, "deposits");
+        const q = query(
+          depositsRef,
+          where("userId", "==", user.uid),
+          orderBy("timestamp", "desc")
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          historyContainer.innerHTML = `
+            <div class="bg-black p-6 rounded-lg shadow text-center text-gray-100">
+              No deposit history found.
+            </div>
+          `;
+          return;
+        }
+
+        let cards = "";
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          const amount = d.amount || 0;
+          const method = d.method || "Unknown";
+          const transactionId = d.transactionId || "N/A";
+          const date = d.timestamp?.toDate().toLocaleString() || "N/A";
+          const status = d.status || "pending";
+
+          let statusColor = "text-yellow-400";
+          let borderColor = "border-yellow-400";
+          if (status === "approved") {
+            statusColor = "text-green-600";
+            borderColor = "border-green-500";
+          } else if (status === "rejected") {
+            statusColor = "text-red-600";
+            borderColor = "border-red-500";
+          }
+
+          cards += `
+            <div class="glow-yellow bg-black rounded-lg p-5 border-l-4 ${borderColor}">
+              <div class="flex justify-between items-center mb-2">
+                <h3 class="text-lg font-semibold text-yellow-400">৳${amount}</h3>
+                <span class="text-xs px-2 py-1 rounded ${statusColor} bg-opacity-10 border ${statusColor.replace('text', 'border')}">
+                  ${status.charAt(0).toUpperCase() + status.slice(1)}
+                </span>
+              </div>
+              <div class="text-sm text-gray-300 space-y-1">
+                <p><strong>Method:</strong> ${method}</p>
+                <p class="font-bold">Transaction ID:<span style="font-size: 12px;" class="uppercase font-normal ml-1">${transactionId}</span></p>
+                <p class="text-xs text-gray-400"><strong>Date:</strong> ${date}</p>
+              </div>
+            </div>
+          `;
+        });
+
+        historyContainer.innerHTML = cards;
+
+      } catch (error) {
+        historyContainer.innerHTML = `
+          <div class="bg-red-100 text-red-600 p-5 rounded-lg shadow text-center">
+            Error loading history: ${error.message}
+          </div>
+        `;
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
