@@ -8,6 +8,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
   <style>
     .swal2-timer-progress-bar {
       background: #facc15 !important;
@@ -24,12 +25,11 @@
     <h2 class="text-md font-semibold text-white mb-6">Please Login to Your Account</h2>
 
     <form onsubmit="login(event)">
-      <!-- Email or Phone Input -->
       <div class="mb-4">
-        <label for="loginId" class="block text-sm font-medium text-gray-300 mb-1">Email or Phone</label>
+        <label for="loginEmail" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
         <div class="relative">
-          <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-          <input type="text" id="loginId" name="loginId" placeholder="Enter your email or phone" required 
+          <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input type="email" id="loginEmail" name="loginEmail" placeholder="Enter your email" required 
             class="w-full px-4 py-2 border border-gray-600 rounded-sm outline-none text-white bg-gray-800 pl-10 text-sm">
         </div>
       </div>
@@ -67,96 +67,82 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
-      authDomain: "dlstournament-31ac1.firebaseapp.com",
-      projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.firebasestorage.app",
-      messagingSenderId: "874377019055",
-      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
-      measurementId: "G-0DGFJEV6GL"
-    };
+  apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+  authDomain: "dlstournament-31ac1.firebaseapp.com",
+  projectId: "dlstournament-31ac1",
+  storageBucket: "dlstournament-31ac1.firebasestorage.app",
+  messagingSenderId: "874377019055",
+  appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+  measurementId: "G-0DGFJEV6GL"
+};
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const showToast = (icon, title) => {
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon,
-        title,
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-        background: '#1a202c',
-        color: '#fff'
-      });
-    };
-
-    window.login = async function(event) {
+    window.login = async function (event) {
       event.preventDefault();
 
-      const loginId = document.getElementById("loginId").value.trim();
+      const email = document.getElementById("loginEmail").value.trim();
       const password = document.getElementById("loginPassword").value.trim();
 
-      if (!loginId || !password) {
-        showToast('error', 'Please enter both Email/Phone and password.');
+      if (!email || !password) {
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: 'Please enter both email and password.',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          background: '#1a202c',
+          color: '#fff'
+        });
         return;
       }
 
-      let emailToLogin = null;
-
-      // Simple phone detection (digits only, length >= 7)
-      const isPhone = /^\d{7,}$/.test(loginId);
-
-      if (isPhone) {
-        // Find user by phone in Firestore
-        try {
-          const q = query(collection(db, "users"), where("phone", "==", loginId));
-          const querySnapshot = await getDocs(q);
-          if (querySnapshot.empty) {
-            showToast('error', 'No user found with this phone number.');
-            return;
-          }
-          const userDoc = querySnapshot.docs[0];
-          emailToLogin = userDoc.data().email;
-        } catch (e) {
-          console.error("Error fetching user by phone:", e);
-          showToast('error', 'Failed to find user by phone.');
-          return;
-        }
-      } else {
-        // Treat as email
-        emailToLogin = loginId;
-      }
-
       try {
-        const userCredential = await signInWithEmailAndPassword(auth, emailToLogin, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const uid = userCredential.user.uid;
 
-        // Fetch user role from Firestore
         const userDocRef = doc(db, "users", uid);
         const userDocSnap = await getDoc(userDocRef);
 
-        if (!userDocSnap.exists()) {
-          showToast('error', 'User data not found in database.');
-          return;
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'Login Successful!',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            background: '#1a202c',
+            color: '#fff'
+          }).then(() => {
+            if (userData.role === "admin") {
+              window.location.href = "admin.html";
+            } else {
+              window.location.href = "dashboard.html";
+            }
+          });
+        } else {
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: 'User data not found in database.',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            background: '#1a202c',
+            color: '#fff'
+          });
         }
-
-        const userData = userDocSnap.data();
-
-        showToast('success', 'Login Successful!');
-        setTimeout(() => {
-          if (userData.role === "admin") {
-            window.location.href = "admin.html";
-          } else {
-            window.location.href = "dashboard.html";
-          }
-        }, 1500);
 
       } catch (error) {
         let msg = "Login failed.";
@@ -167,7 +153,17 @@
         } else if (error.code === "auth/invalid-email") {
           msg = "Invalid email format.";
         }
-        showToast('error', msg);
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'error',
+          title: msg,
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          background: '#1a202c',
+          color: '#fff'
+        });
       }
     };
   </script>
