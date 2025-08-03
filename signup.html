@@ -122,7 +122,7 @@
       const snapshot = await getDocs(q);
       let nextId = 101;
       if (!snapshot.empty) {
-        const lastUser = snapshot.docs[0].data().userId; // e.g. "DCL109"
+        const lastUser = snapshot.docs[0].data().userId;
         const lastNumber = parseInt(lastUser.replace("DCL", ""));
         nextId = lastNumber + 1;
       }
@@ -165,7 +165,7 @@
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const uid = userCredential.user.uid;
 
-        const userId = await generateCustomUserId(); // 👈 Custom userId: DCL101, DCL102...
+        const userId = await generateCustomUserId(); // e.g. DCL101
 
         let referBonus = 0;
         try {
@@ -177,7 +177,8 @@
           console.error("Failed to fetch refer bonus config:", e);
         }
 
-        await setDoc(doc(db, "users", uid), {
+        // ✅ Save user data using `userId` as document ID
+        await setDoc(doc(db, "users", userId), {
           uid,
           userId,
           username,
@@ -191,6 +192,7 @@
           createdAt: serverTimestamp()
         });
 
+        // Handle referral bonus
         if (inputReferCode && inputReferCode !== uid && referBonus > 0) {
           const q = query(collection(db, "users"), where("uid", "==", inputReferCode));
           const querySnapshot = await getDocs(q);
