@@ -21,7 +21,6 @@
     </div>
     <nav class="flex flex-col space-y-4 text-sm">
       <!-- Navigation links here -->
-      <!-- ... -->
       <button id="logoutBtn" class="flex items-center space-x-3 hover:bg-red-600 p-2 rounded mt-10 transition">
         <i class="fas fa-sign-out-alt"></i><span>Logout</span>
       </button>
@@ -48,24 +47,10 @@
         <div class="text-xl font-semibold text-blue-700 mb-2" id="totalUsersCount">Total Users: ...</div>
       </div>
 
-      <!-- Users Table Section -->
+      <!-- Users Card Section -->
       <div class="bg-white shadow rounded p-4">
-        <div class="overflow-x-auto max-h-[600px]">
-          <table class="w-full text-sm border border-gray-300 rounded overflow-hidden min-w-[700px]">
-            <thead class="bg-gray-100 sticky top-0 z-10">
-              <tr>
-                <th class="p-3 border border-gray-300 text-left">Profile</th>
-                <th class="p-3 border border-gray-300 text-left">User ID</th>
-                <th class="p-3 border border-gray-300 text-left">Username</th>
-                <th class="p-3 border border-gray-300 text-left">Email</th>
-                <th class="p-3 border border-gray-300 text-left">Balance (৳)</th>
-                <th class="p-3 border border-gray-300 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="usersTableBody">
-              <tr><td colspan="6" class="p-4 text-center text-gray-500">Loading users...</td></tr>
-            </tbody>
-          </table>
+        <div id="usersTableBody" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div class="text-center text-gray-500 col-span-full">Loading users...</div>
         </div>
       </div>
     </main>
@@ -83,7 +68,9 @@
     import {
       getFirestore,
       collection,
-      getDocs
+      getDocs,
+      doc,
+      updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -136,7 +123,7 @@
         const usersSnapshot = await getDocs(usersCol);
 
         if (usersSnapshot.empty) {
-          usersTableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center">No users found.</td></tr>`;
+          usersTableBody.innerHTML = `<div class="col-span-full text-center p-4 text-gray-500">No users found.</div>`;
           return;
         }
 
@@ -146,27 +133,50 @@
           users.push({ id: docSnap.id, ...user });
         });
 
-        let rowsHtml = "";
+        let cardsHtml = "";
         users.forEach((user) => {
-          rowsHtml += `
-            <tr class="hover:bg-gray-50 border-t">
-              <td class="p-3 border border-gray-300 text-center">
-                <img src="${user.photoUrl || 'https://via.placeholder.com/50'}" alt="Profile" class="rounded-full w-8 h-8 object-cover">
-              </td>
-              <td class="p-3 border border-gray-300">${user.userId || "N/A"}</td>
-              <td class="p-3 border border-gray-300">${user.username || "N/A"}</td>
-              <td class="p-3 border border-gray-300 break-words max-w-xs">${user.email || "N/A"}</td>
-              <td class="p-3 border border-gray-300">
-                <p class="text-gray-800 font-medium">৳ ${user.balance !== undefined ? user.balance.toFixed(2) : "0.00"}</p>
-              </td>
-              <td class="p-3 border border-gray-300 text-center text-gray-400 italic">N/A</td>
-            </tr>
+          cardsHtml += `
+            <div class="bg-gray-50 border border-gray-200 rounded-lg shadow p-4 flex flex-col space-y-3">
+              <div class="flex items-center space-x-4">
+                <img src="${user.photoUrl || 'https://via.placeholder.com/50'}" alt="Profile" class="rounded-full w-12 h-12 object-cover border" />
+                <div>
+                  <p class="text-sm text-gray-800 font-semibold">${user.username || "N/A"}</p>
+                  <p class="text-xs text-gray-500 break-words max-w-[150px]">${user.email || "N/A"}</p>
+                </div>
+              </div>
+              <div class="text-sm text-gray-700">
+                <strong>User ID:</strong> ${user.userId || "N/A"}
+              </div>
+              <div class="flex items-center justify-between">
+                <input type="number" min="0" step="0.01" value="${user.balance || 0}" class="balance-input border rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" data-uid="${user.id}" />
+              </div>
+              <button class="update-balance-btn bg-blue-600 hover:bg-green-600 text-white text-sm py-1 rounded transition" data-uid="${user.id}">
+                Update Balance
+              </button>
+            </div>
           `;
         });
 
-        usersTableBody.innerHTML = rowsHtml;
+        usersTableBody.innerHTML = cardsHtml;
+
+        document.querySelectorAll(".update-balance-btn").forEach(btn => {
+          btn.addEventListener("click", async (e) => {
+            const uid = e.target.getAttribute("data-uid");
+            const input = document.querySelector(`.balance-input[data-uid="${uid}"]`);
+            const newBalance = parseFloat(input.value);
+            if (isNaN(newBalance) || newBalance < 0) {
+              alert("Please enter a valid non-negative balance.");
+              return;
+            }
+            await updateDoc(doc(db, "users", uid), {
+              balance: newBalance,
+            });
+            alert("Updated successfully.");
+          });
+        });
+
       } catch (error) {
-        usersTableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-600">Error loading users: ${error.message}</td></tr>`;
+        usersTableBody.innerHTML = `<div class="col-span-full text-center p-4 text-red-600">Error loading users: ${error.message}</div>`;
         console.error("Error loading users:", error);
       }
     }
