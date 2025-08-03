@@ -124,6 +124,25 @@
       document.getElementById("referCodeInput").value = refCode;
     }
 
+    // ৬ ডিজিট ইউনিক ইউজারআইডি জেনারেট ও চেক করার ফাংশন
+    async function generateUniqueUserId() {
+      const min = 100000;
+      const max = 999999;
+      let uniqueId;
+      let isUnique = false;
+
+      while (!isUnique) {
+        uniqueId = Math.floor(Math.random() * (max - min + 1)) + min;
+        // Firestore এ userId এর জন্য চেক
+        const q = query(collection(db, "users"), where("userId", "==", uniqueId));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+          isUnique = true;
+        }
+      }
+      return uniqueId;
+    }
+
     window.signup = async function (event) {
       event.preventDefault();
 
@@ -161,6 +180,9 @@
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const uid = userCredential.user.uid;
 
+        // ৬ ডিজিট ইউনিক userId জেনারেট করা
+        const userId = await generateUniqueUserId();
+
         let referBonus = 0;
         try {
           const rewardsDoc = await getDoc(doc(db, "referSettings", "rewards"));
@@ -173,6 +195,7 @@
 
         await setDoc(doc(db, "users", uid), {
           uid,
+          userId,
           username,
           email,
           password,
