@@ -24,7 +24,7 @@
 
     <h2 class="text-md font-semibold text-white mb-6">Please Create Your New Account</h2>
 
-    <form onsubmit="signup(event)">
+    <form id="signupForm" onsubmit="signup(event)">
       <!-- Username -->
       <div class="mb-4">
         <label for="username" class="block text-sm font-medium text-gray-300 mb-1">Username</label>
@@ -65,9 +65,14 @@
         </div>
       </div>
 
-      <button type="submit"
-        class="w-full text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500 font-extrabold py-2 rounded-sm">
+      <button id="createAccountBtn" type="submit"
+        class="w-full text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500 font-extrabold py-2 rounded-sm relative flex justify-center items-center">
         Create Account
+        <!-- Loading spinner -->
+        <svg id="loadingSpinner" class="hidden animate-spin h-5 w-5 ml-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
       </button>
     </form>
 
@@ -123,17 +128,28 @@
     window.signup = async function (event) {
       event.preventDefault();
 
+      const btn = document.getElementById("createAccountBtn");
+      const spinner = document.getElementById("loadingSpinner");
+      
+      // Show spinner and disable button while processing
+      btn.disabled = true;
+      spinner.classList.remove("hidden");
+
       const username = document.getElementById("username").value.trim();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
       const inputReferCode = document.getElementById("referCodeInput").value.trim();
 
       if (!username || !email || !password) {
+        spinner.classList.add("hidden");
+        btn.disabled = false;
         showError("Please fill in all required fields.");
         return;
       }
 
       if (password.length < 6) {
+        spinner.classList.add("hidden");
+        btn.disabled = false;
         showError("Password must be at least 6 characters long.");
         return;
       }
@@ -195,6 +211,10 @@
 
       } catch (error) {
         showError("Signup failed: " + error.message);
+      } finally {
+        // Hide spinner and enable button again only if page not redirected
+        spinner.classList.add("hidden");
+        btn.disabled = false;
       }
     };
   </script>
