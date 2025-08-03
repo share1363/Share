@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finished Matches</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <header class="bg-blue-700 text-white p-4 flex justify-between items-center sticky top-0 z-30">
+    <h1 class="text-xl font-bold">Finished Matches</h1>
+    <a href="admin.html" class="bg-white text-blue-700 px-4 py-2 rounded hover:bg-gray-200 transition">
+      Back to Admin Panel
+    </a>
+  </header>
+
+  <main class="p-4 md:p-6 flex-grow">
+    <div id="finishedContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <p class="col-span-full text-center text-gray-500">Loading finished matches...</p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.appspot.com",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const finishedContainer = document.getElementById("finishedContainer");
+
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        loadFinishedMatches();
+      }
+    });
+
+    async function loadFinishedMatches() {
+      try {
+        const q = query(collection(db, "matches"), where("finished", "==", true));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          finishedContainer.innerHTML = `<p class="col-span-full text-center text-gray-500">No finished matches found.</p>`;
+          return;
+        }
+
+        let html = "";
+        snapshot.forEach(docSnap => {
+          const match = docSnap.data();
+          const id = docSnap.id;
+
+          html += `
+            <div id="match-${id}" class="bg-white p-5 rounded shadow border flex flex-col justify-between">
+              <div>
+                <h2 class="font-semibold text-lg mb-2">${match.title || "Untitled Match"}</h2>
+                <p><strong>Date & Time:</strong> ${new Date(match.dateTime).toLocaleString()}</p>
+                <p><strong>Total Prize:</strong> ৳${match.totalPrice || 0}</p>
+                <p><strong>Entry Fee:</strong> ৳${match.entryFee || 0}</p>
+                <p><strong>Per Goal:</strong> ৳${match.perGoal || 0}</p>
+                <p><strong>Slot Limit:</strong> ${match.slotLimit || 0}</p>
+                <p><strong>Match Code:</strong> ${match.matchCode || 'N/A'}</p>
+                <p><strong>Status:</strong> <span id="status-${id}" class="capitalize font-semibold">Finished</span></p>
+              </div>
+
+              <form data-id="${id}" class="mt-4 flex items-center gap-2" onsubmit="event.preventDefault(); updateStatus('${id}', this.statusSelect.value);">
+                <select name="statusSelect" class="border rounded px-2 py-1">
+                  <option value="false">Live</option>
+                  <option value="true" selected>Finished</option>
+                </select>
+                <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition">
+                  Update Status
+                </button>
+              </form>
+            </div>
+          `;
+        });
+
+        finishedContainer.innerHTML = html;
+      } catch (error) {
+        finishedContainer.innerHTML = `<p class="col-span-full text-center text-red-600">Error loading matches: ${error.message}</p>`;
+        console.error("Firestore fetch error:", error);
+      }
+    }
+
+    async function updateStatus(matchId, statusValue) {
+      try {
+        let finishedBool = statusValue === "true";
+
+        const matchRef = doc(db, "matches", matchId);
+        await updateDoc(matchRef, { finished: finishedBool });
+
+        if (finishedBool) {
+          const statusSpan = document.getElementById(`status-${matchId}`);
+          if (statusSpan) statusSpan.textContent = "Finished";
+        } else {
+          const matchDiv = document.getElementById(`match-${matchId}`);
+          if (matchDiv) matchDiv.remove();
+        }
+
+        alert("Status updated successfully!");
+      } catch (error) {
+        alert("Failed to update status: " + error.message);
+        console.error("Firestore update error:", error);
+      }
+    }
+
+    window.updateStatus = updateStatus;
+  </script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add Match</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <header class="bg-blue-700 text-white p-4 flex justify-between items-center sticky top-0 z-30">
+    <h1 class="text-xl font-bold">Add Match</h1>
+    <a href="admin.html" class="bg-white text-blue-700 px-4 py-2 rounded hover:bg-gray-200 transition">
+      Back to Admin Panel
+    </a>
+  </header>
+
+  <main class="p-4 md:p-6 flex-grow">
+    <!-- Add Match Section -->
+    <div class="bg-white shadow rounded p-4">
+      <h2 class="text-lg font-semibold text-blue-700 mb-4">Add New Match</h2>
+      <form id="addMatchForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-medium mb-1">Match Title</label>
+            <input type="text" id="matchTitle" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Date & Time</label>
+            <input type="datetime-local" id="matchDateTime" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Total Price (৳)</label>
+            <input type="number" id="totalPrice" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Per Goal (৳)</label>
+            <input type="number" id="perGoal" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Entry Fee (৳)</label>
+            <input type="number" id="entryFee" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Slot Limit</label>
+            <input type="number" id="slotLimit" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required min="1" />
+          </div>
+        </div>
+        <button type="submit" class="bg-blue-600 hover:bg-green-600 text-white px-6 py-2 rounded transition">
+          Add Match
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.appspot.com",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const addMatchForm = document.getElementById("addMatchForm");
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+
+    // Function to generate a 6-letter random uppercase word (e.g., AHHSSJ)
+    function generateMatchCode() {
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      let code = "";
+      for (let i = 0; i < 6; i++) {
+        code += letters.charAt(Math.floor(Math.random() * letters.length));
+      }
+      return code;
+    }
+
+    addMatchForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById("matchTitle").value.trim();
+      const dateTime = document.getElementById("matchDateTime").value;
+      const totalPrice = parseFloat(document.getElementById("totalPrice").value);
+      const perGoal = parseFloat(document.getElementById("perGoal").value);
+      const entryFee = parseFloat(document.getElementById("entryFee").value);
+      const slotLimit = parseInt(document.getElementById("slotLimit").value, 10);
+
+      if (!title || !dateTime || isNaN(totalPrice) || isNaN(perGoal) || isNaN(entryFee) || isNaN(slotLimit) || slotLimit < 1) {
+        alert("Please fill out all fields correctly.");
+        return;
+      }
+
+      const matchCode = generateMatchCode();
+
+      try {
+        await addDoc(collection(db, "matches"), {
+          title,
+          dateTime,
+          totalPrice,
+          perGoal,
+          entryFee,
+          slotLimit,
+          finished: false,
+          status: "live",
+          matchCode, // 6-letter match code
+        });
+        alert(`✅ Match added successfully!\nMatch Code: ${matchCode}`);
+        addMatchForm.reset();
+      } catch (error) {
+        console.error("Error adding match:", error);
+        alert("❌ Failed to add match.");
+      }
+    });
+  </script>
+</body>
+</html>

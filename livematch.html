@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Live Match</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-blue-700 text-white p-4 flex justify-between items-center sticky top-0 z-30">
+    <h1 class="text-xl font-bold">Live Match</h1>
+    <a href="admin.html" class="bg-white text-blue-700 px-4 py-2 rounded hover:bg-gray-200 transition">
+      Back to Admin Panel
+    </a>
+  </header>
+
+  <!-- Main -->
+  <main class="p-4 md:p-6 flex-grow">
+    <div id="matchesContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <p class="text-center col-span-full text-gray-500">Loading matches...</p>
+    </div>
+  </main>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-lg relative">
+      <h2 class="text-lg font-bold mb-4">Edit Match</h2>
+      <form id="editForm" class="space-y-3">
+        <input type="hidden" id="editMatchId" />
+        <div>
+          <label class="block text-sm font-semibold">Title</label>
+          <input id="editTitle" type="text" class="w-full border p-2 rounded" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Total Price (৳)</label>
+          <input id="editTotalPrice" type="number" class="w-full border p-2 rounded" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Per Goal (৳)</label>
+          <input id="editPerGoal" type="number" class="w-full border p-2 rounded" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Entry Fee (৳)</label>
+          <input id="editEntryFee" type="number" class="w-full border p-2 rounded" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Slot Limit</label>
+          <input id="editSlotLimit" type="number" class="w-full border p-2 rounded" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold">Date & Time</label>
+          <input id="editDateTime" type="datetime-local" class="w-full border p-2 rounded" />
+        </div>
+        <div class="flex justify-end space-x-3 pt-4">
+          <button type="button" onclick="closeEditModal()" class="text-gray-600 hover:underline">Cancel</button>
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase & Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.appspot.com",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const matchesContainer = document.getElementById("matchesContainer");
+
+    let matchesCache = {};
+
+    onAuthStateChanged(auth, user => {
+      if (!user) window.location.href = "login.html";
+      else loadMatches();
+    });
+
+    async function loadMatches() {
+      try {
+        const q = query(collection(db, "matches"), orderBy("dateTime", "asc"));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          matchesContainer.innerHTML = `<p class="text-center col-span-full text-gray-500">No matches found.</p>`;
+          return;
+        }
+
+        let cardsHtml = "";
+        matchesCache = {};
+
+        for (const docSnap of snapshot.docs) {
+          const match = docSnap.data();
+          const id = docSnap.id;
+
+          if (match.finished === true) continue;
+
+          const participantsSnapshot = await getDocs(collection(db, "matches", id, "participants"));
+          const participants = participantsSnapshot.docs.map(p => ({
+            uid: p.id,
+            ...p.data()
+          }));
+
+          matchesCache[id] = { match, participants };
+          cardsHtml += createCardHTML(id, match, participants);
+        }
+
+        matchesContainer.innerHTML = cardsHtml;
+
+        document.querySelectorAll(".win-button").forEach(button => {
+          button.addEventListener("click", declareWinner);
+        });
+
+      } catch (error) {
+        matchesContainer.innerHTML = `<p class="text-center col-span-full text-red-600">Error: ${error.message}</p>`;
+        console.error(error);
+      }
+    }
+
+    function createCardHTML(id, match, participants) {
+      const team1 = participants[0] || { teamName: "Team A", uid: "N/A" };
+      const team2 = participants[1] || { teamName: "Team B", uid: "N/A" };
+      const winnerUid = match.winnerUid;
+
+      const getStatus = (uid) => winnerUid === uid ? "🏆 Winner" : (winnerUid ? "❌ Lost" : "");
+
+      const getButton = (uid, teamName) => {
+        const disabled = winnerUid ? "disabled" : "";
+        const text = winnerUid ? (winnerUid === uid ? "Winner Declared ✔️" : "Not Winner") : `Declare ${teamName} Winner`;
+        const bg = winnerUid ? (winnerUid === uid ? "bg-green-500" : "bg-gray-400") : "bg-green-500 hover:bg-green-600";
+
+        return `<button data-matchid="${id}" data-uid="${uid}" class="win-button mt-2 ${bg} text-white px-3 py-1 rounded transition text-sm" ${disabled}>${text}</button>`;
+      };
+
+      const getScreenshotBtn = (participant) => {
+        if (participant.screenshotUrl) {
+          return `<a href="${participant.screenshotUrl}" target="_blank" class="mt-2 inline-block text-blue-600 hover:underline text-sm">🔗 View Screenshot</a>`;
+        }
+        return "";
+      };
+
+      return `
+      <div id="card-${id}" class="bg-white rounded shadow p-5 flex flex-col justify-between border border-gray-200">
+        <div>
+          <h2 class="text-lg font-semibold mb-1">${match.title || ""}</h2>
+          <p class="text-xs text-gray-500 mb-2">Match Code: <span class="font-semibold text-blue-600">${match.matchCode || "N/A"}</span></p>
+          <p><strong>Date & Time:</strong> ${new Date(match.dateTime).toLocaleString()}</p>
+          <p><strong>Total Price (৳):</strong> ${match.totalPrice || 0}</p>
+          <p><strong>Per Goal (৳):</strong> ${match.perGoal || 0}</p>
+          <p><strong>Entry Fee (৳):</strong> ${match.entryFee || 0}</p>
+          <p><strong>Slot Limit:</strong> ${match.slotLimit || 0}</p>
+        </div>
+
+        <div class="mt-4 flex justify-between items-center text-gray-700 font-semibold">
+          <div class="flex-1 text-center">
+            <div>${team1.teamName}</div>
+            <div class="text-xs text-gray-400 break-all mb-1">${team1.uid}</div>
+            <div id="result-${id}-${team1.uid}" class="text-sm font-bold text-green-600">${getStatus(team1.uid)}</div>
+            ${getButton(team1.uid, team1.teamName)}
+            ${getScreenshotBtn(team1)}
+          </div>
+
+          <span class="text-gray-500 font-bold">VS</span>
+
+          <div class="flex-1 text-center">
+            <div>${team2.teamName}</div>
+            <div class="text-xs text-gray-400 break-all mb-1">${team2.uid}</div>
+            <div id="result-${id}-${team2.uid}" class="text-sm font-bold text-green-600">${getStatus(team2.uid)}</div>
+            ${getButton(team2.uid, team2.teamName)}
+            ${getScreenshotBtn(team2)}
+          </div>
+        </div>
+
+        <div class="text-center text-sm text-gray-500 mt-3" id="status-${id}"></div>
+
+        <div class="mt-4 flex justify-end space-x-3">
+         <button onclick="editMatch('${id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded flex items-center gap-1 text-sm">
+         <i class="fas fa-edit"></i> Edit
+         </button>
+         <button onclick="finishMatch('${id}')" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded flex items-center gap-1 text-sm">
+         <i class="fas fa-flag-checkered"></i> Finish Match
+         </button>
+        </div>
+      </div>`;
+    }
+
+    window.finishMatch = async function (id) {
+      try {
+        await updateDoc(doc(db, "matches", id), { finished: true, status: "finished" });
+        alert("Match marked as finished.");
+        await loadMatches();
+      } catch (error) {
+        alert("Failed to mark match as finished: " + error.message);
+        console.error(error);
+      }
+    };
+
+    async function declareWinner(e) {
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      btn.textContent = "Processing...";
+      const matchId = btn.dataset.matchid;
+      const winnerUid = btn.dataset.uid;
+
+      try {
+        const matchDocRef = doc(db, "matches", matchId);
+        const snap = await getDoc(matchDocRef);
+        if (!snap.exists()) throw new Error("Match not found");
+
+        const matchData = snap.data();
+        const totalPrice = matchData.totalPrice || 0;
+        if (totalPrice <= 0) throw new Error("Invalid totalPrice");
+
+        await updateDoc(doc(db, "users", winnerUid), { balance: increment(totalPrice) });
+        await updateDoc(matchDocRef, { winnerUid });
+        await loadMatches();
+      } catch (error) {
+        const statusDiv = document.getElementById(`status-${matchId}`);
+        statusDiv.textContent = `Error: ${error.message}`;
+        statusDiv.classList.remove("text-green-600");
+        statusDiv.classList.add("text-red-500");
+
+        btn.textContent = "Declare Winner";
+        btn.disabled = false;
+        console.error("Error declaring winner:", error);
+      }
+    }
+
+    window.editMatch = function (id) {
+      const { match } = matchesCache[id];
+      document.getElementById("editMatchId").value = id;
+      document.getElementById("editTitle").value = match.title || "";
+      document.getElementById("editTotalPrice").value = match.totalPrice || 0;
+      document.getElementById("editPerGoal").value = match.perGoal || 0;
+      document.getElementById("editEntryFee").value = match.entryFee || 0;
+      document.getElementById("editSlotLimit").value = match.slotLimit || 0;
+      document.getElementById("editDateTime").value = new Date(match.dateTime).toISOString().slice(0, 16);
+
+      document.getElementById("editModal").classList.remove("hidden");
+      document.getElementById("editModal").classList.add("flex");
+    };
+
+    window.closeEditModal = function () {
+      document.getElementById("editModal").classList.add("hidden");
+    };
+
+    document.getElementById("editForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = document.getElementById("editMatchId").value;
+      try {
+        await updateDoc(doc(db, "matches", id), {
+          title: document.getElementById("editTitle").value,
+          totalPrice: Number(document.getElementById("editTotalPrice").value),
+          perGoal: Number(document.getElementById("editPerGoal").value),
+          entryFee: Number(document.getElementById("editEntryFee").value),
+          slotLimit: Number(document.getElementById("editSlotLimit").value),
+          dateTime: new Date(document.getElementById("editDateTime").value).toISOString(),
+        });
+        closeEditModal();
+        await loadMatches();
+      } catch (err) {
+        alert("Failed to update match: " + err.message);
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
