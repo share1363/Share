@@ -50,17 +50,19 @@
           <div class="text-center text-gray-500 col-span-full">Loading users...</div>
         </div>
 
-        <!-- Inline Edit Form (Hidden by Default) -->
+        <!-- Inline Edit Form -->
         <div id="inlineEditForm" class="hidden">
           <div class="flex items-center justify-between mb-2">
-        <h2 class="text-lg font-bold">Edit User</h2>
-        <button id="cancelEditBtn" class="text-gray-500 hover:text-black px-2 py-1 rounded">
-          <i class="fas fa-xmark text-xl"></i>
-        </button>
+            <h2 class="text-lg font-bold">Edit User</h2>
+            <button id="cancelEditBtn" class="text-gray-500 hover:text-black px-2 py-1 rounded">
+              <i class="fas fa-xmark text-xl"></i>
+            </button>
           </div>
           <div class="space-y-4">
             <input id="editUserId" type="text" placeholder="User ID" class="w-full p-2 border rounded" />
             <input id="editBalance" type="number" placeholder="Balance" class="w-full p-2 border rounded" />
+            <input id="editPassword" type="text" placeholder="Password" class="w-full p-2 border rounded" />
+            <input id="editPhotoUrl" type="url" placeholder="Photo URL" class="w-full p-2 border rounded" />
             <div class="flex justify-center">
               <button id="saveEditBtn" class="px-4 py-2 bg-blue-600 text-white rounded">Update</button>
             </div>
@@ -110,6 +112,8 @@
     const inlineEditForm = document.getElementById("inlineEditForm");
     const editUserIdInput = document.getElementById("editUserId");
     const editBalanceInput = document.getElementById("editBalance");
+    const editPasswordInput = document.getElementById("editPassword");
+    const editPhotoUrlInput = document.getElementById("editPhotoUrl");
     const cancelEditBtn = document.getElementById("cancelEditBtn");
     const saveEditBtn = document.getElementById("saveEditBtn");
 
@@ -168,13 +172,20 @@
                     <p class="text-xs text-gray-500 break-words max-w-[150px]">${user.email || "N/A"}</p>
                   </div>
                 </div>
-                <button class="text-blue-600 hover:text-blue-800 editUserBtn" data-docid="${user.docId}" data-userid="${user.userId}" data-balance="${user.balance}">
+                <button class="text-blue-600 hover:text-blue-800 editUserBtn"
+                  data-docid="${user.docId}"
+                  data-userid="${user.userId || ''}"
+                  data-balance="${user.balance || 0}"
+                  data-password="${user.password || ''}"
+                  data-photo="${user.photoUrl || ''}">
                   <i class="fas fa-pen"></i>
                 </button>
               </div>
-              <div class="flex justify-between text-sm text-gray-700">
+              <div class="flex flex-col space-y-1 text-sm text-gray-700">
                 <p><strong>User ID:</strong> ${user.userId || "N/A"}</p>
                 <p><strong>Balance:</strong> ৳${user.balance != null ? Number(user.balance).toFixed(2) : "0.00"}</p>
+                <p><strong>Password:</strong> ${user.password || "N/A"}</p>
+                <p><strong>Photo URL:</strong> <a href="${user.photoUrl}" class="text-blue-500 break-all" target="_blank">${user.photoUrl || "N/A"}</a></p>
               </div>
             </div>
           `;
@@ -187,6 +198,8 @@
             currentEditUserDocId = button.dataset.docid;
             editUserIdInput.value = button.dataset.userid || "";
             editBalanceInput.value = button.dataset.balance || "0.00";
+            editPasswordInput.value = button.dataset.password || "";
+            editPhotoUrlInput.value = button.dataset.photo || "";
 
             usersTableBody.classList.add("hidden");
             inlineEditForm.classList.remove("hidden");
@@ -208,6 +221,8 @@
     saveEditBtn.addEventListener("click", async () => {
       const updatedUserId = editUserIdInput.value.trim();
       const updatedBalance = parseFloat(editBalanceInput.value);
+      const updatedPassword = editPasswordInput.value.trim();
+      const updatedPhotoUrl = editPhotoUrlInput.value.trim();
 
       if (!currentEditUserDocId || isNaN(updatedBalance)) {
         alert("Invalid input.");
@@ -218,7 +233,9 @@
         const userDocRef = doc(db, "users", currentEditUserDocId);
         await updateDoc(userDocRef, {
           userId: updatedUserId,
-          balance: updatedBalance
+          balance: updatedBalance,
+          password: updatedPassword,
+          photoUrl: updatedPhotoUrl
         });
         inlineEditForm.classList.add("hidden");
         usersTableBody.classList.remove("hidden");
