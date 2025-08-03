@@ -119,12 +119,11 @@
       document.getElementById("referCodeInput").value = refCode;
     }
 
-    // 🔢 সিরিয়াল userId তৈরি (DCL101, DCL102, ...)
     async function generateDCLUserId() {
       const counterRef = doc(db, "counters", "users");
       const counterSnap = await getDoc(counterRef);
 
-      let newNumber = 101; // default
+      let newNumber = 101;
       if (counterSnap.exists()) {
         const data = counterSnap.data();
         newNumber = (data.lastUserId || 100) + 1;
@@ -174,16 +173,17 @@
 
         const userId = await generateDCLUserId();
 
-        await setDoc(doc(db, "users", uid), {
+        // 🔥 Document created using userId as doc ID
+        await setDoc(doc(db, "users", userId), {
           uid,
-          userId, // DCL format
+          userId,
           username,
           email,
           password,
           photoUrl: "",
           balance: 0,
           role: "user",
-          referCode: uid,
+          referCode: userId,
           referredBy: inputReferCode || null,
           createdAt: serverTimestamp()
         });
