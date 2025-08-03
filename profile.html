@@ -66,10 +66,15 @@
       <div id="profileImageContainer" class="w-14 h-14 rounded-full bg-yellow-500 bg-opacity-20 flex items-center justify-center border-2 border-yellow-400 shadow-inner">
         <img id="profileImage" class="w-full h-full rounded-full object-cover" alt="Profile Image" />
       </div>
-      <div>
+      <div class="flex-1">
         <h3 id="username" class="text-lg font-bold text-yellow-400">Username</h3>
         <p id="email" class="text-sm text-yellow-300">user@example.com</p>
-        <p id="userIdDisplay" class="text-xs text-gray-400 mt-1">ID: loading...</p>
+        <div class="flex items-center gap-2 mt-1">
+          <p id="userIdDisplay" class="text-xs text-gray-400">ID: loading...</p>
+          <button onclick="copyUserId()" class="text-yellow-400 hover:text-yellow-500 text-xs" title="Copy User ID">
+            <i class="fa-solid fa-copy"></i>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -196,7 +201,9 @@
         document.getElementById("username").textContent = userData.username || "No Name";
         document.getElementById("mainBalance").textContent = userData.balance ?? 0;
         document.getElementById("profileImage").src = userData.photoUrl || 'default-avatar.png';
-        document.getElementById("userIdDisplay").textContent = `ID: ${userData.userId || 'Unavailable'}`;
+        const userId = userData.userId || 'Unavailable';
+        document.getElementById("userIdDisplay").textContent = `ID: ${userId}`;
+        document.getElementById("userIdDisplay").setAttribute("data-userid", userId);
       }
       hideLoader();
     });
@@ -220,6 +227,24 @@
         position: 'top-end',
         icon: 'success',
         title: 'Referral link copied!',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        background: '#1a202c',
+        color: '#fff'
+      });
+    });
+  };
+
+  window.copyUserId = () => {
+    const userIdText = document.getElementById("userIdDisplay").getAttribute("data-userid");
+    if (!userIdText) return;
+    navigator.clipboard.writeText(userIdText).then(() => {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'User ID copied!',
         showConfirmButton: false,
         timer: 2000,
         timerProgressBar: true,
