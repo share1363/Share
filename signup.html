@@ -9,7 +9,6 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
   <style>
     .swal2-timer-progress-bar {
       background: #facc15 !important;
@@ -162,11 +161,11 @@
       }
 
       try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-
+        // Create user with Firebase Authentication (Firebase hashes password internally)
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const uid = userCredential.user.uid;
 
+        // Fetch referral bonus amount from Firestore
         let referBonus = 0;
         try {
           const rewardsDoc = await getDoc(doc(db, "referSettings", "rewards"));
@@ -177,12 +176,13 @@
           console.error("Failed to fetch refer bonus config:", e);
         }
 
+        // Save user info in Firestore (do NOT save plain password)
         await setDoc(doc(db, "users", uid), {
           uid,
           username,
           phone,
           email,
-          password: hashedPassword,
+          password: "", // Don't save password here
           photoUrl: "",
           balance: 0,
           role: "user",
@@ -191,6 +191,7 @@
           createdAt: serverTimestamp()
         });
 
+        // Add referral bonus to referrer if applicable
         if (inputReferCode && inputReferCode !== uid && referBonus > 0) {
           const q = query(collection(db, "users"), where("uid", "==", inputReferCode));
           const querySnapshot = await getDocs(q);
