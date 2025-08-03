@@ -147,33 +147,12 @@
               <div class="text-sm text-gray-700">
                 <strong>User ID:</strong> ${user.userId || "N/A"}
               </div>
-              <div class="flex items-center justify-between">
-                <input type="number" min="0" step="0.01" value="${user.balance || 0}" class="balance-input border rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" data-uid="${user.id}" />
-              </div>
-              <button class="update-balance-btn bg-blue-600 hover:bg-green-600 text-white text-sm py-1 rounded transition" data-uid="${user.id}">
-                Update Balance
-              </button>
+              <p class="text-sm text-gray-700"><strong>Balance:</strong> $${user.balance != null ? user.balance.toFixed(2) : "0.00"}</p>
             </div>
           `;
         });
 
         usersTableBody.innerHTML = cardsHtml;
-
-        document.querySelectorAll(".update-balance-btn").forEach(btn => {
-          btn.addEventListener("click", async (e) => {
-            const uid = e.target.getAttribute("data-uid");
-            const input = document.querySelector(`.balance-input[data-uid="${uid}"]`);
-            const newBalance = parseFloat(input.value);
-            if (isNaN(newBalance) || newBalance < 0) {
-              alert("Please enter a valid non-negative balance.");
-              return;
-            }
-            await updateDoc(doc(db, "users", uid), {
-              balance: newBalance,
-            });
-            alert("Updated successfully.");
-          });
-        });
 
       } catch (error) {
         usersTableBody.innerHTML = `<div class="col-span-full text-center p-4 text-red-600">Error loading users: ${error.message}</div>`;
