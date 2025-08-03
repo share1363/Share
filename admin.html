@@ -1,341 +1,350 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Panel</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col lg:flex-row">
 
-  <!-- Sidebar -->
-  <aside id="sidebar" class="w-64 bg-blue-800 text-white min-h-screen p-5 space-y-6 fixed lg:static top-0 left-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 z-50 shadow-lg">
-    <div class="flex justify-between items-center mb-8">
-      <h2 class="text-2xl font-bold">Admin Panel</h2>
-      <button id="closeSidebar" class="lg:hidden text-white text-2xl">
-        <i class="fas fa-xmark"></i>
-      </button>
-    </div>
-    <nav class="flex flex-col space-y-4 text-sm">
-      <a href="admin.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
-        <i class="fas fa-home"></i><span>Dashboard</span>
-      </a>
-      <a href="playerslist.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
-        <i class="fas fa-clipboard-list"></i><span>Players List</span>
-      </a>
-      <a href="fixerslist.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
-        <i class="fas fa-clipboard-list"></i><span>Fixers</span>
-      </a>
-      <a href="sami.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
-        <i class="fas fa-clipboard-list"></i><span>Sami Fxers</span>
-      </a>
-      <a href="matchresut.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
-        <i class="fas fa-clipboard-list"></i><span>Match Result Update</span>
-      </a>
-      <a href="point.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
-        <i class="fas fa-clipboard-list"></i><span>Points Table</span>
-      </a>
-      <a href="livematch.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
-        <i class="fas fa-clipboard-list"></i><span>Live Match</span>
-      <a href="finisheddmatch.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
-        <i class="fas fa-clipboard-list"></i><span>Finished Match</span>
-      </a>
-      <a href="deposit-requests.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
-        <i class="fas fa-clipboard-list"></i><span>Deposit Request</span>
-      </a>
-      <a href="withdraw-requests.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
-        <i class="fas fa-clipboard-list"></i><span>Withdrawal Request</span>
-      </a>
-      <a href="referral-setting.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
-        <i class="fas fa-clipboard-list"></i><span>Referral Settings</span>
-      </a>
-      <a href="setting.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
-        <i class="fas fa-clipboard-list"></i><span>Settings</span>
-      </a>
-      <button id="logoutBtn" class="flex items-center space-x-3 hover:bg-red-600 p-2 rounded mt-10 transition">
-        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
-      </button>
-    </nav>
-  </aside>
+  <!-- Sidebar -->
+  <aside id="sidebar" class="w-64 bg-blue-800 text-white min-h-screen p-5 space-y-6 fixed lg:static top-0 left-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 z-50 shadow-lg">
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-2xl font-bold">Admin Panel</h2>
+      <button id="closeSidebar" class="lg:hidden text-white text-2xl">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+    <nav class="flex flex-col space-y-4 text-sm">
+      <a href="admin.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-home"></i><span>Dashboard</span>
+      </a>
+      <a href="playerslist.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Players List</span>
+      </a>
+      <a href="fixerslist.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Fixers</span>
+      </a>
+      <a href="sami.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Sami Fxers</span>
+      </a>
+      <a href="matchresut.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Match Result Update</span>
+      </a>
+      <a href="point.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Points Table</span>
+      </a>
+      <a href="livematch.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Live Match</span>
+      </a>
+      <a href="finisheddmatch.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Finished Match</span>
+      </a>
+      <a href="deposit-requests.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Deposit Request</span>
+      </a>
+      <a href="withdraw-requests.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Withdrawal Request</span>
+      </a>
+      <a href="referral-setting.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Referral Settings</span>
+      </a>
+      <a href="setting.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Settings</span>
+      </a>
+      <button id="logoutBtn" class="flex items-center space-x-3 hover:bg-red-600 p-2 rounded mt-10 transition">
+        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+      </button>
+    </nav>
+  </aside>
 
-  <!-- Overlay -->
-  <div id="overlay" class="fixed inset-0 bg-black bg-opacity-40 z-40 hidden lg:hidden"></div>
+  <!-- Overlay -->
+  <div id="overlay" class="fixed inset-0 bg-black bg-opacity-40 z-40 hidden lg:hidden"></div>
 
-  <!-- Main Content -->
-  <div class="flex-grow w-full lg:ml-64 min-h-screen flex flex-col">
-    <header class="bg-blue-700 text-white p-4 flex justify-between items-center shadow-md sticky top-0 z-30">
-      <div class="flex items-center space-x-4">
-        <button id="openSidebar" class="lg:hidden text-2xl">
-          <i class="fas fa-bars"></i>
-        </button>
-        <h1 class="text-xl font-bold">Admin Panel</h1>
-      </div>
-    </header>
+  <!-- Main Content -->
+  <div class="flex-grow w-full lg:ml-64 min-h-screen flex flex-col">
+    <header class="bg-blue-700 text-white p-4 flex justify-between items-center shadow-md sticky top-0 z-30">
+      <div class="flex items-center space-x-4">
+        <button id="openSidebar" class="lg:hidden text-2xl">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="text-xl font-bold">Admin Panel</h1>
+      </div>
+    </header>
 
-    <main class="p-4 md:p-6 space-y-6 overflow-auto flex-grow">
-      <!-- Total Users Section -->
-      <div class="bg-white shadow rounded p-4">
-        <div class="text-xl font-semibold text-blue-700 mb-2" id="totalUsersCount">Total Users: ...</div>
-        <!-- Buttons: Plus and Minus with Font Awesome icons -->
-        <div class="flex space-x-4">
-          <!-- Minus button (Reset all balances to 0) -->
-          <button id="minusBtn" class="bg-red-500 text-white p-2 rounded flex items-center">
-            <i class="fas fa-minus mr-2"></i> Minus
-          </button>
-          <!-- Plus button (Add 10tk to all balances) -->
-          <button id="plusBtn" class="bg-green-500 text-white p-2 rounded flex items-center">
-            <i class="fas fa-plus mr-2"></i> Plus
-          </button>
-        </div>
-      </div>
+    <main class="p-4 md:p-6 space-y-6 overflow-auto flex-grow">
+      <!-- Total Users Section -->
+      <div class="bg-white shadow rounded p-4">
+        <div class="text-xl font-semibold text-blue-700 mb-2" id="totalUsersCount">Total Users: ...</div>
+        <!-- Buttons: Plus and Minus with Font Awesome icons -->
+        <div class="flex space-x-4">
+          <!-- Minus button (Reset all balances to 0) -->
+          <button id="minusBtn" class="bg-red-500 text-white p-2 rounded flex items-center">
+            <i class="fas fa-minus mr-2"></i> Minus
+          </button>
+          <!-- Plus button (Add 20tk to all balances) -->
+          <button id="plusBtn" class="bg-green-500 text-white p-2 rounded flex items-center">
+            <i class="fas fa-plus mr-2"></i> Plus
+          </button>
+        </div>
+      </div>
 
-      <!-- Users Table Section -->
-      <div class="bg-white shadow rounded p-4">
-        <div class="overflow-x-auto max-h-[600px]">
-          <table class="w-full text-sm border border-gray-300 rounded overflow-hidden min-w-[600px]">
-            <thead class="bg-gray-100 sticky top-0 z-10">
-              <tr>
-                <th class="p-3 border border-gray-300 text-left">Profile Photo</th>
-                <th class="p-3 border border-gray-300 text-left">Username</th>
-                <th class="p-3 border border-gray-300 text-left">Email</th>
-                <th class="p-3 border border-gray-300 text-left">Balance (৳)</th>
-                <th class="p-3 border border-gray-300 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="usersTableBody">
-              <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading users...</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <!-- Pagination -->
-        <div class="mt-4 flex justify-between items-center">
-          <button id="prevPageBtn" class="bg-gray-300 text-black p-2 rounded" disabled>Previous</button>
-          <span id="pageNumber" class="text-sm text-gray-600">Page 1</span>
-          <button id="nextPageBtn" class="bg-gray-300 text-black p-2 rounded">Next</button>
-        </div>
-      </div>
-    </main>
-  </div>
+      <!-- Users Table Section -->
+      <div class="bg-white shadow rounded p-4">
+        <div class="overflow-x-auto max-h-[600px]">
+          <table class="w-full text-sm border border-gray-300 rounded overflow-hidden min-w-[600px]">
+            <thead class="bg-gray-100 sticky top-0 z-10">
+              <tr>
+                <th class="p-3 border border-gray-300 text-left">Profile Photo</th>
+                <th class="p-3 border border-gray-300 text-left">User ID</th>
+                <th class="p-3 border border-gray-300 text-left">Email</th>
+                <th class="p-3 border border-gray-300 text-left">Balance (৳)</th>
+                <th class="p-3 border border-gray-300 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading users...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Pagination -->
+        <div class="mt-4 flex justify-between items-center">
+          <button id="prevPageBtn" class="bg-gray-300 text-black p-2 rounded" disabled>Previous</button>
+          <span id="pageNumber" class="text-sm text-gray-600">Page 1</span>
+          <button id="nextPageBtn" class="bg-gray-300 text-black p-2 rounded">Next</button>
+        </div>
+      </div>
+    </main>
+  </div>
 
-  <!-- Firebase and Logic -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signOut,
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      getDocs,
-      doc,
-      updateDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <!-- Firebase and Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut,
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const firebaseConfig = {
+    const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
       authDomain: "dlstournament-31ac1.firebaseapp.com",
       projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.firebasestorage.app",
+      storageBucket: "dlstournament-31ac1.appspot.com",
       messagingSenderId: "874377019055",
       appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
       measurementId: "G-0DGFJEV6GL"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    const usersTableBody = document.getElementById("usersTableBody");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const totalUsersCountElem = document.getElementById("totalUsersCount");
-    const minusBtn = document.getElementById("minusBtn");
-    const plusBtn = document.getElementById("plusBtn");
-    const prevPageBtn = document.getElementById("prevPageBtn");
-    const nextPageBtn = document.getElementById("nextPageBtn");
-    const pageNumberElem = document.getElementById("pageNumber");
+    const usersTableBody = document.getElementById("usersTableBody");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const totalUsersCountElem = document.getElementById("totalUsersCount");
+    const minusBtn = document.getElementById("minusBtn");
+    const plusBtn = document.getElementById("plusBtn");
+    const prevPageBtn = document.getElementById("prevPageBtn");
+    const nextPageBtn = document.getElementById("nextPageBtn");
+    const pageNumberElem = document.getElementById("pageNumber");
 
-    let currentPage = 1;
-    const usersPerPage = 5;
+    let currentPage = 1;
+    const usersPerPage = 5;
 
-    logoutBtn.addEventListener("click", async () => {
-      await signOut(auth);
-      window.location.href = "index.html";
-    });
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    });
 
-    onAuthStateChanged(auth, user => {
-      if (!user) {
-        window.location.href = "login.html";
-      } else {
-        loadTotalUsersCount();
-        loadUsers();
-      }
-    });
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "index.html";
+      } else {
+        loadTotalUsersCount();
+        loadUsers();
+      }
+    });
 
-    async function loadTotalUsersCount() {
-      try {
-        const usersCol = collection(db, "users");
-        const usersSnapshot = await getDocs(usersCol);
-        totalUsersCountElem.textContent = `Total Users: ${usersSnapshot.size}`;
-      } catch (err) {
-        totalUsersCountElem.textContent = "Total Users: Error";
-        console.error("Error loading user count:", err);
-      }
-    }
+    async function loadTotalUsersCount() {
+      try {
+        const usersCol = collection(db, "users");
+        const usersSnapshot = await getDocs(usersCol);
+        totalUsersCountElem.textContent = `Total Users: ${usersSnapshot.size}`;
+      } catch (err) {
+        totalUsersCountElem.textContent = "Total Users: Error";
+        console.error("Error loading user count:", err);
+      }
+    }
 
-    async function loadUsers() {
-      try {
-        const usersCol = collection(db, "users");
-        const usersSnapshot = await getDocs(usersCol);
+    async function loadUsers() {
+      try {
+        const usersCol = collection(db, "users");
+        const usersSnapshot = await getDocs(usersCol);
 
-        if (usersSnapshot.empty) {
-          usersTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center">No users found.</td></tr>`;
-          return;
-        }
+        if (usersSnapshot.empty) {
+          usersTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center">No users found.</td></tr>`;
+          return;
+        }
 
-        const users = [];
-        usersSnapshot.forEach((docSnap) => {
-          const user = docSnap.data();
-          users.push({ id: docSnap.id, ...user });
-        });
+        const users = [];
+        usersSnapshot.forEach((docSnap) => {
+          const user = docSnap.data();
+          users.push({ id: docSnap.id, ...user });
+        });
 
-        const totalUsers = users.length;
-        const totalPages = Math.ceil(totalUsers / usersPerPage);
+        const totalUsers = users.length;
+        const totalPages = Math.ceil(totalUsers / usersPerPage);
 
-        // Pagination buttons logic
-        prevPageBtn.disabled = currentPage === 1;
-        nextPageBtn.disabled = currentPage === totalPages;
+        // Pagination buttons logic
+        prevPageBtn.disabled = currentPage === 1;
+        nextPageBtn.disabled = currentPage === totalPages;
 
-        const startIndex = (currentPage - 1) * usersPerPage;
-        const endIndex = startIndex + usersPerPage;
-        const usersToDisplay = users.slice(startIndex, endIndex);
+        const startIndex = (currentPage - 1) * usersPerPage;
+        const endIndex = startIndex + usersPerPage;
+        const usersToDisplay = users.slice(startIndex, endIndex);
 
-        let rowsHtml = "";
-        usersToDisplay.forEach((user) => {
-          rowsHtml += `
-            <tr class="hover:bg-gray-50 border-t">
-              <td class="p-3 border border-gray-300 text-center">
-                <img src="${user.photoUrl || 'https://via.placeholder.com/50'}" alt="Profile" class="rounded-full w-12 h-12 object-cover">
-              </td>
-              <td class="p-3 border border-gray-300">${user.username || "N/A"}</td>
-              <td class="p-3 border border-gray-300 break-words max-w-xs">${user.email || "N/A"}</td>
-              <td class="p-3 border border-gray-300">
-                <input type="number" min="0" step="0.01" value="${user.balance || 0}" class="balance-input border rounded px-2 py-1 w-28 focus:outline-none focus:ring-2 focus:ring-blue-400" data-uid="${user.id}" />
-              </td>
-              <td class="p-3 border border-gray-300 text-center">
-                <button class="update-balance-btn bg-blue-500 hover:bg-green-600 text-white px-4 py-1 rounded transition" data-uid="${user.id}">
-                  Update
-                </button>
-              </td>
-            </tr>
-          `;
-        });
+        let rowsHtml = "";
+        usersToDisplay.forEach((user) => {
+          rowsHtml += `
+            <tr class="hover:bg-gray-50 border-t">
+              <td class="p-3 border border-gray-300 text-center">
+                <img src="${user.photoUrl || 'https://via.placeholder.com/50'}" alt="Profile" class="rounded-full w-12 h-12 object-cover">
+              </td>
+              <td class="p-3 border border-gray-300 font-mono">${user.userId || "N/A"}</td>
+              <td class="p-3 border border-gray-300 break-words max-w-xs">${user.email || "N/A"}</td>
+              <td class="p-3 border border-gray-300">
+                <input type="number" min="0" step="0.01" value="${user.balance || 0}" class="balance-input border rounded px-2 py-1 w-28 focus:outline-none focus:ring-2 focus:ring-blue-400" data-uid="${user.id}" />
+              </td>
+              <td class="p-3 border border-gray-300 text-center">
+                <button class="update-balance-btn bg-blue-500 hover:bg-green-600 text-white px-4 py-1 rounded transition" data-uid="${user.id}">
+                  Update
+                </button>
+              </td>
+            </tr>
+          `;
+        });
 
-        usersTableBody.innerHTML = rowsHtml;
+        usersTableBody.innerHTML = rowsHtml;
 
-        // Page Number Update
-        pageNumberElem.textContent = `Page ${currentPage}`;
+        pageNumberElem.textContent = `Page ${currentPage}`;
 
-        document.querySelectorAll(".update-balance-btn").forEach(btn => {
-          btn.addEventListener("click", async (e) => {
-            const uid = e.target.getAttribute("data-uid");
-            const input = document.querySelector(`.balance-input[data-uid="${uid}"]`);
-            const newBalance = parseFloat(input.value);
+        // Attach update balance event listeners
+        document.querySelectorAll(".update-balance-btn").forEach(btn => {
+          btn.addEventListener("click", async (e) => {
+            const uid = e.target.getAttribute("data-uid");
+            const input = document.querySelector(`.balance-input[data-uid="${uid}"]`);
+            const newBalance = parseFloat(input.value);
 
-            if (isNaN(newBalance) || newBalance < 0) {
-              alert("Please enter a valid non-negative balance.");
-              return;
-            }
+            if (isNaN(newBalance) || newBalance < 0) {
+              alert("Please enter a valid non-negative balance.");
+              return;
+            }
 
-            await updateDoc(doc(db, "users", uid), {
-              balance: newBalance,
-            });
+            try {
+              await updateDoc(doc(db, "users", uid), {
+                balance: newBalance,
+              });
+              alert("Updated successfully.");
+            } catch (err) {
+              alert("Update failed: " + err.message);
+            }
+          });
+        });
 
-            alert("Updated successfully.");
-          });
-        });
+      } catch (error) {
+        usersTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-600">Error loading users: ${error.message}</td></tr>`;
+        console.error("Error loading users:", error);
+      }
+    }
 
-      } catch (error) {
-        usersTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-600">Error loading users: ${error.message}</td></tr>`;
-        console.error("Error loading users:", error);
-      }
-    }
+    // Pagination Buttons
+    prevPageBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        loadUsers();
+      }
+    });
 
-    // Pagination Button Event Listeners
-    prevPageBtn.addEventListener("click", () => {
-      if (currentPage > 1) {
-        currentPage--;
-        loadUsers();
-      }
-    });
+    nextPageBtn.addEventListener("click", () => {
+      currentPage++;
+      loadUsers();
+    });
 
-    nextPageBtn.addEventListener("click", () => {
-      currentPage++;
-      loadUsers();
-    });
+    // Minus button: reset balances to 0
+    minusBtn.addEventListener("click", async () => {
+      try {
+        const usersCol = collection(db, "users");
+        const usersSnapshot = await getDocs(usersCol);
 
-    // Reset all user balances to 0 (Minus button)
-    minusBtn.addEventListener("click", async () => {
-      try {
-        const usersCol = collection(db, "users");
-        const usersSnapshot = await getDocs(usersCol);
-        usersSnapshot.forEach(async (docSnap) => {
-          await updateDoc(doc(db, "users", docSnap.id), {
-            balance: 0
-          });
-        });
-        alert("All user balances 0.");
-      } catch (error) {
-        alert("Error resetting balances: " + error.message);
-        console.error("Error resetting balances:", error);
-      }
-    });
+        // Use Promise.all for proper concurrency handling
+        await Promise.all(
+          usersSnapshot.docs.map(docSnap => updateDoc(doc(db, "users", docSnap.id), { balance: 0 }))
+        );
 
-    // Add 10tk to all user balances (Plus button)
-    plusBtn.addEventListener("click", async () => {
-      try {
-        const usersCol = collection(db, "users");
-        const usersSnapshot = await getDocs(usersCol);
-        usersSnapshot.forEach(async (docSnap) => {
-          const userData = docSnap.data();
-          const newBalance = userData.balance + 20;
-          await updateDoc(doc(db, "users", docSnap.id), {
-            balance: newBalance
-          });
-        });
-        alert("All user balances add successful.");
-      } catch (error) {
-        alert("Error adding to balances: " + error.message);
-        console.error("Error adding to balances:", error);
-      }
-    });
+        alert("All user balances reset to 0.");
+        loadUsers();
+      } catch (err) {
+        alert("Error resetting balances: " + err.message);
+        console.error(err);
+      }
+    });
 
-    // Sidebar toggle
-    const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("overlay");
-    const openSidebarBtn = document.getElementById("openSidebar");
-    const closeSidebarBtn = document.getElementById("closeSidebar");
+    // Plus button: add 20 to all balances
+    plusBtn.addEventListener("click", async () => {
+      try {
+        const usersCol = collection(db, "users");
+        const usersSnapshot = await getDocs(usersCol);
 
-    openSidebarBtn.addEventListener("click", () => {
-      sidebar.classList.remove("-translate-x-full");
-      overlay.classList.remove("hidden");
-    });
+        await Promise.all(
+          usersSnapshot.docs.map(docSnap => {
+            const userData = docSnap.data();
+            const newBalance = (userData.balance || 0) + 20;
+            return updateDoc(doc(db, "users", docSnap.id), { balance: newBalance });
+          })
+        );
 
-    closeSidebarBtn.addEventListener("click", () => {
-      sidebar.classList.add("-translate-x-full");
-      overlay.classList.add("hidden");
-    });
+        alert("Added 20৳ to all user balances.");
+        loadUsers();
+      } catch (err) {
+        alert("Error adding to balances: " + err.message);
+        console.error(err);
+      }
+    });
 
-    overlay.addEventListener("click", () => {
-      sidebar.classList.add("-translate-x-full");
-      overlay.classList.add("hidden");
-    });
-  </script>
+    // Sidebar toggle logic
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    const openSidebarBtn = document.getElementById("openSidebar");
+    const closeSidebarBtn = document.getElementById("closeSidebar");
+
+    openSidebarBtn.addEventListener("click", () => {
+      sidebar.classList.remove("-translate-x-full");
+      overlay.classList.remove("hidden");
+    });
+
+    closeSidebarBtn.addEventListener("click", () => {
+      sidebar.classList.add("-translate-x-full");
+      overlay.classList.add("hidden");
+    });
+
+    overlay.addEventListener("click", () => {
+      sidebar.classList.add("-translate-x-full");
+      overlay.classList.add("hidden");
+    });
+  </script>
 </body>
-  </html>
+</html>
