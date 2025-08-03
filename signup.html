@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    .swal2-timer-progress-bar {
+      background: #facc15 !important;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen px-5 py-10">
+  <div class="bg-gradient-to-tl from-gray-900 via-gray-900 p-5 rounded-sm shadow-lg w-full max-w-sm border border-gray-600 shadow-2xl">
+
+    <div class="flex flex-col items-center justify-center mb-4">
+      <h1 style="font-family: 'Audiowide', cursive;" class="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent">Khelo Dls</h1>
+    </div>
+
+    <h2 class="text-md font-semibold text-white mb-6">Please Create Your New Account</h2>
+
+    <form onsubmit="signup(event)">
+      <!-- Username -->
+      <div class="mb-4">
+        <label for="username" class="block text-sm font-medium text-gray-300 mb-1">Username</label>
+        <div class="relative">
+          <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input type="text" id="username" required placeholder="Enter your username"
+            class="w-full px-4 py-2 border border-gray-600 rounded-sm outline-none text-white bg-gray-800 pl-10 text-sm"/>
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div class="mb-4">
+        <label for="phone" class="block text-sm font-medium text-gray-300 mb-1">Phone</label>
+        <div class="relative">
+          <i class="fas fa-phone absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input type="text" id="phone" required placeholder="Enter your phone number"
+            class="w-full px-4 py-2 border border-gray-600 rounded-sm outline-none text-white bg-gray-800 pl-10 text-sm"/>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="mb-4">
+        <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+        <div class="relative">
+          <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input type="email" id="email" required placeholder="Enter your email"
+            class="w-full px-4 py-2 border border-gray-600 rounded-sm outline-none text-white bg-gray-800 pl-10 text-sm"/>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="mb-4">
+        <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+        <div class="relative">
+          <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input type="password" id="password" required placeholder="Create a password"
+            class="w-full px-4 py-2 border border-gray-600 rounded-sm outline-none text-white bg-gray-800 pl-10 text-sm"/>
+        </div>
+      </div>
+
+      <!-- Referral -->
+      <div class="mb-6 hidden">
+        <label for="referCodeInput" class="block text-sm font-medium text-gray-300 mb-1">Sponsor Code</label>
+        <div class="relative">
+          <i class="fas fa-gift absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input type="text" id="referCodeInput" placeholder="Enter sponsor code"
+            class="w-full px-4 py-2 border border-gray-600 rounded-sm outline-none text-white bg-gray-800 pl-10 text-sm"/>
+        </div>
+      </div>
+
+      <!-- Terms -->
+      <div class="flex items-center mb-6">
+        <input type="checkbox" id="terms" required class="text-blue-600 focus:ring-blue-500 border-gray-600 rounded-sm"/>
+        <label for="terms" class="text-sm text-gray-300 ml-2">I agree to the <a href="#" class="text-blue-300">Terms and Conditions</a></label>
+      </div>
+
+      <button type="submit"
+        class="w-full text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500 font-extrabold py-2 rounded-sm">
+        Create Account
+      </button>
+    </form>
+
+    <div class="mt-2 text-center">
+      <p class="text-base text-gray-300">Already have an account? 
+        <a href="index.html" class="text-blue-300 hover:underline text-lg font-medium">Login</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Firebase Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDocs, collection, query, where, updateDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBscFHFPGGsWYNe91JO5meCzueVcDg4gFw",
+      authDomain: "dls12364.firebaseapp.com",
+      projectId: "dls12364",
+      storageBucket: "dls12364.firebasestorage.app",
+      messagingSenderId: "431397971734",
+      appId: "1:431397971734:web:0cb1a8b53ee09157425237",
+      measurementId: "G-B75EB4GGRV"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const showError = (msg) => {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'error',
+        title: msg,
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+        background: '#1a202c',
+        color: '#fff'
+      });
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get("ref");
+    if (refCode) {
+      document.getElementById("referCodeInput").value = refCode;
+    }
+
+    window.signup = async function (event) {
+      event.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const inputReferCode = document.getElementById("referCodeInput").value.trim();
+
+      if (!username || !phone || !email || !password) {
+        showError("Please fill in all required fields.");
+        return;
+      }
+
+      if (phone.length < 7) {
+        showError("Please enter a valid phone number.");
+        return;
+      }
+
+      if (password.length < 6) {
+        showError("Password must be at least 6 characters long.");
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
+
+        let referBonus = 0;
+        try {
+          const rewardsDoc = await getDoc(doc(db, "referSettings", "rewards"));
+          if (rewardsDoc.exists()) {
+            referBonus = rewardsDoc.data().referBonus || 0;
+          }
+        } catch (e) {
+          console.error("Failed to fetch refer bonus config:", e);
+        }
+
+        await setDoc(doc(db, "users", uid), {
+          uid,
+          username,
+          phone,
+          email,
+          balance: 0,
+          role: "user",
+          referCode: uid,
+          referredBy: inputReferCode || null,
+          verified: "not verified",  // Default value for verification
+          createdAt: serverTimestamp()
+        });
+
+        if (inputReferCode && inputReferCode !== uid && referBonus > 0) {
+          const q = query(collection(db, "users"), where("uid", "==", inputReferCode));
+          const querySnapshot = await getDocs(q);
+
+          if (!querySnapshot.empty) {
+            const referrerDoc = querySnapshot.docs[0];
+            const referrerRef = doc(db, "users", referrerDoc.id);
+            const currentBalance = referrerDoc.data().balance || 0;
+            await updateDoc(referrerRef, { balance: currentBalance + referBonus });
+          }
+        }
+
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Sign-up Successful!',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          background: '#1a202c',
+          color: '#fff'
+        });
+
+        setTimeout(() => {
+          window.location.href = "verified.html";  // Redirect to the verified page
+        }, 2000);
+
+      } catch (error) {
+        showError("Signup failed: " + error.message);
+      }
+    };
+  </script>
+</body>
+</html>
