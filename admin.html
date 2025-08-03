@@ -53,24 +53,23 @@
     </main>
   </div>
 
-    <!-- Edit Modal -->
-<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden px-4">
-  <div class="bg-white rounded-lg p-6 w-full max-w-sm space-y-4">
-    <div class="flex items-center justify-between mb-2">
-      <h2 class="text-lg font-bold">Edit User</h2>
-      <button id="cancelEditBtn" class="text-gray-500 hover:text-black px-2 py-1 rounded">
-        <i class="fas fa-xmark text-xl"></i>
-      </button>
-    </div>
-    <input id="editUserId" type="text" placeholder="User ID" class="w-full p-2 border rounded" />
-    <input id="editBalance" type="number" placeholder="Balance" class="w-full p-2 border rounded" />
-    <div class="flex justify-center">
-      <button id="saveEditBtn" class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+  <!-- Edit Modal -->
+  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden px-4">
+    <div class="bg-white rounded-lg p-6 w-full max-w-sm space-y-4">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-bold">Edit User</h2>
+        <button id="cancelEditBtn" class="text-gray-500 hover:text-black px-2 py-1 rounded">
+          <i class="fas fa-xmark text-xl"></i>
+        </button>
+      </div>
+      <input id="editUserId" type="text" placeholder="User ID" class="w-full p-2 border rounded" />
+      <input id="editBalance" type="number" placeholder="Balance" class="w-full p-2 border rounded" />
+      <div class="flex justify-center">
+        <button id="saveEditBtn" class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+      </div>
     </div>
   </div>
-</div>
 
-  
   <!-- Firebase and Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -188,6 +187,7 @@
             editUserIdInput.value = button.dataset.userid || "";
             editBalanceInput.value = button.dataset.balance || "0.00";
             editModal.classList.remove("hidden");
+            usersTableBody.classList.add("hidden"); // Hides the users table
           });
         });
 
@@ -199,6 +199,7 @@
 
     cancelEditBtn.addEventListener("click", () => {
       editModal.classList.add("hidden");
+      usersTableBody.classList.remove("hidden"); // Show the table again
       currentEditUserDocId = "";
     });
 
@@ -218,6 +219,7 @@
           balance: updatedBalance
         });
         editModal.classList.add("hidden");
+        usersTableBody.classList.remove("hidden"); // Show table after save
         loadUsers();
       } catch (err) {
         alert("Failed to update user.");
