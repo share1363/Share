@@ -70,7 +70,7 @@
         <h3 id="username" class="text-lg font-bold text-yellow-400">Username</h3>
         <p id="email" class="text-sm text-yellow-300">user@example.com</p>
         <div class="flex items-center gap-2 mt-1">
-          <p id="userIdDisplay" class="text-xs text-gray-400">loading...</p>
+          <p class="text-xs text-gray-400">USER ID:<span id="userIdDisplay" class="font-semibold ml-1"></span></p>
           <button onclick="copyUserId()" class="text-yellow-400 hover:text-yellow-500 text-xs" title="Copy User ID">
             <i class="fa-solid fa-copy"></i>
           </button>
@@ -202,7 +202,7 @@
         document.getElementById("mainBalance").textContent = userData.balance ?? 0;
         document.getElementById("profileImage").src = userData.photoUrl || 'default-avatar.png';
         const userId = userData.userId || 'Unavailable';
-        document.getElementById("userIdDisplay").textContent = `USER ID: ${userId}`;
+        document.getElementById("userIdDisplay").textContent = `${userId}`;
         document.getElementById("userIdDisplay").setAttribute("data-userid", userId);
       }
       hideLoader();
@@ -256,4 +256,4 @@
 </script>
 
 </body>
-  </html>
+</html>
