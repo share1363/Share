@@ -45,12 +45,13 @@
         <div class="text-xl font-semibold text-blue-700 mb-2" id="totalUsersCount">Total Users: ...</div>
       </div>
 
-      <!-- Search Bar -->
-      <div class="bg-white shadow rounded p-4">
-        <input id="searchInput" type="text" placeholder="Search by User ID..." class="w-full p-2 border rounded" />
-      </div>
-
       <div class="bg-white shadow rounded p-4" id="usersContainer">
+        <!-- Search input -->
+        <div class="mb-4">
+          <input id="searchInput" type="text" placeholder="Search by User ID" class="w-full p-2 border rounded" />
+        </div>
+
+        <!-- User cards -->
         <div id="usersTableBody" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <div class="text-center text-gray-500 col-span-full">Loading users...</div>
         </div>
@@ -125,7 +126,6 @@
     const usersTableBody = document.getElementById("usersTableBody");
     const logoutBtn = document.getElementById("logoutBtn");
     const totalUsersCountElem = document.getElementById("totalUsersCount");
-    const searchInput = document.getElementById("searchInput");
 
     const inlineEditForm = document.getElementById("inlineEditForm");
     const editUserIdInput = document.getElementById("editUserId");
@@ -135,8 +135,10 @@
     const cancelEditBtn = document.getElementById("cancelEditBtn");
     const saveEditBtn = document.getElementById("saveEditBtn");
 
-    let currentEditUserDocId = "";
+    const searchInput = document.getElementById("searchInput");
+
     let allUsers = [];
+    let currentEditUserDocId = "";
 
     logoutBtn.addEventListener("click", async () => {
       await signOut(auth);
@@ -168,8 +170,12 @@
         const usersCol = collection(db, "users");
         const usersSnapshot = await getDocs(usersCol);
 
-        allUsers = [];
+        if (usersSnapshot.empty) {
+          usersTableBody.innerHTML = `<div class="col-span-full text-center p-4 text-gray-500">No users found.</div>`;
+          return;
+        }
 
+        allUsers = [];
         usersSnapshot.forEach((docSnap) => {
           const user = docSnap.data();
           allUsers.push({ docId: docSnap.id, ...user });
@@ -183,12 +189,13 @@
     }
 
     function renderUsers(users) {
-      if (!users.length) {
-        usersTableBody.innerHTML = `<div class="col-span-full text-center text-gray-500">No matching users found.</div>`;
+      let cardsHtml = "";
+
+      if (users.length === 0) {
+        usersTableBody.innerHTML = `<div class="col-span-full text-center p-4 text-gray-500">No users match your search.</div>`;
         return;
       }
 
-      let cardsHtml = "";
       users.forEach((user) => {
         cardsHtml += `
           <div class="bg-gray-50 border border-gray-200 rounded-lg shadow p-4 flex flex-col space-y-3">
@@ -234,14 +241,6 @@
       });
     }
 
-    searchInput.addEventListener("input", () => {
-      const query = searchInput.value.trim().toLowerCase();
-      const filteredUsers = allUsers.filter(user =>
-        (user.userId || "").toLowerCase().includes(query)
-      );
-      renderUsers(filteredUsers);
-    });
-
     cancelEditBtn.addEventListener("click", () => {
       inlineEditForm.classList.add("hidden");
       usersTableBody.classList.remove("hidden");
@@ -274,6 +273,14 @@
         alert("Failed to update user.");
         console.error(err);
       }
+    });
+
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.trim().toLowerCase();
+      const filtered = allUsers.filter(user =>
+        user.userId?.toLowerCase().includes(query)
+      );
+      renderUsers(filtered);
     });
 
     const sidebar = document.getElementById("sidebar");
