@@ -66,10 +66,9 @@
       </div>
 
       <button id="createAccountBtn" type="submit"
-        class="w-full text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500 font-extrabold py-2 rounded-sm relative flex justify-center items-center">
-        Create Account
-        <!-- Loading spinner -->
-        <svg id="loadingSpinner" class="hidden animate-spin h-5 w-5 ml-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        class="w-full text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500 font-extrabold py-2 rounded-sm flex justify-center items-center space-x-2">
+        <span id="btnText">Create Account</span>
+        <svg id="loadingSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
         </svg>
@@ -130,9 +129,11 @@
 
       const btn = document.getElementById("createAccountBtn");
       const spinner = document.getElementById("loadingSpinner");
-      
-      // Show spinner and disable button while processing
+      const btnText = document.getElementById("btnText");
+
+      // লোডিং শুরু: বাটনের টেক্সট হাইড, স্পিনার দেখানো, বাটন ডিসেবল করা
       btn.disabled = true;
+      btnText.classList.add("hidden");
       spinner.classList.remove("hidden");
 
       const username = document.getElementById("username").value.trim();
@@ -142,6 +143,7 @@
 
       if (!username || !email || !password) {
         spinner.classList.add("hidden");
+        btnText.classList.remove("hidden");
         btn.disabled = false;
         showError("Please fill in all required fields.");
         return;
@@ -149,6 +151,7 @@
 
       if (password.length < 6) {
         spinner.classList.add("hidden");
+        btnText.classList.remove("hidden");
         btn.disabled = false;
         showError("Password must be at least 6 characters long.");
         return;
@@ -172,7 +175,7 @@
           uid,
           username,
           email,
-          password, // Warning: saving plain text password is a security risk!
+          password,
           photoUrl: "",
           balance: 0,
           role: "user",
@@ -212,8 +215,9 @@
       } catch (error) {
         showError("Signup failed: " + error.message);
       } finally {
-        // Hide spinner and enable button again only if page not redirected
+        // লোডিং শেষ: বাটনের টেক্সট দেখানো, স্পিনার হাইড, বাটন এনেবল
         spinner.classList.add("hidden");
+        btnText.classList.remove("hidden");
         btn.disabled = false;
       }
     };
