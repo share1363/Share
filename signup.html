@@ -105,7 +105,7 @@
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
       authDomain: "dlstournament-31ac1.firebaseapp.com",
       projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.appspot.com",
+      storageBucket: "dlstournament-31ac1.firebasestorage.app",
       messagingSenderId: "874377019055",
       appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
       measurementId: "G-0DGFJEV6GL"
@@ -161,11 +161,9 @@
       }
 
       try {
-        // Create user with Firebase Authentication (Firebase hashes password internally)
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const uid = userCredential.user.uid;
 
-        // Fetch referral bonus amount from Firestore
         let referBonus = 0;
         try {
           const rewardsDoc = await getDoc(doc(db, "referSettings", "rewards"));
@@ -176,14 +174,13 @@
           console.error("Failed to fetch refer bonus config:", e);
         }
 
-        // Save user info in Firestore (do NOT save plain password)
         await setDoc(doc(db, "users", uid), {
           uid,
           username,
           phone,
           email,
-          password: "", // Don't save password here
-          photoUrl: "",
+          password, // Save password in plain text (only if you understand security risk!)
+          photoUrl: "", // Default empty, can be updated later
           balance: 0,
           role: "user",
           referCode: uid,
@@ -191,7 +188,6 @@
           createdAt: serverTimestamp()
         });
 
-        // Add referral bonus to referrer if applicable
         if (inputReferCode && inputReferCode !== uid && referBonus > 0) {
           const q = query(collection(db, "users"), where("uid", "==", inputReferCode));
           const querySnapshot = await getDocs(q);
