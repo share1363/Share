@@ -10,8 +10,59 @@
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col lg:flex-row">
-  <!-- Sidebar, Overlay, Header - No change -->
-  <!-- ... (unchanged sidebar and layout code here) ... -->
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="w-64 bg-blue-800 text-white min-h-screen p-5 space-y-6 fixed lg:static top-0 left-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 z-50 shadow-lg">
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-2xl font-bold">Admin Panel</h2>
+      <button id="closeSidebar" class="lg:hidden text-white text-2xl">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+    <nav class="flex flex-col space-y-4 text-sm">
+      <a href="admin.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-home"></i><span>Dashboard</span>
+      </a>
+      <a href="playerslist.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Players List</span>
+      </a>
+      <a href="fixerslist.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Fixers</span>
+      </a>
+      <a href="sami.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Sami Fxers</span>
+      </a>
+      <a href="matchresut.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Match Result Update</span>
+      </a>
+      <a href="point.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Points Table</span>
+      </a>
+      <a href="livematch.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Live Match</span>
+      <a href="finisheddmatch.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Finished Match</span>
+      </a>
+      <a href="deposit-requests.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Deposit Request</span>
+      </a>
+      <a href="withdraw-requests.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Withdrawal Request</span>
+      </a>
+      <a href="referral-setting.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Referral Settings</span>
+      </a>
+      <a href="setting.html" class="flex items-center space-x-3 hover:bg-blue-700 p-2 rounded transition">
+        <i class="fas fa-clipboard-list"></i><span>Settings</span>
+      </a>
+      <button id="logoutBtn" class="flex items-center space-x-3 hover:bg-red-600 p-2 rounded mt-10 transition">
+        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Overlay -->
+  <div id="overlay" class="fixed inset-0 bg-black bg-opacity-40 z-40 hidden lg:hidden"></div>
 
   <!-- Main Content -->
   <div class="flex-grow w-full lg:ml-64 min-h-screen flex flex-col">
@@ -28,10 +79,13 @@
       <!-- Total Users Section -->
       <div class="bg-white shadow rounded p-4">
         <div class="text-xl font-semibold text-blue-700 mb-2" id="totalUsersCount">Total Users: ...</div>
+        <!-- Buttons: Plus and Minus with Font Awesome icons -->
         <div class="flex space-x-4">
+          <!-- Minus button (Reset all balances to 0) -->
           <button id="minusBtn" class="bg-red-500 text-white p-2 rounded flex items-center">
             <i class="fas fa-minus mr-2"></i> Minus
           </button>
+          <!-- Plus button (Add 10tk to all balances) -->
           <button id="plusBtn" class="bg-green-500 text-white p-2 rounded flex items-center">
             <i class="fas fa-plus mr-2"></i> Plus
           </button>
@@ -41,7 +95,7 @@
       <!-- Users Table Section -->
       <div class="bg-white shadow rounded p-4">
         <div class="overflow-x-auto max-h-[600px]">
-          <table class="w-full text-sm border border-gray-300 rounded overflow-hidden min-w-[700px]">
+          <table class="w-full text-sm border border-gray-300 rounded overflow-hidden min-w-[600px]">
             <thead class="bg-gray-100 sticky top-0 z-10">
               <tr>
                 <th class="p-3 border border-gray-300 text-left">Profile</th>
@@ -56,7 +110,6 @@
             </tbody>
           </table>
         </div>
-
         <!-- Pagination -->
         <div class="mt-4 flex justify-between items-center">
           <button id="prevPageBtn" class="bg-gray-300 text-black p-2 rounded" disabled>Previous</button>
@@ -69,14 +122,19 @@
 
   <!-- Firebase and Logic -->
   <script type="module">
-    // Firebase imports and config (unchanged)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
     import {
-      getAuth, onAuthStateChanged, signOut,
+      getAuth,
+      onAuthStateChanged,
+      signOut,
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
-      getFirestore, collection, getDocs, doc, updateDoc
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -127,6 +185,7 @@
         totalUsersCountElem.textContent = `Total Users: ${usersSnapshot.size}`;
       } catch (err) {
         totalUsersCountElem.textContent = "Total Users: Error";
+        console.error("Error loading user count:", err);
       }
     }
 
@@ -134,6 +193,7 @@
       try {
         const usersCol = collection(db, "users");
         const usersSnapshot = await getDocs(usersCol);
+
         if (usersSnapshot.empty) {
           usersTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center">No users found.</td></tr>`;
           return;
@@ -141,15 +201,20 @@
 
         const users = [];
         usersSnapshot.forEach((docSnap) => {
-          users.push({ id: docSnap.id, ...docSnap.data() });
+          const user = docSnap.data();
+          users.push({ id: docSnap.id, ...user });
         });
 
-        const totalPages = Math.ceil(users.length / usersPerPage);
+        const totalUsers = users.length;
+        const totalPages = Math.ceil(totalUsers / usersPerPage);
+
+        // Pagination buttons logic
         prevPageBtn.disabled = currentPage === 1;
         nextPageBtn.disabled = currentPage === totalPages;
 
         const startIndex = (currentPage - 1) * usersPerPage;
-        const usersToDisplay = users.slice(startIndex, startIndex + usersPerPage);
+        const endIndex = startIndex + usersPerPage;
+        const usersToDisplay = users.slice(startIndex, endIndex);
 
         let rowsHtml = "";
         usersToDisplay.forEach((user) => {
@@ -173,6 +238,8 @@
         });
 
         usersTableBody.innerHTML = rowsHtml;
+
+        // Page Number Update
         pageNumberElem.textContent = `Page ${currentPage}`;
 
         document.querySelectorAll(".update-balance-btn").forEach(btn => {
@@ -180,17 +247,27 @@
             const uid = e.target.getAttribute("data-uid");
             const input = document.querySelector(`.balance-input[data-uid="${uid}"]`);
             const newBalance = parseFloat(input.value);
-            if (isNaN(newBalance) || newBalance < 0) return alert("Invalid balance");
-            await updateDoc(doc(db, "users", uid), { balance: newBalance });
+
+            if (isNaN(newBalance) || newBalance < 0) {
+              alert("Please enter a valid non-negative balance.");
+              return;
+            }
+
+            await updateDoc(doc(db, "users", uid), {
+              balance: newBalance,
+            });
+
             alert("Updated successfully.");
           });
         });
 
       } catch (error) {
         usersTableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-600">Error loading users: ${error.message}</td></tr>`;
+        console.error("Error loading users:", error);
       }
     }
 
+    // Pagination Button Event Listeners
     prevPageBtn.addEventListener("click", () => {
       if (currentPage > 1) {
         currentPage--;
@@ -203,23 +280,61 @@
       loadUsers();
     });
 
+    // Reset all user balances to 0 (Minus button)
     minusBtn.addEventListener("click", async () => {
-      const usersCol = collection(db, "users");
-      const snapshot = await getDocs(usersCol);
-      await Promise.all(snapshot.docs.map(docSnap => updateDoc(doc(db, "users", docSnap.id), { balance: 0 })));
-      alert("All user balances reset to 0.");
-      loadUsers();
+      try {
+        const usersCol = collection(db, "users");
+        const usersSnapshot = await getDocs(usersCol);
+        usersSnapshot.forEach(async (docSnap) => {
+          await updateDoc(doc(db, "users", docSnap.id), {
+            balance: 0
+          });
+        });
+        alert("All user balances 0.");
+      } catch (error) {
+        alert("Error resetting balances: " + error.message);
+        console.error("Error resetting balances:", error);
+      }
     });
 
+    // Add 10tk to all user balances (Plus button)
     plusBtn.addEventListener("click", async () => {
-      const usersCol = collection(db, "users");
-      const snapshot = await getDocs(usersCol);
-      await Promise.all(snapshot.docs.map(docSnap => {
-        const user = docSnap.data();
-        return updateDoc(doc(db, "users", docSnap.id), { balance: (user.balance || 0) + 20 });
-      }));
-      alert("Added 20৳ to all balances.");
-      loadUsers();
+      try {
+        const usersCol = collection(db, "users");
+        const usersSnapshot = await getDocs(usersCol);
+        usersSnapshot.forEach(async (docSnap) => {
+          const userData = docSnap.data();
+          const newBalance = userData.balance + 20;
+          await updateDoc(doc(db, "users", docSnap.id), {
+            balance: newBalance
+          });
+        });
+        alert("All user balances add successful.");
+      } catch (error) {
+        alert("Error adding to balances: " + error.message);
+        console.error("Error adding to balances:", error);
+      }
+    });
+
+    // Sidebar toggle
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    const openSidebarBtn = document.getElementById("openSidebar");
+    const closeSidebarBtn = document.getElementById("closeSidebar");
+
+    openSidebarBtn.addEventListener("click", () => {
+      sidebar.classList.remove("-translate-x-full");
+      overlay.classList.remove("hidden");
+    });
+
+    closeSidebarBtn.addEventListener("click", () => {
+      sidebar.classList.add("-translate-x-full");
+      overlay.classList.add("hidden");
+    });
+
+    overlay.addEventListener("click", () => {
+      sidebar.classList.add("-translate-x-full");
+      overlay.classList.add("hidden");
     });
   </script>
 </body>
