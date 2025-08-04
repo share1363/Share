@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Joining Form</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-black text-white">
 
   <!-- Header -->
-  <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
+  <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between rounded-b-xl">
     <div class="flex items-center gap-2">
       <div class="bg-yellow-600 bg-opacity-50 border border-yellow-500 text-yellow-300 w-8 h-8 flex items-center justify-center font-bold rounded-full shadow" style="font-family: 'Audiowide', cursive;">DL</div>
       <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent" style="font-family: 'Audiowide', cursive;">D.C.L TOUR</h2>
     </div>
-    <div style="height: 30px;" class="flex items-center gap-1 bg-black px-1 py-1 rounded-full shadow-lg border border-gray-600 ml-8">
+    <div class="flex items-center gap-1 bg-black px-1 py-1 rounded-full shadow-lg border border-gray-600 ml-8">
       <div class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
         <i class="fa-solid fa-bangladeshi-taka-sign text-white text-sm"></i>
       </div>
@@ -34,7 +34,7 @@
       <div class="mb-5 flex items-center gap-3 bg-yellow-900 bg-opacity-20 rounded-lg p-1 border border-yellow-500 shadow-inner">
         <i class="fa-solid fa-exclamation-triangle text-yellow-400 text-2xl"></i>
         <p class="text-yellow-300 font-semibold text-sm" style="font-family: 'Audiowide', cursive;">
-          📣 Alert Message : যারা একটিভ থাকবেন এবং প্রতিদিনের ম্যাচ প্রতিদিন খেলতে পারবেন শুধু তারাই টুর্নামেন্টের রেজিস্ট্রেশন করবেন দয়া করে সময় মত না খেলতে পারলে রেজিস্ট্রেশন করবেন না।
+          📣 যারা একটিভ থাকবেন এবং প্রতিদিনের ম্যাচ খেলতে পারবেন শুধু তারাই টুর্নামেন্টে যোগ দিন।
         </p>
       </div>
       <div class="bg-gray-900 rounded-lg shadow-xl border border-gray-700 bg-cover bg-center" style="background-image: url('863247.jpeg');">
@@ -47,10 +47,10 @@
           <h1 style="font-family: 'Audiowide', cursive;" class="text-center text-sm font-semibold text-gray-200 mb-2">Tournament Joining Form</h1>
 
           <form class="space-y-4" id="registration-form">
-            <input type="text" id="team" name="team" required placeholder="Enter your DLS team name" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <input type="number" step="any" id="dls-rating" name="dls-rating" required placeholder="Enter your DLS rating" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <input type="number" id="age" name="age" required placeholder="Enter your age" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <input type="number" id="years-played" name="years-played" required placeholder="How many years have you played DLS" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
+            <input type="text" id="team" required placeholder="Enter your DLS team name" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
+            <input type="number" step="any" id="dls-rating" required placeholder="Enter your DLS rating" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
+            <input type="number" id="age" required placeholder="Enter your age" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
+            <input type="number" id="years-played" required placeholder="How many years have you played DLS" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
             <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded-md transition duration-300">Join Now</button>
           </form>
         </div>
@@ -58,7 +58,6 @@
     </div>
   </main>
 
-  <!-- Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
@@ -74,7 +73,6 @@
       storageBucket: "dlstournament-31ac1.appspot.com",
       messagingSenderId: "874377019055",
       appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
-      measurementId: "G-0DGFJEV6GL"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -93,7 +91,7 @@
         const data = docSnap.data();
         slot = data?.slot ?? 0;
         slotUsed = data?.slotUsed ?? 0;
-        joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
+        joiningSlot.textContent = `Slot: ${slotUsed}/${slot}`;
       }
     }
 
@@ -144,13 +142,13 @@
         return Swal.fire({ icon: 'error', title: 'Slot Full', text: 'All slots are already taken.', timer: 3000, showConfirmButton: false });
       }
 
-      const snapshot = await getDocs(query(collection(db, "tourReg"), where("uid", "==", currentUser.uid)));
+      const snapshot = await getDocs(query(collection(db, "tourReg", "playerReg", "playerReg"), where("uid", "==", currentUser.uid)));
       if (!snapshot.empty) {
         Swal.close();
         return Swal.fire({ icon: 'error', title: 'Already Registered', text: 'You have already registered.', confirmButtonColor: '#EF4444' });
       }
 
-      const teamSnapshot = await getDocs(query(collection(db, "tourReg"), where("team", "==", team)));
+      const teamSnapshot = await getDocs(query(collection(db, "tourReg", "playerReg", "playerReg"), where("team", "==", team)));
       if (!teamSnapshot.empty) {
         Swal.close();
         return Swal.fire({ icon: 'error', title: 'Team Exists', text: 'Team name already used.', confirmButtonColor: '#EF4444' });
@@ -169,21 +167,15 @@
           const data = slotSnap.data();
           if (data.slotUsed >= data.slot) throw new Error("Slot full.");
 
-          const playerRef = doc(collection(db, "tourReg")); // 🔥 random ID
-          transaction.set(playerRef, {
+          const playerRegCollectionRef = collection(db, "tourReg", "playerReg", "playerReg");
+          transaction.set(doc(playerRegCollectionRef), {
             team, dlsRating, age, yearsPlayed,
             uid: currentUser.uid, username, photoUrl,
             createdAt: new Date()
           });
 
-          transaction.update(slotRef, {
-            slotUsed: data.slotUsed + 1,
-            slot: data.slot - 1
-          });
-
-          transaction.update(doc(db, "users", currentUser.uid), {
-            balance: balance - joiningFee
-          });
+          transaction.update(slotRef, { slotUsed: data.slotUsed + 1, slot: data.slot - 1 });
+          transaction.update(doc(db, "users", currentUser.uid), { balance: balance - joiningFee });
 
           slotUsed = data.slotUsed + 1;
           slot = data.slot - 1;
