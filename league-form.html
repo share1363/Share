@@ -28,43 +28,46 @@
     </div>
   </header>
 
-  <!-- Main Form -->
-  <main class="w-full max-w-md mt-3 px-4 mx-auto mb-20">
-    <div class="p-2">
-      <div class="mb-5 flex items-center gap-3 bg-yellow-900 bg-opacity-20 rounded-lg p-1 border border-yellow-500 shadow-inner">
-        <i class="fa-solid fa-exclamation-triangle text-yellow-400 text-2xl"></i>
-        <p class="text-yellow-300 font-semibold text-sm" style="font-family: 'Audiowide', cursive;">
-          📣 যারা একটিভ থাকবেন এবং প্রতিদিনের ম্যাচ খেলতে পারবেন শুধু তারাই টুর্নামেন্টে যোগ দিন।
-        </p>
-      </div>
-      <div class="bg-gray-900 rounded-lg shadow-xl border border-gray-700 bg-cover bg-center" style="background-image: url('863247.jpeg');">
-        <div class="bg-black bg-opacity-50 p-4 rounded-md">
-          <div class="bg-yellow-900 bg-opacity-20 border border-gray-700 rounded-md p-1 mb-4">
-            <p id="joiningSlot" class="text-center text-yellow-300 mb-1 font-medium">Loading...</p>
-            <p id="joiningFee" class="text-center text-yellow-300 font-medium">Loading...</p>
+    <!-- Main Content -->
+  <main class="flex-grow p-4 max-w-4xl mx-auto">
+    <div class="bg-white shadow rounded p-4">
+      <form id="playerForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="tourSelect" class="block text-sm font-medium text-gray-700">Select Tournament</label>
+            <select id="tourSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-green-200 text-sm p-2" required>
+              <option value="">-- Select Tournament --</option>
+            </select>
           </div>
-
-          <h1 style="font-family: 'Audiowide', cursive;" class="text-center text-sm font-semibold text-gray-200 mb-2">Tournament Joining Form</h1>
-
-          <form class="space-y-4" id="registration-form">
-            <input type="text" id="team" required placeholder="Enter your DLS team name" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <input type="number" step="any" id="dls-rating" required placeholder="Enter your DLS rating" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <input type="number" id="age" required placeholder="Enter your age" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <input type="number" id="years-played" required placeholder="How many years have you played DLS" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded-md transition duration-300">Join Now</button>
-          </form>
+          <div>
+            <label for="team" class="block text-sm font-medium text-gray-700">Team</label>
+            <input type="text" id="team" name="team" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-green-200 text-sm p-2" placeholder="Enter team name" required>
+          </div>
+          <div>
+            <label for="dls-rating" class="block text-sm font-medium text-gray-700">DLS Rating</label>
+            <input type="number" id="dls-rating" name="rating" step="any" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-green-200 text-sm p-2" placeholder="Enter DLS rating" required>
+          </div>
+          <div>
+            <label for="age" class="block text-sm font-medium text-gray-700">Age</label>
+            <input type="number" id="age" name="age" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-green-200 text-sm p-2" placeholder="Enter age" required>
+          </div>
+          <div>
+            <label for="years-played" class="block text-sm font-medium text-gray-700">Played Years</label>
+            <input type="number" id="years-played" name="playedYears" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-green-200 text-sm p-2" placeholder="Enter played years" required>
+          </div>
         </div>
-      </div>
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded">
+          Register Player
+        </button>
+      </form>
     </div>
   </main>
 
+  <!-- Firebase + Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getFirestore, collection, addDoc, doc, getDoc, getDocs,
-      runTransaction, query, where, updateDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
@@ -73,124 +76,68 @@
       storageBucket: "dlstournament-31ac1.appspot.com",
       messagingSenderId: "874377019055",
       appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL"
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    let currentUser = null, slot = null, slotUsed = 0, joiningFee = null;
-    const mainBalance = document.getElementById("mainBalance");
-    const joiningSlot = document.getElementById("joiningSlot");
-    const joiningFeeDisplay = document.getElementById("joiningFee");
-
-    async function loadSlotInfo() {
-      const slotDocRef = doc(db, "settings", "slot");
-      const docSnap = await getDoc(slotDocRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        slot = data?.slot ?? 0;
-        slotUsed = data?.slotUsed ?? 0;
-        joiningSlot.textContent = `Slot: ${slotUsed}/${slot}`;
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        loadTournamentOptions();
       }
-    }
-
-    async function loadJoiningFee() {
-      const feeDocRef = doc(db, "settings", "joiningFee");
-      const docSnap = await getDoc(feeDocRef);
-      joiningFee = docSnap.exists() ? (docSnap.data()?.fee || 0) : 0;
-      joiningFeeDisplay.textContent = `Entry Fee: ৳${joiningFee}`;
-    }
-
-    async function getUserInfo(uid) {
-      const docSnap = await getDoc(doc(db, "users", uid));
-      const data = docSnap.data();
-      return {
-        username: data?.username ?? "",
-        photoUrl: data?.photoUrl ?? "",
-        balance: data?.balance ?? 0
-      };
-    }
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return window.location.href = "login.html";
-      currentUser = user;
-      await loadSlotInfo();
-      await loadJoiningFee();
-      const userData = await getUserInfo(user.uid);
-      mainBalance.innerText = userData.balance.toFixed(0);
     });
 
-    const form = document.getElementById("registration-form");
-
-    form.addEventListener("submit", async (e) => {
+    document.getElementById("playerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      Swal.fire({ title: 'Processing...', text: 'Please wait...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+      const tourId = document.getElementById("tourSelect").value;
+      const team = document.getElementById("team").value.trim();
+      const rating = parseFloat(document.getElementById("dls-rating").value);
+      const age = parseInt(document.getElementById("age").value);
+      const playedYears = parseInt(document.getElementById("years-played").value);
 
-      const team = form['team'].value.trim();
-      const dlsRating = form['dls-rating'].value.trim();
-      const age = form['age'].value.trim();
-      const yearsPlayed = form['years-played'].value.trim();
-
-      if (!team || !dlsRating || !age || !yearsPlayed) {
-        Swal.close();
-        return Swal.fire({ icon: 'warning', text: 'All fields are required.', confirmButtonColor: '#F59E0B' });
-      }
-
-      if (slotUsed >= slot) {
-        Swal.close();
-        return Swal.fire({ icon: 'error', title: 'Slot Full', text: 'All slots are already taken.', timer: 3000, showConfirmButton: false });
-      }
-
-      const snapshot = await getDocs(query(collection(db, "tourReg", "playerReg", "playerReg"), where("uid", "==", currentUser.uid)));
-      if (!snapshot.empty) {
-        Swal.close();
-        return Swal.fire({ icon: 'error', title: 'Already Registered', text: 'You have already registered.', confirmButtonColor: '#EF4444' });
-      }
-
-      const teamSnapshot = await getDocs(query(collection(db, "tourReg", "playerReg", "playerReg"), where("team", "==", team)));
-      if (!teamSnapshot.empty) {
-        Swal.close();
-        return Swal.fire({ icon: 'error', title: 'Team Exists', text: 'Team name already used.', confirmButtonColor: '#EF4444' });
-      }
-
-      const { username, photoUrl, balance } = await getUserInfo(currentUser.uid);
-      if (balance < joiningFee) {
-        Swal.close();
-        return Swal.fire({ icon: 'error', title: 'Insufficient Balance', text: `Current balance: ৳${balance.toFixed(0)}`, confirmButtonColor: '#EF4444' });
+      if (!tourId || !team || isNaN(rating) || rating < 0 || isNaN(age) || age <= 0 || isNaN(playedYears) || playedYears < 0) {
+        alert("Please fill in all fields with valid values.");
+        return;
       }
 
       try {
-        await runTransaction(db, async (transaction) => {
-          const slotRef = doc(db, "settings", "slot");
-          const slotSnap = await transaction.get(slotRef);
-          const data = slotSnap.data();
-          if (data.slotUsed >= data.slot) throw new Error("Slot full.");
-
-          const playerRegCollectionRef = collection(db, "tourReg", "playerReg", "playerReg");
-          transaction.set(doc(playerRegCollectionRef), {
-            team, dlsRating, age, yearsPlayed,
-            uid: currentUser.uid, username, photoUrl,
-            createdAt: new Date()
-          });
-
-          transaction.update(slotRef, { slotUsed: data.slotUsed + 1, slot: data.slot - 1 });
-          transaction.update(doc(db, "users", currentUser.uid), { balance: balance - joiningFee });
-
-          slotUsed = data.slotUsed + 1;
-          slot = data.slot - 1;
-          joiningSlot.textContent = `Slot: ${slotUsed}/${slot}`;
+        await addDoc(collection(db, "tourReg", tourId, "players"), {
+          team,
+          rating,
+          age,
+          playedYears,
+          createdAt: new Date()
         });
-
-        Swal.close();
-        Swal.fire({ icon: 'success', title: 'Success', text: 'You have successfully joined!', confirmButtonColor: '#F59E0B' });
-        form.reset();
-
+        alert("Player registered successfully!");
+        e.target.reset();
       } catch (err) {
-        Swal.close();
-        Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Failed to join.', confirmButtonColor: '#EF4444' });
+        console.error("Error registering player:", err);
+        alert("Failed to register player.");
       }
     });
+
+    async function loadTournamentOptions() {
+      const select = document.getElementById("tourSelect");
+      select.innerHTML = `<option value="">-- Select Tournament --</option>`;
+
+      try {
+        const snap = await getDocs(collection(db, "tourReg"));
+        snap.forEach(doc => {
+          const data = doc.data();
+          const option = document.createElement("option");
+          option.value = doc.id;
+          option.textContent = data.tourName || "Untitled";
+          select.appendChild(option);
+        });
+      } catch (err) {
+        console.error("Error loading tournament options:", err);
+      }
+    }
   </script>
+
 </body>
 </html>
