@@ -109,7 +109,7 @@
       measurementId: "G-0DGFJEV6GL"
     };
 
-    const app = initializeApp(firebaseConfig); // ✅ This line was missing
+    const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
@@ -182,13 +182,13 @@
         return Swal.fire({ icon: 'error', title: 'Slot Full', text: 'All slots are already taken.', timer: 3000, timerProgressBar: true, showConfirmButton: false });
       }
 
-      const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
+      const snapshot = await getDocs(query(collection(db, "tourReg"), where("uid", "==", currentUser.uid)));
       if (!snapshot.empty) {
         Swal.close();
         return Swal.fire({ icon: 'error', title: 'Already Registered', text: 'You have already registered.', confirmButtonColor: '#EF4444' });
       }
 
-      const teamSnapshot = await getDocs(query(collection(db, "playersform"), where("team", "==", team)));
+      const teamSnapshot = await getDocs(query(collection(db, "tourReg"), where("team", "==", team)));
       if (!teamSnapshot.empty) {
         Swal.close();
         return Swal.fire({ icon: 'error', title: 'Team Exists', text: 'Team name already used.', confirmButtonColor: '#EF4444' });
@@ -207,7 +207,7 @@
           const data = slotSnap.data();
           if (data.slotUsed >= data.slot) throw new Error("Slot full.");
 
-          transaction.set(doc(collection(db, "playersform")), {
+          transaction.set(doc(collection(db, "tourReg")), {
             team, dlsRating, age, yearsPlayed,
             uid: currentUser.uid, username, photoUrl,
             createdAt: new Date()
