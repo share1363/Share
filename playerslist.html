@@ -61,7 +61,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
@@ -85,7 +85,7 @@
       }
     });
 
-    // Add or overwrite "createInfo" document
+    // Add new tournament
     document.getElementById("tourForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -99,15 +99,13 @@
       }
 
       try {
-        const tourRef = doc(db, "tourReg", "createInfo");
-        await setDoc(tourRef, {
+        await addDoc(collection(db, "tourReg"), {
           tourName,
           entryFee,
           slot,
-          status: "Running",
+          status: "Running", // Default status added
           createdAt: new Date()
         });
-
         alert("Tournament created successfully!");
         e.target.reset();
         loadTournaments();
@@ -117,40 +115,40 @@
       }
     });
 
-    // Load the "createInfo" tournament document
+    // Load tournaments
     async function loadTournaments() {
       const list = document.getElementById("tournamentList");
       const loadingText = document.getElementById("loadingTours");
-      list.innerHTML = "";
+      list.innerHTML = ""; // Clear previous content
 
       try {
-        const tourRef = doc(db, "tourReg", "createInfo");
-        const docSnap = await getDoc(tourRef);
+        const snap = await getDocs(collection(db, "tourReg"));
 
-        if (!docSnap.exists()) {
+        if (snap.empty) {
           list.innerHTML = `<div class="text-gray-500 text-center">No tournaments found.</div>`;
           return;
         }
 
-        const data = docSnap.data();
+        snap.forEach(docSnap => {
+          const data = docSnap.data();
 
-        const div = document.createElement("div");
-        div.className = "p-3 bg-gray-50 border border-gray-200 rounded shadow-sm flex justify-between items-center";
+          const div = document.createElement("div");
+          div.className = "p-3 bg-gray-50 border border-gray-200 rounded shadow-sm flex justify-between items-center";
 
-        div.innerHTML = `
-          <div class="text-sm text-gray-800">
-            <strong>${data.tourName || "Untitled"}</strong><br>
-            <span class="text-xs text-gray-600">Slot: ${data.slot || "N/A"}</span><br>
-            <span class="text-xs text-gray-600">Entry Fee: ৳${data.entryFee || 0}</span><br>
-            <span class="text-xs text-green-600 font-medium">Status: ${data.status || "Unknown"}</span>
-          </div>
-        `;
+          div.innerHTML = `
+            <div class="text-sm text-gray-800">
+              <strong>${data.tourName || "Untitled"}</strong><br>
+              <span class="text-xs text-gray-600">Slot: ${data.slot || "N/A"}</span><br>
+              <span class="text-xs text-gray-600">Entry Fee: ₹${data.entryFee || 0}</span><br>
+              <span class="text-xs text-green-600 font-medium">Status: ${data.status || "Unknown"}</span>
+            </div>
+          `;
 
-        list.appendChild(div);
-
+          list.appendChild(div);
+        });
       } catch (error) {
-        console.error("Error loading tournament:", error);
-        list.innerHTML = `<div class="text-red-600 text-center">Error loading tournament.</div>`;
+        console.error("Error loading tournaments:", error);
+        list.innerHTML = `<div class="text-red-600 text-center">Error loading tournaments.</div>`;
       }
     }
   </script>
