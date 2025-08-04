@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-black text-white">
+<body class="bg-black text-white min-h-screen">
 
   <!-- Header -->
   <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between rounded-b-xl">
@@ -30,30 +30,30 @@
 
   <!-- Main Content -->
   <main class="flex-grow p-4 max-w-4xl mx-auto">
-    <div class="bg-white shadow rounded p-4">
+    <div class="bg-gray-900 text-white shadow rounded-lg p-4 border border-gray-700">
       <form id="playerForm" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label for="tourSelect" class="block text-sm font-medium text-gray-700">Select Tournament</label>
-            <select id="tourSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-green-200 text-sm p-2" required>
+            <label for="tourSelect" class="block text-sm font-medium text-gray-300">Select Tournament</label>
+            <select id="tourSelect" class="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white focus:ring focus:ring-green-400 text-sm p-2" required>
               <option value="">-- Select Tournament --</option>
             </select>
           </div>
           <div>
-            <label for="team" class="block text-sm font-medium text-gray-700">Team</label>
-            <input type="text" id="team" name="team" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-green-200 text-sm p-2" placeholder="Enter team name" required>
+            <label for="team" class="block text-sm font-medium text-gray-300">Team</label>
+            <input type="text" id="team" name="team" class="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white focus:ring focus:ring-green-400 text-sm p-2" placeholder="Enter team name" required>
           </div>
           <div>
-            <label for="dls-rating" class="block text-sm font-medium text-gray-700">DLS Rating</label>
-            <input type="number" id="dls-rating" name="rating" step="any" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-green-200 text-sm p-2" placeholder="Enter DLS rating" required>
+            <label for="dls-rating" class="block text-sm font-medium text-gray-300">DLS Rating</label>
+            <input type="number" id="dls-rating" name="rating" step="any" class="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white focus:ring focus:ring-green-400 text-sm p-2" placeholder="Enter DLS rating" required>
           </div>
           <div>
-            <label for="age" class="block text-sm font-medium text-gray-700">Age</label>
-            <input type="number" id="age" name="age" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-green-200 text-sm p-2" placeholder="Enter age" required>
+            <label for="age" class="block text-sm font-medium text-gray-300">Age</label>
+            <input type="number" id="age" name="age" class="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white focus:ring focus:ring-green-400 text-sm p-2" placeholder="Enter age" required>
           </div>
           <div>
-            <label for="years-played" class="block text-sm font-medium text-gray-700">Played Years</label>
-            <input type="number" id="years-played" name="playedYears" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-green-200 text-sm p-2" placeholder="Enter played years" required>
+            <label for="years-played" class="block text-sm font-medium text-gray-300">Played Years</label>
+            <input type="number" id="years-played" name="playedYears" class="mt-1 block w-full rounded-md bg-gray-800 border-gray-700 text-white focus:ring focus:ring-green-400 text-sm p-2" placeholder="Enter played years" required>
           </div>
         </div>
         <button type="submit" class="bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded">
@@ -112,11 +112,11 @@
     }
 
     async function loadSlotInfo() {
-      // Placeholder function (define your logic here if needed)
+      // Placeholder for slot info logic if needed
     }
 
     async function loadJoiningFee() {
-      // Placeholder function (define your logic here if needed)
+      // Placeholder for joining fee logic if needed
     }
 
     document.getElementById("playerForm").addEventListener("submit", async (e) => {
