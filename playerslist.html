@@ -33,6 +33,10 @@
             <input type="text" id="tourName" name="tourName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 text-sm p-2" placeholder="Enter tour name" required>
           </div>
           <div>
+            <label for="entryFee" class="block text-sm font-medium text-gray-700">Entry Fee</label>
+            <input type="number" id="entryFee" name="entryFee" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 text-sm p-2" placeholder="Enter entry fee" required>
+          </div>
+          <div>
             <label for="slot" class="block text-sm font-medium text-gray-700">Slot</label>
             <input type="number" id="slot" name="slot" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 text-sm p-2" placeholder="Enter number of slots" required>
           </div>
@@ -86,17 +90,20 @@
       e.preventDefault();
 
       const tourName = document.getElementById("tourName").value.trim();
+      const entryFee = parseFloat(document.getElementById("entryFee").value);
       const slot = parseInt(document.getElementById("slot").value);
 
-      if (!tourName || isNaN(slot) || slot <= 0) {
-        alert("Please fill in both fields with valid values.");
+      if (!tourName || isNaN(entryFee) || entryFee < 0 || isNaN(slot) || slot <= 0) {
+        alert("Please fill in all fields with valid values.");
         return;
       }
 
       try {
         await addDoc(collection(db, "tourReg"), {
           tourName,
+          entryFee,
           slot,
+          status: "Running", // Default status added
           createdAt: new Date()
         });
         alert("Tournament created successfully!");
@@ -131,7 +138,9 @@
           div.innerHTML = `
             <div class="text-sm text-gray-800">
               <strong>${data.tourName || "Untitled"}</strong><br>
-              <span class="text-xs text-gray-600">Slot: ${data.slot || "N/A"}</span>
+              <span class="text-xs text-gray-600">Slot: ${data.slot || "N/A"}</span><br>
+              <span class="text-xs text-gray-600">Entry Fee: ₹${data.entryFee || 0}</span><br>
+              <span class="text-xs text-green-600 font-medium">Status: ${data.status || "Unknown"}</span>
             </div>
           `;
 
