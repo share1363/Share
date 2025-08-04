@@ -81,6 +81,12 @@
       </form>
     </div>
 
+    <!-- Players List -->
+    <div id="playersContainer" class="bg-white shadow rounded p-4 hidden">
+      <div class="text-xl font-semibold text-purple-700 mb-4">Players in Selected Tournament</div>
+      <div id="playersList" class="grid md:grid-cols-2 gap-4"></div>
+    </div>
+
     <!-- Tournament List Section -->
     <div class="bg-white shadow rounded p-4">
       <div class="text-xl font-semibold text-blue-700 mb-4">Tournaments</div>
@@ -120,16 +126,15 @@
       }
     });
 
-    // Create Tournament
+    // Tournament Creation
     document.getElementById("tourForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const tourName = document.getElementById("tourName").value.trim();
       const entryFee = parseFloat(document.getElementById("entryFee").value);
       const slot = parseInt(document.getElementById("slot").value);
 
-      if (!tourName || isNaN(entryFee) || entryFee < 0 || isNaN(slot) || slot <= 0) {
-        alert("Please fill in all fields with valid values.");
+      if (!tourName || isNaN(entryFee) || isNaN(slot)) {
+        alert("Invalid input.");
         return;
       }
 
@@ -141,17 +146,17 @@
           status: "Running",
           createdAt: new Date()
         });
-        alert("Tournament created successfully!");
+        alert("Tournament created.");
         e.target.reset();
         loadTournaments();
         loadTournamentOptions();
       } catch (err) {
-        console.error("Error adding tournament:", err);
+        console.error(err);
         alert("Failed to create tournament.");
       }
     });
 
-    // Register Player
+    // Player Registration
     document.getElementById("playerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -161,8 +166,8 @@
       const age = parseInt(document.getElementById("age").value);
       const playedYears = parseInt(document.getElementById("playedYears").value);
 
-      if (!tourId || !team || isNaN(rating) || rating < 0 || isNaN(age) || age <= 0 || isNaN(playedYears) || playedYears < 0) {
-        alert("Please fill in all fields with valid values.");
+      if (!tourId || !team || isNaN(rating) || isNaN(age) || isNaN(playedYears)) {
+        alert("Invalid input.");
         return;
       }
 
@@ -174,48 +179,42 @@
           playedYears,
           createdAt: new Date()
         });
-        alert("Player registered successfully!");
+        alert("Player registered.");
         e.target.reset();
+        loadPlayersForTournament(tourId);
       } catch (err) {
-        console.error("Error registering player:", err);
+        console.error(err);
         alert("Failed to register player.");
       }
     });
 
-    // Load Tournaments
+    // Load Tournament List
     async function loadTournaments() {
       const list = document.getElementById("tournamentList");
-      const loadingText = document.getElementById("loadingTours");
       list.innerHTML = "";
 
       try {
         const snap = await getDocs(collection(db, "tourReg"));
-
         if (snap.empty) {
           list.innerHTML = `<div class="text-gray-500 text-center">No tournaments found.</div>`;
           return;
         }
 
-        snap.forEach(docSnap => {
-          const data = docSnap.data();
-
+        snap.forEach(doc => {
+          const data = doc.data();
           const div = document.createElement("div");
-          div.className = "p-3 bg-gray-50 border border-gray-200 rounded shadow-sm flex justify-between items-center";
-
+          div.className = "p-3 bg-gray-50 border border-gray-200 rounded shadow-sm";
           div.innerHTML = `
-            <div class="text-sm text-gray-800">
-              <strong>${data.tourName || "Untitled"}</strong><br>
-              <span class="text-xs text-gray-600">Slot: ${data.slot || "N/A"}</span><br>
-              <span class="text-xs text-gray-600">Entry Fee: ৳${data.entryFee || 0}</span><br>
-              <span class="text-xs text-green-600 font-medium">Status: ${data.status || "Unknown"}</span>
-            </div>
-          `;
-
+            <div class="text-sm">
+              <strong>${data.tourName}</strong><br>
+              <span class="text-xs text-gray-600">Slot: ${data.slot}</span><br>
+              <span class="text-xs text-gray-600">Entry Fee: ৳${data.entryFee}</span><br>
+              <span class="text-xs text-green-600 font-medium">Status: ${data.status}</span>
+            </div>`;
           list.appendChild(div);
         });
       } catch (error) {
-        console.error("Error loading tournaments:", error);
-        list.innerHTML = `<div class="text-red-600 text-center">Error loading tournaments.</div>`;
+        list.innerHTML = `<div class="text-red-600">Failed to load tournaments.</div>`;
       }
     }
 
@@ -230,11 +229,50 @@
           const data = doc.data();
           const option = document.createElement("option");
           option.value = doc.id;
-          option.textContent = data.tourName || "Untitled";
+          option.textContent = data.tourName;
           select.appendChild(option);
         });
       } catch (err) {
         console.error("Error loading tournament options:", err);
+      }
+    }
+
+    // Load Players for Selected Tournament
+    document.getElementById("tourSelect").addEventListener("change", (e) => {
+      const tourId = e.target.value;
+      if (tourId) {
+        loadPlayersForTournament(tourId);
+      } else {
+        document.getElementById("playersContainer").classList.add("hidden");
+      }
+    });
+
+    async function loadPlayersForTournament(tourId) {
+      const container = document.getElementById("playersContainer");
+      const list = document.getElementById("playersList");
+      list.innerHTML = "";
+
+      try {
+        const snap = await getDocs(collection(db, "tourReg", tourId, "players"));
+        if (snap.empty) {
+          list.innerHTML = `<div class="text-gray-500 col-span-full text-center">No players registered yet.</div>`;
+        } else {
+          snap.forEach(doc => {
+            const data = doc.data();
+            const card = document.createElement("div");
+            card.className = "bg-white border p-4 rounded shadow";
+            card.innerHTML = `
+              <div class="font-semibold text-lg">${data.team}</div>
+              <div class="text-sm text-gray-700">DLS Rating: ${data.rating}</div>
+              <div class="text-sm text-gray-700">Age: ${data.age}</div>
+              <div class="text-sm text-gray-700">Played Years: ${data.playedYears}</div>
+            `;
+            list.appendChild(card);
+          });
+        }
+        container.classList.remove("hidden");
+      } catch (err) {
+        console.error("Error loading players:", err);
       }
     }
   </script>
