@@ -120,10 +120,8 @@
       }
     });
 
-    // Create Tournament
     document.getElementById("tourForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const tourName = document.getElementById("tourName").value.trim();
       const entryFee = parseFloat(document.getElementById("entryFee").value);
       const slot = parseInt(document.getElementById("slot").value);
@@ -151,10 +149,8 @@
       }
     });
 
-    // Register Player
     document.getElementById("playerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const tourId = document.getElementById("tourSelect").value;
       const team = document.getElementById("team").value.trim();
       const rating = parseFloat(document.getElementById("rating").value);
@@ -176,16 +172,15 @@
         });
         alert("Player registered successfully!");
         e.target.reset();
+        loadTournaments(); // Reload to reflect player
       } catch (err) {
         console.error("Error registering player:", err);
         alert("Failed to register player.");
       }
     });
 
-    // Load Tournaments
     async function loadTournaments() {
       const list = document.getElementById("tournamentList");
-      const loadingText = document.getElementById("loadingTours");
       list.innerHTML = "";
 
       try {
@@ -196,30 +191,51 @@
           return;
         }
 
-        snap.forEach(docSnap => {
+        for (const docSnap of snap.docs) {
           const data = docSnap.data();
+          const docId = docSnap.id;
 
           const div = document.createElement("div");
-          div.className = "p-3 bg-gray-50 border border-gray-200 rounded shadow-sm flex justify-between items-center";
+          div.className = "p-3 bg-gray-50 border border-gray-200 rounded shadow-sm";
 
-          div.innerHTML = `
-            <div class="text-sm text-gray-800">
-              <strong>${data.tourName || "Untitled"}</strong><br>
-              <span class="text-xs text-gray-600">Slot: ${data.slot || "N/A"}</span><br>
-              <span class="text-xs text-gray-600">Entry Fee: ৳${data.entryFee || 0}</span><br>
-              <span class="text-xs text-green-600 font-medium">Status: ${data.status || "Unknown"}</span>
+          const headerHTML = `
+            <div class="flex justify-between items-center mb-2">
+              <div class="text-sm text-gray-800">
+                <strong>${data.tourName || "Untitled"}</strong><br>
+                <span class="text-xs text-gray-600">Slot: ${data.slot || "N/A"}</span><br>
+                <span class="text-xs text-gray-600">Entry Fee: ৳${data.entryFee || 0}</span><br>
+                <span class="text-xs text-green-600 font-medium">Status: ${data.status || "Unknown"}</span>
+              </div>
             </div>
           `;
 
+          const playersSnap = await getDocs(collection(db, "tourReg", docId, "players"));
+          let playersHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">`;
+
+          playersSnap.forEach(playerDoc => {
+            const player = playerDoc.data();
+            playersHTML += `
+              <div class="bg-white border border-gray-200 p-3 rounded shadow-sm text-sm">
+                <div><strong>Team:</strong> ${player.team}</div>
+                <div><strong>Rating:</strong> ${player.rating}</div>
+                <div><strong>Age:</strong> ${player.age}</div>
+                <div><strong>Played Years:</strong> ${player.playedYears}</div>
+              </div>
+            `;
+          });
+
+          playersHTML += playersSnap.empty ? `<div class="text-gray-500 text-sm col-span-full">No players registered.</div>` : "";
+          playersHTML += `</div>`;
+
+          div.innerHTML = headerHTML + playersHTML;
           list.appendChild(div);
-        });
+        }
       } catch (error) {
         console.error("Error loading tournaments:", error);
         list.innerHTML = `<div class="text-red-600 text-center">Error loading tournaments.</div>`;
       }
     }
 
-    // Load Tournament Dropdown
     async function loadTournamentOptions() {
       const select = document.getElementById("tourSelect");
       select.innerHTML = `<option value="">-- Select Tournament --</option>`;
