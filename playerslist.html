@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Players List - Admin Panel</title>
+  <title>tour create - Admin Panel</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -51,23 +51,13 @@
       </div>
     </div>
 
-    <!-- Players List Section -->
-    <div class="bg-white shadow rounded p-4">
-      <div class="text-xl font-semibold text-blue-700 mb-4">Players List</div>
-      <div id="playersCardContainer" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <!-- Player cards will be inserted here -->
-        <div class="col-span-full text-center text-gray-500" id="loadingText">Loading players...</div>
-      </div>
-    </div>
-
   </main>
 
   <!-- Firebase + Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
@@ -82,13 +72,11 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     onAuthStateChanged(auth, user => {
       if (!user) {
         window.location.href = "login.html";
       } else {
-        loadPlayers();
         loadTournaments();
       }
     });
@@ -152,106 +140,6 @@
       } catch (error) {
         console.error("Error loading tournaments:", error);
         list.innerHTML = `<div class="text-red-600 text-center">Error loading tournaments.</div>`;
-      }
-    }
-
-    // Load players
-    async function loadPlayers() {
-      const container = document.getElementById("playersCardContainer");
-      const loadingText = document.getElementById("loadingText");
-
-      try {
-        const playersSnapshot = await getDocs(collection(db, "playersform"));
-        if (playersSnapshot.empty) {
-          loadingText.innerText = "No players found.";
-          return;
-        }
-
-        loadingText.remove();
-
-        playersSnapshot.forEach(docSnap => {
-          const p = docSnap.data();
-          const docId = docSnap.id;
-
-          const card = document.createElement("div");
-          card.className = "bg-white shadow-md rounded-lg p-4 border border-gray-200";
-
-          const imageUrl = p.photoUrl || "https://via.placeholder.com/80?text=No+Image";
-
-          const imageId = `img-${docId}`;
-          const fileInputId = `file-${docId}`;
-          const photoUrlInputId = `photourl-${docId}`;
-          const updateBtnId = `update-${docId}`;
-
-          card.innerHTML = `
-            <div class="flex items-center mb-3">
-              <img id="${imageId}" src="${imageUrl}" class="w-10 h-10 rounded-full object-cover border border-gray-300 mr-3" />
-              <div class="text-lg font-bold text-gray-800">${p.username || "N/A"}</div>
-              <input type="file" id="${fileInputId}" class="hidden" accept="image/*" />
-              <button id="${updateBtnId}" class="ml-auto text-sm text-green-600 hover:underline">Update</button>
-            </div>
-
-            <input type="text" id="${photoUrlInputId}" value="${imageUrl}" class="w-full text-xs text-gray-700 mb-3 border rounded px-2 py-1 bg-white" />
-
-            <div class="flex justify-between text-sm text-gray-600 mb-2">
-              <div><span class="font-semibold">Team:</span> ${p.team || "N/A"}</div>
-              <div><span class="font-semibold">DLS Rating:</span> ${p.dlsRating ?? "N/A"}</div>
-            </div>
-
-            <div class="flex justify-between text-sm text-gray-600">
-              <div><span class="font-semibold">Age:</span> ${p.age ?? "N/A"} Years</div>
-              <div><span class="font-semibold">Played:</span> ${p.yearsPlayed ?? "N/A"} Years</div>
-            </div>
-          `;
-
-          container.appendChild(card);
-
-          const updateBtn = card.querySelector(`#${updateBtnId}`);
-          const photoUrlInput = card.querySelector(`#${photoUrlInputId}`);
-          const imageEl = card.querySelector(`#${imageId}`);
-          const fileInput = card.querySelector(`#${fileInputId}`);
-
-          updateBtn.addEventListener("click", async () => {
-            const newUrl = photoUrlInput.value.trim();
-            if (!newUrl) return alert("Photo URL cannot be empty.");
-
-            try {
-              await updateDoc(doc(db, "playersform", docId), { photoUrl: newUrl });
-              imageEl.src = newUrl;
-              alert("Photo URL updated successfully!");
-            } catch (err) {
-              console.error("Photo URL update error:", err);
-              alert("Failed to update photo URL.");
-            }
-          });
-
-          updateBtn.addEventListener("dblclick", () => fileInput.click());
-
-          fileInput.addEventListener("change", async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            try {
-              const storageRef = ref(storage, `players/${docId}/photo.jpg`);
-              await uploadBytes(storageRef, file);
-              const downloadURL = await getDownloadURL(storageRef);
-
-              await updateDoc(doc(db, "playersform", docId), { photoUrl: downloadURL });
-
-              imageEl.src = downloadURL;
-              photoUrlInput.value = downloadURL;
-
-              alert("Photo uploaded and updated successfully!");
-            } catch (err) {
-              console.error("Photo upload error:", err);
-              alert("Failed to upload photo.");
-            }
-          });
-        });
-
-      } catch (error) {
-        console.error("Error loading players:", error);
-        container.innerHTML = `<div class="col-span-full text-center text-red-600">${error.message}</div>`;
       }
     }
   </script>
