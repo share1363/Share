@@ -89,26 +89,35 @@
     onAuthStateChanged(auth, async (user) => {
       if (!user) return window.location.href = "login.html";
       currentUser = user;
-      currentUserData = await getUserInfo(user.uid);
+      currentUserData = await getUserInfo(user.uid, user);
       document.getElementById("mainBalance").innerText = currentUserData.balance.toFixed(0);
       await loadTournamentOptions();
       await loadSlotInfo();
       await loadJoiningFee();
     });
 
-    async function getUserInfo(uid) {
+    async function getUserInfo(uid, firebaseUser) {
       try {
         const userRef = doc(db, "users", uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
-          return userSnap.data();
+          const data = userSnap.data();
+          // If no photoUrl in Firestore, fallback to Auth
+          return {
+            ...data,
+            photoUrl: data.photoUrl || firebaseUser.photoURL || ""
+          };
         } else {
           console.warn("User document not found");
-          return { balance: 0 };
+          return {
+            username: firebaseUser.displayName || "Unknown",
+            photoUrl: firebaseUser.photoURL || "",
+            balance: 0
+          };
         }
       } catch (err) {
         console.error("Error fetching user data:", err);
-        return { balance: 0 };
+        return { username: "Unknown", photoUrl: "", balance: 0 };
       }
     }
 
@@ -123,7 +132,6 @@
     async function loadTournamentOptions() {
       const select = document.getElementById("tourSelect");
       select.innerHTML = `<option value="">-- Select Tournament --</option>`;
-
       try {
         const snap = await getDocs(collection(db, "tourReg"));
         snap.forEach(doc => {
