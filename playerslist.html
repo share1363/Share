@@ -60,7 +60,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
     const firebaseConfig = {
@@ -78,6 +78,7 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
+    // Auth check
     onAuthStateChanged(auth, user => {
       if (!user) {
         window.location.href = "login.html";
@@ -86,6 +87,33 @@
       }
     });
 
+    // Form submission for Create Tournament
+    document.getElementById("tourForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const tourName = document.getElementById("tourName").value.trim();
+      const entryFee = parseInt(document.getElementById("entryFee").value);
+      const slot = parseInt(document.getElementById("slot").value);
+
+      if (!tourName || isNaN(entryFee) || isNaN(slot)) {
+        return alert("Please fill all fields correctly.");
+      }
+
+      try {
+        await addDoc(collection(db, "playersform"), {
+          tourName,
+          entryFee,
+          slot
+        });
+        alert("Tournament created successfully!");
+        document.getElementById("tourForm").reset();
+      } catch (err) {
+        console.error("Error saving tournament:", err);
+        alert("Failed to create tournament.");
+      }
+    });
+
+    // Load Players Function
     async function loadPlayers() {
       const container = document.getElementById("playersCardContainer");
       const loadingText = document.getElementById("loadingText");
@@ -116,7 +144,7 @@
           card.innerHTML = `
             <div class="flex items-center mb-3">
               <img id="${imageId}" src="${imageUrl}" class="w-10 h-10 rounded-full object-cover border border-gray-300 mr-3" />
-              <div class="text-lg font-bold text-gray-800">${p.username || "N/A"}</div>
+              <div class="text-lg font-bold text-gray-800">${p.username || p.tourName || "N/A"}</div>
               <input type="file" id="${fileInputId}" class="hidden" accept="image/*" />
               <button id="${updateBtnId}" class="ml-auto text-sm text-green-600 hover:underline">Update</button>
             </div>
