@@ -94,7 +94,7 @@
       }
 
       try {
-        await addDoc(collection(db, "tourdb"), {
+        await addDoc(collection(db, "tourReg"), {
           tourName,
           slot,
           createdAt: new Date()
@@ -115,7 +115,7 @@
       list.innerHTML = ""; // Clear previous content
 
       try {
-        const snap = await getDocs(collection(db, "tourdb"));
+        const snap = await getDocs(collection(db, "tourReg"));
 
         if (snap.empty) {
           list.innerHTML = `<div class="text-gray-500 text-center">No tournaments found.</div>`;
