@@ -60,7 +60,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
     const firebaseConfig = {
@@ -78,17 +78,10 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
+    // ✅ Form Submission for Creating Tournament (Save to playersform)
     const tourForm = document.getElementById("tourForm");
-
     tourForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-
-      const user = auth.currentUser;
-      if (!user) {
-        alert("User not logged in.");
-        return;
-      }
-
       const tourName = document.getElementById("tourName").value.trim();
       const entryFee = parseInt(document.getElementById("entryFee").value.trim());
       const slot = parseInt(document.getElementById("slot").value.trim());
@@ -99,28 +92,21 @@
       }
 
       try {
-        const userRef = doc(db, "playersform", user.uid);
-        const userDoc = await getDoc(userRef);
-        if (!userDoc.exists()) {
-          await setDoc(userRef, {}); // Create parent doc if not exists
-        }
-
-        const tourSubRef = collection(db, "playersform", user.uid, "tourName");
-        await addDoc(tourSubRef, {
+        await addDoc(collection(db, "playersform"), {
           tourName,
           entryFee,
-          slot,
-          createdAt: new Date()
+          slot
         });
-
-        alert("Tournament added successfully to player's tourName subcollection!");
+        alert("Tournament added to playersform successfully!");
         tourForm.reset();
+        loadPlayers(); // Optional: Reload player cards if you want
       } catch (err) {
-        console.error("Error saving tournament:", err);
-        alert("Failed to save tournament.");
+        console.error("Error adding tournament:", err);
+        alert("Failed to add tournament.");
       }
     });
 
+    // ✅ Auth Check and Player Load
     onAuthStateChanged(auth, user => {
       if (!user) {
         window.location.href = "login.html";
@@ -151,6 +137,7 @@
           card.className = "bg-white shadow-md rounded-lg p-4 border border-gray-200";
 
           const imageUrl = p.photoUrl || "https://via.placeholder.com/80?text=No+Image";
+
           const imageId = `img-${docId}`;
           const fileInputId = `file-${docId}`;
           const photoUrlInputId = `photourl-${docId}`;
@@ -163,11 +150,14 @@
               <input type="file" id="${fileInputId}" class="hidden" accept="image/*" />
               <button id="${updateBtnId}" class="ml-auto text-sm text-green-600 hover:underline">Update</button>
             </div>
+
             <input type="text" id="${photoUrlInputId}" value="${imageUrl}" class="w-full text-xs text-gray-700 mb-3 border rounded px-2 py-1 bg-white" />
+
             <div class="flex justify-between text-sm text-gray-600 mb-2">
               <div><span class="font-semibold">Team:</span> ${p.team || "N/A"}</div>
               <div><span class="font-semibold">DLS Rating:</span> ${p.dlsRating ?? "N/A"}</div>
             </div>
+
             <div class="flex justify-between text-sm text-gray-600">
               <div><span class="font-semibold">Age:</span> ${p.age ?? "N/A"} Years</div>
               <div><span class="font-semibold">Played:</span> ${p.yearsPlayed ?? "N/A"} Years</div>
@@ -207,6 +197,7 @@
               const downloadURL = await getDownloadURL(storageRef);
 
               await updateDoc(doc(db, "playersform", docId), { photoUrl: downloadURL });
+
               imageEl.src = downloadURL;
               photoUrlInput.value = downloadURL;
 
