@@ -87,7 +87,7 @@
       }
     });
 
-    // Form submission for Create Tournament
+    // Create Tournament → Subcollection addtour under playersform
     document.getElementById("tourForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -100,11 +100,14 @@
       }
 
       try {
-        await addDoc(collection(db, "playersform"), {
+        // Store in: playersform > addtour (subcollection)
+        const parentRef = doc(db, "playersform", "addtour"); // This is the document
+        await addDoc(collection(parentRef, "tournaments"), {
           tourName,
           entryFee,
           slot
         });
+
         alert("Tournament created successfully!");
         document.getElementById("tourForm").reset();
       } catch (err) {
@@ -113,7 +116,7 @@
       }
     });
 
-    // Load Players Function
+    // Load Players Function (unchanged)
     async function loadPlayers() {
       const container = document.getElementById("playersCardContainer");
       const loadingText = document.getElementById("loadingText");
