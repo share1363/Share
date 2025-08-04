@@ -1,191 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Players List - Admin Panel</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Players List - Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-  <!-- Header -->
-  <header class="bg-white shadow-md relative">
-    <div class="max-w-7xl mx-auto px-4 py-3 relative flex items-center justify-center">
-      <p onclick="window.location.href='admin.html'" class="absolute left-4 text-gray-700 cursor-pointer">
-        <i class="fas fa-arrow-left text-2xl"></i>
-      </p>
-      <h1 class="text-xl font-bold text-gray-800">Players List</h1>
-    </div>
-  </header>
+  <!-- Header -->
+  <header class="bg-white shadow-md relative">
+    <div class="max-w-7xl mx-auto px-4 py-3 relative flex items-center justify-center">
+      <p onclick="window.location.href='admin.html'" class="absolute left-4 text-gray-700 cursor-pointer">
+        <i class="fas fa-arrow-left text-2xl"></i>
+      </p>
+      <h1 class="text-xl font-bold text-gray-800">Players List</h1>
+    </div>
+  </header>
 
-  <!-- Main -->
-  <main class="p-4 md:p-6 space-y-6 overflow-auto flex-grow">
-    
-    <!-- Tour Info Form -->
-    <div class="bg-white shadow rounded p-4">
-      <div class="text-xl font-semibold text-blue-700 mb-4">Create Tournament</div>
-      <form id="tourForm" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="tourName" class="block text-sm font-medium text-gray-700">Tour Name</label>
-            <input type="text" id="tourName" name="tourName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 text-sm p-2" placeholder="Enter tour name" required>
-          </div>
-          <div>
-            <label for="entryFee" class="block text-sm font-medium text-gray-700">Entry Fee</label>
-            <input type="number" id="entryFee" name="entryFee" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 text-sm p-2" placeholder="Enter entry fee" required>
-          </div>
-          <div>
-            <label for="slot" class="block text-sm font-medium text-gray-700">Slot</label>
-            <input type="number" id="slot" name="slot" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 text-sm p-2" placeholder="Enter number of slots" required>
-          </div>
-        </div>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded">
-          Submit
-        </button>
-      </form>
-    </div>
+  <!-- Main -->
+  <main class="p-4 md:p-6 space-y-6 overflow-auto flex-grow">
+    <!-- Players List Section -->
+    <div class="bg-white shadow rounded p-4">
+      <div class="text-xl font-semibold text-blue-700 mb-4">Players List</div>
+      <div id="playersCardContainer" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <!-- Player cards will be inserted here -->
+        <div class="col-span-full text-center text-gray-500" id="loadingText">Loading players...</div>
+      </div>
+    </div>
+  </main>
 
-    <!-- Players List Section -->
-    <div class="bg-white shadow rounded p-4">
-      <div class="text-xl font-semibold text-blue-700 mb-4">Players List</div>
-      <div id="playersCardContainer" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <!-- Player cards will be inserted here -->
-        <div class="col-span-full text-center text-gray-500" id="loadingText">Loading players...</div>
-      </div>
-    </div>
-  </main>
+  <!-- Firebase + Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-  <!-- Firebase + Logic -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.appspot.com",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL"
+    };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
-      authDomain: "dlstournament-31ac1.firebaseapp.com",
-      projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.appspot.com",
-      messagingSenderId: "874377019055",
-      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
-      measurementId: "G-0DGFJEV6GL"
-    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        loadPlayers();
+      }
+    });
 
-    onAuthStateChanged(auth, user => {
-      if (!user) {
-        window.location.href = "login.html";
-      } else {
-        loadPlayers();
-      }
-    });
+    async function loadPlayers() {
+      const container = document.getElementById("playersCardContainer");
+      const loadingText = document.getElementById("loadingText");
 
-    async function loadPlayers() {
-      const container = document.getElementById("playersCardContainer");
-      const loadingText = document.getElementById("loadingText");
+      try {
+        const playersSnapshot = await getDocs(collection(db, "playersform"));
+        if (playersSnapshot.empty) {
+          loadingText.innerText = "No players found.";
+          return;
+        }
 
-      try {
-        const playersSnapshot = await getDocs(collection(db, "playersform"));
-        if (playersSnapshot.empty) {
-          loadingText.innerText = "No players found.";
-          return;
-        }
+        loadingText.remove();
 
-        loadingText.remove();
+        playersSnapshot.forEach(docSnap => {
+          const p = docSnap.data();
+          const docId = docSnap.id;
 
-        playersSnapshot.forEach(docSnap => {
-          const p = docSnap.data();
-          const docId = docSnap.id;
+          const card = document.createElement("div");
+          card.className = "bg-white shadow-md rounded-lg p-4 border border-gray-200";
 
-          const card = document.createElement("div");
-          card.className = "bg-white shadow-md rounded-lg p-4 border border-gray-200";
+          const imageUrl = p.photoUrl || "https://via.placeholder.com/80?text=No+Image";
 
-          const imageUrl = p.photoUrl || "https://via.placeholder.com/80?text=No+Image";
+          const imageId = `img-${docId}`;
+          const fileInputId = `file-${docId}`;
+          const photoUrlInputId = `photourl-${docId}`;
+          const updateBtnId = `update-${docId}`;
 
-          const imageId = `img-${docId}`;
-          const fileInputId = `file-${docId}`;
-          const photoUrlInputId = `photourl-${docId}`;
-          const updateBtnId = `update-${docId}`;
+          card.innerHTML = `
+            <div class="flex items-center mb-3">
+              <img id="${imageId}" src="${imageUrl}" class="w-10 h-10 rounded-full object-cover border border-gray-300 mr-3" />
+              <div class="text-lg font-bold text-gray-800">${p.username || "N/A"}</div>
+              <input type="file" id="${fileInputId}" class="hidden" accept="image/*" />
+              <button id="${updateBtnId}" class="ml-auto text-sm text-green-600 hover:underline">Update</button>
+            </div>
 
-          card.innerHTML = `
-            <div class="flex items-center mb-3">
-              <img id="${imageId}" src="${imageUrl}" class="w-10 h-10 rounded-full object-cover border border-gray-300 mr-3" />
-              <div class="text-lg font-bold text-gray-800">${p.username || "N/A"}</div>
-              <input type="file" id="${fileInputId}" class="hidden" accept="image/*" />
-              <button id="${updateBtnId}" class="ml-auto text-sm text-green-600 hover:underline">Update</button>
-            </div>
+            <input type="text" id="${photoUrlInputId}" value="${imageUrl}" class="w-full text-xs text-gray-700 mb-3 border rounded px-2 py-1 bg-white" />
 
-            <input type="text" id="${photoUrlInputId}" value="${imageUrl}" class="w-full text-xs text-gray-700 mb-3 border rounded px-2 py-1 bg-white" />
+            <div class="flex justify-between text-sm text-gray-600 mb-2">
+              <div><span class="font-semibold">Team:</span> ${p.team || "N/A"}</div>
+              <div><span class="font-semibold">DLS Rating:</span> ${p.dlsRating ?? "N/A"}</div>
+            </div>
 
-            <div class="flex justify-between text-sm text-gray-600 mb-2">
-              <div><span class="font-semibold">Team:</span> ${p.team || "N/A"}</div>
-              <div><span class="font-semibold">DLS Rating:</span> ${p.dlsRating ?? "N/A"}</div>
-            </div>
+            <div class="flex justify-between text-sm text-gray-600">
+              <div><span class="font-semibold">Age:</span> ${p.age ?? "N/A"} Years</div>
+              <div><span class="font-semibold">Played:</span> ${p.yearsPlayed ?? "N/A"} Years</div>
+            </div>
+          `;
 
-            <div class="flex justify-between text-sm text-gray-600">
-              <div><span class="font-semibold">Age:</span> ${p.age ?? "N/A"} Years</div>
-              <div><span class="font-semibold">Played:</span> ${p.yearsPlayed ?? "N/A"} Years</div>
-            </div>
-          `;
+          container.appendChild(card);
 
-          container.appendChild(card);
+          // Handle direct photoUrl update
+          const updateBtn = card.querySelector(`#${updateBtnId}`);
+          const photoUrlInput = card.querySelector(`#${photoUrlInputId}`);
+          const imageEl = card.querySelector(`#${imageId}`);
 
-          const updateBtn = card.querySelector(`#${updateBtnId}`);
-          const photoUrlInput = card.querySelector(`#${photoUrlInputId}`);
-          const imageEl = card.querySelector(`#${imageId}`);
+          updateBtn.addEventListener("click", async () => {
+            const newUrl = photoUrlInput.value.trim();
+            if (!newUrl) return alert("Photo URL cannot be empty.");
 
-          updateBtn.addEventListener("click", async () => {
-            const newUrl = photoUrlInput.value.trim();
-            if (!newUrl) return alert("Photo URL cannot be empty.");
+            try {
+              await updateDoc(doc(db, "playersform", docId), { photoUrl: newUrl });
+              imageEl.src = newUrl;
+              alert("Photo URL updated successfully!");
+            } catch (err) {
+              console.error("Photo URL update error:", err);
+              alert("Failed to update photo URL.");
+            }
+          });
 
-            try {
-              await updateDoc(doc(db, "playersform", docId), { photoUrl: newUrl });
-              imageEl.src = newUrl;
-              alert("Photo URL updated successfully!");
-            } catch (err) {
-              console.error("Photo URL update error:", err);
-              alert("Failed to update photo URL.");
-            }
-          });
+          // File upload logic
+          const fileInput = card.querySelector(`#${fileInputId}`);
+          updateBtn.addEventListener("dblclick", () => fileInput.click()); // optional: double click to open file input
 
-          const fileInput = card.querySelector(`#${fileInputId}`);
-          updateBtn.addEventListener("dblclick", () => fileInput.click());
+          fileInput.addEventListener("change", async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-          fileInput.addEventListener("change", async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+            try {
+              const storageRef = ref(storage, `players/${docId}/photo.jpg`);
+              await uploadBytes(storageRef, file);
+              const downloadURL = await getDownloadURL(storageRef);
 
-            try {
-              const storageRef = ref(storage, `players/${docId}/photo.jpg`);
-              await uploadBytes(storageRef, file);
-              const downloadURL = await getDownloadURL(storageRef);
+              await updateDoc(doc(db, "playersform", docId), { photoUrl: downloadURL });
 
-              await updateDoc(doc(db, "playersform", docId), { photoUrl: downloadURL });
+              imageEl.src = downloadURL;
+              photoUrlInput.value = downloadURL;
 
-              imageEl.src = downloadURL;
-              photoUrlInput.value = downloadURL;
+              alert("Photo uploaded and updated successfully!");
+            } catch (err) {
+              console.error("Photo upload error:", err);
+              alert("Failed to upload photo.");
+            }
+          });
+        });
 
-              alert("Photo uploaded and updated successfully!");
-            } catch (err) {
-              console.error("Photo upload error:", err);
-              alert("Failed to upload photo.");
-            }
-          });
-        });
-
-      } catch (error) {
-        console.error("Error loading players:", error);
-        container.innerHTML = `<div class="col-span-full text-center text-red-600">${error.message}</div>`;
-      }
-    }
-  </script>
+      } catch (error) {
+        console.error("Error loading players:", error);
+        container.innerHTML = `<div class="col-span-full text-center text-red-600">${error.message}</div>`;
+      }
+    }
+  </script>
 
 </body>
 </html>
