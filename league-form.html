@@ -84,15 +84,16 @@
     const db = getFirestore(app);
 
     let currentUser = null;
+    let currentUserData = null;
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) return window.location.href = "login.html";
       currentUser = user;
+      currentUserData = await getUserInfo(user.uid);
+      document.getElementById("mainBalance").innerText = currentUserData.balance.toFixed(0);
       await loadTournamentOptions();
       await loadSlotInfo();
       await loadJoiningFee();
-      const userData = await getUserInfo(user.uid);
-      document.getElementById("mainBalance").innerText = userData.balance.toFixed(0);
     });
 
     async function getUserInfo(uid) {
@@ -112,41 +113,12 @@
     }
 
     async function loadSlotInfo() {
-      // Placeholder for slot info logic if needed
+      // Placeholder
     }
 
     async function loadJoiningFee() {
-      // Placeholder for joining fee logic if needed
+      // Placeholder
     }
-
-    document.getElementById("playerForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const tourId = document.getElementById("tourSelect").value;
-      const team = document.getElementById("team").value.trim();
-      const rating = parseFloat(document.getElementById("dls-rating").value);
-      const age = parseInt(document.getElementById("age").value);
-      const playedYears = parseInt(document.getElementById("years-played").value);
-
-      if (!tourId || !team || isNaN(rating) || rating < 0 || isNaN(age) || age <= 0 || isNaN(playedYears) || playedYears < 0) {
-        alert("Please fill in all fields with valid values.");
-        return;
-      }
-
-      try {
-        await addDoc(collection(db, "tourReg", tourId, "players"), {
-          team,
-          rating,
-          age,
-          playedYears,
-          createdAt: new Date()
-        });
-        alert("Player registered successfully!");
-        e.target.reset();
-      } catch (err) {
-        console.error("Error registering player:", err);
-        alert("Failed to register player.");
-      }
-    });
 
     async function loadTournamentOptions() {
       const select = document.getElementById("tourSelect");
@@ -165,7 +137,38 @@
         console.error("Error loading tournament options:", err);
       }
     }
-  </script>
 
+    document.getElementById("playerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const tourId = document.getElementById("tourSelect").value;
+      const team = document.getElementById("team").value.trim();
+      const rating = parseFloat(document.getElementById("dls-rating").value);
+      const age = parseInt(document.getElementById("age").value);
+      const playedYears = parseInt(document.getElementById("years-played").value);
+
+      if (!tourId || !team || isNaN(rating) || rating < 0 || isNaN(age) || age <= 0 || isNaN(playedYears) || playedYears < 0) {
+        alert("Please fill in all fields with valid values.");
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "tourReg", tourId, "players"), {
+          uid: currentUser.uid,
+          username: currentUserData?.username || "",
+          photoUrl: currentUserData?.photoUrl || "",
+          team,
+          rating,
+          age,
+          playedYears,
+          createdAt: new Date()
+        });
+        alert("Player registered successfully!");
+        e.target.reset();
+      } catch (err) {
+        console.error("Error registering player:", err);
+        alert("Failed to register player.");
+      }
+    });
+  </script>
 </body>
 </html>
