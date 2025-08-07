@@ -15,7 +15,7 @@
   <style>
     .swal2-timer-progress-bar { background: #facc15 !important; }
     .glow-yellow { box-shadow: 0 0 8px rgba(234, 179, 8, 0.6); }
-    .header-glow { box-shadow: 0 0 10px rgba(255, 255, 255, 0.1), 0 0 15px rgba(251, 191, 36, 0.3); }
+
     .loader {
       width: 48px;
       height: 48px;
@@ -32,38 +32,30 @@
 </head>
 <body class="bg-black text-white">
 
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="fixed inset-0 bg-black flex items-center justify-center z-50">
-    <div class="text-center">
-      <div class="loader mx-auto mb-4"></div>
-      <h1 class="text-2xl font-bold animate-pulse bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent" style="font-family: 'Audiowide', cursive;">D.C.L TOUR</h1>
-      <p class="text-gray-400 text-xs">Loading...</p>
+  <!-- Header -->
+  <header
+    class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
+    <div class="flex items-center space-x-2">
+      <img src="dcl1.jpeg" alt="Logo" class="w-8 h-8 rounded-full border border-yellow-400" />
+      <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-300 via-blue-200 to-yellow-300 bg-clip-text text-transparent"
+        style="font-family: 'Audiowide', cursive;">DCL TOUR</h2>
     </div>
-  </div>
-
-  <!-- Header Section -->
-  <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
-    <div class="flex items-center gap-2">
-      <div class="bg-yellow-600 bg-opacity-50 border border-yellow-500 text-yellow-300 w-8 h-8 flex items-center justify-center font-bold rounded-full shadow" style="font-family: 'Audiowide', cursive;">DL</div>
-      <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent" style="font-family: 'Audiowide', cursive;">D.C.L TOUR</h2>
-    </div>
-    <div style="height: 30px;"
-      class="flex items-center gap-1 bg-black px-1 py-1 rounded-full shadow-lg border border-gray-600 ml-8">
-      <div class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
-        <i class="fa-solid fa-bangladeshi-taka-sign text-white text-sm"></i>
-      </div>
-      <p id="mainBalance" class="text-sm font-bold text-yellow-300">0</p>
-      <button class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center shadow-md">
-        <i class="fa-solid fa-plus text-gray-100 text-sm"></i>
-      </button>
+    <div class="flex space-x-4">
+      <a href="#">
+        <i class="fa-solid fa-bell text-yellow-300 text-shadow text-xl"></i>
+      </a>
+      
+      <a href="https://facebook.com" target="_blank">
+        <i class="fa-brands fa-facebook text-white text-shadow text-xl"></i>
+      </a>
     </div>
   </header>
 
   <!-- Main Content -->
   <main class="px-3 max-w-md mx-auto w-full space-y-6 pb-24">
     <!-- Profile Info -->
-    <section class="bg-gray-900 bg-opacity-50 border border-gray-700 rounded-xl p-3 flex items-center gap-4 card-glow">
-      <div id="profileImageContainer" class="w-14 h-14 rounded-full bg-yellow-500 bg-opacity-20 flex items-center justify-center border-2 border-yellow-400 shadow-inner">
+    <section class="bg-gray-900 bg-opacity-50 border border-t-4 border-gray-600 rounded-xl p-3 flex items-center gap-4 card-glow">
+      <div id="profileImageContainer" class="w-14 h-14 rounded-full bg-yellow-500 bg-opacity-20 flex items-center justify-center border border-t-4 border-green-600 shadow-inner">
         <img id="profileImage" class="w-full h-full rounded-full object-cover" alt="Profile Image" />
       </div>
       <div class="flex-1">
@@ -77,9 +69,57 @@
         </div>
       </div>
     </section>
+    
+    <!-- Balance Summary Section -->
+<section class="bg-gray-900 bg-opacity-60 border border-t-4 border-green-600 rounded-xl text-center card-glow shadow-lg">
+  <div class="px-4 py-3 space-y-2">
+    <h4 class="text-xs text-gray-400 tracking-widest">AVAILABLE BALANCE</h4>
+    <div class="text-2xl font-bold text-white flex justify-center items-center gap-2">
+      <span>BDT</span>
+      <span id="mainBalance">0</span>
+      <button class="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs hover:bg-green-600 shadow">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    </div>
+
+    <div class="flex justify-between items-center mt-4 text-white text-sm font-medium">
+      <div class="flex-1 text-center">
+        <p class="text-xs text-gray-400 mb-1">PLAYED</p>
+        <p id="matchPlayed" class="text-lg font-semibold">0</p>
+      </div>
+      <div class="w-px bg-gray-600 h-6 mx-1.5"></div>
+      <div class="flex-1 text-center">
+        <p class="text-xs text-gray-400 mb-1">WIN</p>
+        <p id="totalWinning" class="text-lg font-semibold">0</p>
+      </div>
+      <div class="w-px bg-gray-600 h-6 mx-1.5"></div>
+      <div class="flex-1 text-center">
+        <p class="text-xs text-gray-400 mb-1">DRAW</p>
+        <p id="totaldraw" class="text-lg font-semibold">0</p>
+      </div>
+      <div class="w-px bg-gray-600 h-6 mx-1.5"></div>
+      <div class="flex-1 text-center">
+        <p class="text-xs text-gray-400 mb-1">LOST</p>
+        <p id="totalLost" class="text-lg font-semibold">0</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="bg-gray-800 bg-opacity-40 border-t border-gray-700 rounded-b-xl p-3 flex justify-between items-center gap-3">
+    <a href="deposit.html" class="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-2 rounded-lg flex items-center justify-center gap-2 shadow">
+      <i class="fa-solid fa-circle-down"></i> Deposit
+    </a>
+    <a href="withdraw.html" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 rounded-lg flex items-center justify-center gap-2 shadow">
+      <i class="fa-solid fa-circle-up"></i> Withdraw
+    </a>
+  </div>
+</section>
+
+
 
     <!-- Referral -->
-    <section class="bg-gray-900 bg-opacity-50 border border-gray-700 rounded-xl p-1 px-3 space-y-2 text-center">
+    <section class="bg-gray-900 bg-opacity-50 border border-t-4 border-gray-600 rounded-xl p-1 px-3 space-y-2 text-center">
       <div>
         <h4 class="text-yellow-400 font-semibold text-base">Your Refer Link</h4>
         <div class="mt-2 flex gap-2">
@@ -95,18 +135,8 @@
       </div>
     </section>
 
-    <!-- Actions -->
-    <section class="bg-gray-900 bg-opacity-50 border border-gray-700 rounded-xl p-4 flex justify-between items-center gap-4">
-      <a href="deposit.html" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 shadow-md">
-        <i class="fa-solid fa-circle-down"></i> Deposit
-      </a>
-      <a href="withdraw.html" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 shadow-md">
-        <i class="fa-solid fa-circle-up"></i> Withdraw
-      </a>
-    </section>
-
     <!-- More Options -->
-    <section class="bg-gray-900 bg-opacity-50 border border-gray-700 rounded-xl p-4 space-y-3">
+    <section class="bg-gray-900 bg-opacity-50 border border-t-4 border-gray-600 rounded-xl p-4 space-y-3">
       <h4 class="text-yellow-400 text-center font-semibold text-base mb-2">More Options</h4>
       <a href="https://m.me/j/AbYn9awI4qHvdDvW/" class="flex items-center justify-between bg-gray-800 hover:bg-gray-700 rounded-lg px-4 py-2 text-yellow-300">
         <span><i class="fa-solid fa-headset mr-2"></i>Support</span>
@@ -161,7 +191,7 @@
       Profile
     </a>
   </nav>
-
+  
   <!-- Firebase Scripts -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
