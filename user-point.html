@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Point Table</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-black text-white min-h-screen">
+
+  <!-- Header Section -->
+  <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
+    <div class="flex items-center gap-2">
+      <div class="bg-yellow-600 bg-opacity-50 border border-yellow-500 text-yellow-300 w-8 h-8 flex items-center justify-center font-bold rounded-full shadow" style="font-family: 'Audiowide', cursive;">KD</div>
+      <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent" style="font-family: 'Audiowide', cursive;">Khelo Dls</h2>
+    </div>
+    <div style="height: 30px;"
+      class="flex items-center gap-1 bg-black px-1 py-1 rounded-full shadow-lg border border-gray-600 ml-8">
+      <div class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
+        <i class="fa-solid fa-bangladeshi-taka-sign text-white text-sm"></i>
+      </div>
+      <p id="mainBalance" class="text-sm font-bold text-yellow-300">0</p>
+      <button class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center shadow-md">
+        <i class="fa-solid fa-plus text-gray-100 text-sm"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Point Tables -->
+  <main class="max-w-7xl mx-auto px-2 mt-6 mb-20">
+    <div id="pointTablesContainer" class="space-y-6 mt-8">
+      <!-- Point tables will be displayed here -->
+    </div>
+  </main>
+
+  <!-- Bottom Nav -->
+  <nav
+    class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-40">
+    <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div
+        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      Home
+    </a>
+    <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div
+        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-gamepad text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      Matches
+    </a>
+    <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div
+        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-trophy text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      League
+    </a>
+    <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div
+        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-ranking-star text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+         Ranking
+      </a>
+
+    <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div
+        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
+        <i class="fa-solid fa-user text-lg text-gray-400 hover:text-yellow-400"></i>
+      </div>
+      Profile
+    </a>
+  </nav>
+
+  <!-- Firebase & Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, getDocs, doc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.firebasestorage.app",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let teamPhotos = {};
+
+    async function loadTeamPhotos() {
+      const snap = await getDocs(collection(db, "playersform"));
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (data.team && data.photoUrl) {
+          teamPhotos[data.team.trim().toLowerCase()] = data.photoUrl;
+        }
+      });
+    }
+
+    function addDays(dateStr, days) {
+      const d = new Date(dateStr);
+      d.setDate(d.getDate() + days);
+      return d.toISOString().split("T")[0];
+    }
+
+    function convertBanglaToEnglish(str) {
+      const map = {
+        '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+        '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+      };
+      return str.replace(/[০-৯]/g, digit => map[digit]);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        await loadTeamPhotos();
+        displayPointTables();
+      }
+    });
+
+    function displayPointTables() {
+      const pointTablesContainer = document.getElementById("pointTablesContainer");
+
+      // Fetch point tables from Firebase and display them
+      const pointTablesRef = collection(db, "pointTables");
+      onSnapshot(pointTablesRef, (snapshot) => {
+        let html = "";
+        
+        if (snapshot.empty) {
+          html = `<p class="text-center text-gray-400">কোনো পয়েন্ট টেবিল নেই।</p>`;
+        } else {
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const groupName = data.groupName;
+            const teams = data.teams;
+
+            html += `
+              <div class="bg-gray-800 p-2 rounded-sm">
+                <h3 class="text-lg font-semibold text-yellow-400 mb-2">${groupName}</h3>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full table-auto text-xs text-gray-400 border-collapse">
+                    <thead>
+                      <tr class="bg-gray-700">
+                        <th class="px-2 py-1 border border-gray-600">SL</th>
+                        <th class="px-2 py-1 border border-gray-600">Team</th>
+                        <th class="px-2 py-1 border border-gray-600 text-center">Played</th>
+                        <th class="px-2 py-1 border border-gray-600 text-center">Win</th>
+                        <th class="px-2 py-1 border border-gray-600 text-center">Loss</th>
+                        <th class="px-2 py-1 border border-gray-600 text-center">Draw</th>
+                        <th class="px-2 py-1 border border-gray-600 text-center">Points</th>
+                        <th class="px-2 py-1 border border-gray-600 text-center">Goals</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${teams.map((team, index) => `
+                        <tr class="border-b border-gray-700">
+                          <td class="px-2 py-1 border border-gray-600 text-center">${index + 1}</td>
+                          <td class="px-2 py-1 border border-gray-600">${team.team}</td>
+                          <td class="px-2 py-1 border border-gray-600 text-center">${team.played}</td>
+                          <td class="px-2 py-1 border border-gray-600 text-center">${team.win}</td>
+                          <td class="px-2 py-1 border border-gray-600 text-center">${team.loss}</td>
+                          <td class="px-2 py-1 border border-gray-600 text-center">${team.draw}</td>
+                          <td class="px-2 py-1 border border-gray-600 text-center">${team.points}</td>
+                          <td class="px-2 py-1 border border-gray-600 text-center">${team.goals}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        pointTablesContainer.innerHTML = html;
+      });
+    }
+  </script>
+</body>
+</html>
