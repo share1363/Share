@@ -8,22 +8,24 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen">
 
   <!-- Header -->
-  <header class="bg-white shadow-md">
-    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-      <h1 class="text-xl font-bold text-gray-800">Update Match Results</h1>
-      <button onclick="window.location.href='admin.html'" class="text-sm bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">
+  <header class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-extrabold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-futbol text-green-600"></i> Update Match Results
+      </h1>
+      <button onclick="window.location.href='admin.html'" class="flex items-center gap-2 text-sm bg-gray-800 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-700 transition">
         <i class="fas fa-arrow-left"></i> Back
       </button>
     </div>
   </header>
 
   <!-- Main -->
-  <main class="max-w-4xl mx-auto p-4">
+  <main class="max-w-5xl mx-auto p-4">
     <div id="resultsContainer" class="space-y-6">
-      <p class="text-center text-gray-500">Loading matches...</p>
+      <p class="text-center text-gray-500 animate-pulse">Loading matches...</p>
     </div>
   </main>
 
@@ -72,35 +74,35 @@
         Object.keys(groupMap).sort().forEach(group => {
           const dateMap = groupMap[group];
           Object.keys(dateMap).sort().forEach((date, i) => {
-            html += `<div class="bg-gray-200 px-3 py-2 rounded font-semibold">${group} - Matchday ${i+1} || ${date}</div>`;
+            html += `<div class="bg-green-600 text-white px-4 py-2 rounded-lg shadow font-semibold mt-6">${group} - Matchday ${i+1} | ${date}</div>`;
             dateMap[date].forEach(match => {
               html += `
-                <div class="bg-white p-3 rounded shadow space-y-2 text-sm">
-                  <div class="flex justify-between">
-                    <div class="flex items-center gap-2">
-                      <span class="font-semibold">${match.team1}</span>
-                      <input type="number" min="0" id="goal1-${match.id}" value="${match.team1Goal ?? ''}" class="w-14 border p-1 rounded text-center" />
+                <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition space-y-3 text-sm">
+                  <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                      <span class="font-bold text-gray-700">${match.team1}</span>
+                      <input type="number" min="0" id="goal1-${match.id}" value="${match.team1Goal ?? ''}" class="w-14 border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
                     </div>
-                    <span class="text-red-500 font-bold">VS</span>
-                    <div class="flex items-center gap-2">
-                      <input type="number" min="0" id="goal2-${match.id}" value="${match.team2Goal ?? ''}" class="w-14 border p-1 rounded text-center" />
-                      <span class="font-semibold">${match.team2}</span>
+                    <span class="text-red-500 font-extrabold">VS</span>
+                    <div class="flex items-center gap-3">
+                      <input type="number" min="0" id="goal2-${match.id}" value="${match.team2Goal ?? ''}" class="w-14 border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
+                      <span class="font-bold text-gray-700">${match.team2}</span>
                     </div>
                   </div>
 
-                  <div class="flex flex-wrap gap-2 items-center">
-                    <select id="winner-${match.id}" class="border p-1 rounded text-sm">
+                  <div class="flex flex-wrap gap-3 items-center">
+                    <select id="winner-${match.id}" class="border p-2 rounded text-sm focus:ring-2 focus:ring-green-400">
                       <option value="None" ${match.winner === "None" ? 'selected' : ''}>None</option>
                       <option value="${match.team1}" ${match.winner === match.team1 ? 'selected' : ''}>${match.team1}</option>
                       <option value="${match.team2}" ${match.winner === match.team2 ? 'selected' : ''}>${match.team2}</option>
                       <option value="Draw" ${match.winner === "Draw" ? 'selected' : ''}>Draw</option>
                     </select>
 
-                    <button onclick="updateResult('${match.id}', '${match.team1}', '${match.team2}')" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
-                      Update
+                    <button onclick="updateResult('${match.id}', '${match.team1}', '${match.team2}')" class="bg-green-600 text-white px-4 py-1.5 rounded-lg shadow hover:bg-green-700 transition text-sm font-medium">
+                      <i class="fas fa-save"></i> Update
                     </button>
 
-                    <p class="text-xs font-medium ${match.status === 'Completed' ? 'text-green-600' : 'text-yellow-600'}">
+                    <p class="text-xs font-medium px-2 py-1 rounded ${match.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
                       Status: ${match.status || 'Pending'}
                     </p>
                   </div>
@@ -119,7 +121,6 @@
       const goal2 = parseInt(document.getElementById(`goal2-${matchId}`).value);
       let winner = document.getElementById(`winner-${matchId}`).value;
 
-      // Auto winner detection if none selected or mismatch
       if (isNaN(goal1) || isNaN(goal2)) {
         Swal.fire({ icon: 'error', title: 'Please enter both goals!' });
         return;
