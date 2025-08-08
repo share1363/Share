@@ -88,7 +88,7 @@
     const db = getFirestore(app);
 
     let teamList = [];
-    let teamUidMap = {}; // teamName -> UID from playersform
+    let teamUidMap = {}; // teamName -> [UIDs] array
 
     onAuthStateChanged(auth, (user) => {
       if (!user) window.location.href = "login.html";
@@ -99,17 +99,17 @@
       }
     });
 
-    // Load teams and their UID (doc.id) from playersform
+    // Load teams and their UID(s) from playersform - now stores multiple UIDs per team in array
     async function loadTeamsAndUIDs() {
       const snapshot = await getDocs(collection(db, "playersform"));
       const teamsSet = new Set();
-      teamUidMap = {}; // reset
+      teamUidMap = {};
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
         if (data.team) {
           teamsSet.add(data.team);
-          // Store UID by team name (assuming team names unique)
-          teamUidMap[data.team] = docSnap.id;
+          if (!teamUidMap[data.team]) teamUidMap[data.team] = [];
+          teamUidMap[data.team].push(docSnap.id);
         }
       });
       teamList = Array.from(teamsSet);
@@ -150,20 +150,20 @@
           sortedDates.forEach((date, i) => {
             html += `<div class="bg-gray-100 px-3 py-2 rounded font-semibold text-gray-700 mb-2">${group} ll Matchday-${i + 1} || ${date}</div>`;
             dateMap[date].forEach(match => {
-              // Get UID for each team from map or show N/A if not found
-              const team1Uid = teamUidMap[match.team1] ?? "N/A";
-              const team2Uid = teamUidMap[match.team2] ?? "N/A";
+              // Get UID array and join by comma or show N/A if none
+              const team1Uids = teamUidMap[match.team1] ?? ["N/A"];
+              const team2Uids = teamUidMap[match.team2] ?? ["N/A"];
 
               html += `
                 <div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
                   <div class="flex justify-between items-center px-2">
                     <div class="text-center w-1/2">
-                      <div class="text-[10px] text-gray-400">UID: ${team1Uid}</div>
+                      <div class="text-[10px] text-gray-400">UID: ${team1Uids.join(", ")}</div>
                       <div class="text-sm font-semibold text-gray-600">${match.team1} <span class="text-black">(${match.team1Goal ?? "-"})</span></div>
                     </div>
                     <div class="text-base font-bold text-red-500">VS</div>
                     <div class="text-center w-1/2">
-                      <div class="text-[10px] text-gray-400">UID: ${team2Uid}</div>
+                      <div class="text-[10px] text-gray-400">UID: ${team2Uids.join(", ")}</div>
                       <div class="text-sm font-semibold text-gray-600">${match.team2} <span class="text-black">(${match.team2Goal ?? "-"})</span></div>
                     </div>
                   </div>
