@@ -74,8 +74,11 @@
         Object.keys(groupMap).sort().forEach(group => {
           const dateMap = groupMap[group];
           Object.keys(dateMap).sort().forEach((date, i) => {
-            // No group name here, only "Matchday N | date"
-            html += `<div class="bg-green-600 text-white px-4 py-2 rounded-lg shadow font-semibold mt-6">Matchday ${i + 1} | ${date}</div>`;
+            // Matchday and date centered
+            html += `<div class="bg-green-600 text-white px-4 py-2 rounded-lg shadow font-semibold mt-6 text-center">
+              Matchday ${i + 1} | ${date}
+            </div>`;
+
             dateMap[date].forEach(match => {
               // Determine winner text for display:
               let resultText = "Result: ";
@@ -88,8 +91,8 @@
               html += `
                 <div class="matchCard bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition space-y-4 text-sm">
 
-                  <!-- Show group name inside each match card -->
-                  <div class="text-sm text-center font-semibold text-green-700 mb-2">
+                  <!-- Group name with background -->
+                  <div class="text-sm text-center font-semibold text-white bg-green-700 rounded-md py-1 mb-2 select-none">
                     ${group}
                   </div>
 
