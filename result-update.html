@@ -53,6 +53,19 @@
       else loadMatches();
     });
 
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr; // fallback if invalid date
+      const day = d.getDate();
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      const month = monthNames[d.getMonth()];
+      const year = d.getFullYear();
+      return `${day}-${month}-${year}`;
+    }
+
     function loadMatches() {
       const container = document.getElementById("resultsContainer");
 
@@ -74,9 +87,10 @@
         Object.keys(groupMap).sort().forEach(group => {
           const dateMap = groupMap[group];
           Object.keys(dateMap).sort().forEach((date, i) => {
-            // Matchday and date centered
-            html += `<div class="bg-green-600 text-white px-4 py-2 rounded-lg shadow font-semibold mt-6 text-center">
-              Matchday ${i + 1} | ${date}
+            const formattedDate = formatDate(date);
+            // Matchday and date centered with formatted date
+            html += `<div class="bg-green-600 uppercase text-white px-4 py-2 rounded-lg shadow font-semibold mt-6 text-center">
+              Match-day-${i + 1} | ${formattedDate}
             </div>`;
 
             dateMap[date].forEach(match => {
