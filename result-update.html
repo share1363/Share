@@ -96,11 +96,6 @@
                       <option value="Draw" ${match.winner === "Draw" ? 'selected' : ''}>Draw</option>
                     </select>
 
-                    <select id="status-${match.id}" class="border p-1 rounded text-sm">
-                      <option value="Pending" ${match.status === "Pending" ? 'selected' : ''}>Pending</option>
-                      <option value="Completed" ${match.status === "Completed" ? 'selected' : ''}>Completed</option>
-                    </select>
-
                     <button onclick="updateResult('${match.id}')" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
                       Update
                     </button>
@@ -119,13 +114,12 @@
       const goal1 = document.getElementById(`goal1-${matchId}`).value;
       const goal2 = document.getElementById(`goal2-${matchId}`).value;
       const winner = document.getElementById(`winner-${matchId}`).value;
-      const status = document.getElementById(`status-${matchId}`).value;
 
       await updateDoc(doc(db, "fixers", matchId), {
         team1Goal: goal1 === "" ? null : parseInt(goal1),
         team2Goal: goal2 === "" ? null : parseInt(goal2),
         winner,
-        status
+        status: "Completed"
       });
 
       Swal.fire({
