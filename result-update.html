@@ -105,8 +105,6 @@
 
                   <div class="flex justify-between">
 
-                    
-
                     <p class="text-xs font-medium px-2 py-1 rounded ${match.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
                       Status: ${match.status || 'Pending'}
                     </p>
@@ -116,9 +114,11 @@
                     </p>
 
                   </div>
-                  <button onclick="updateResult('${match.id}', '${match.team1}', '${match.team2}')" class="bg-green-600 text-white px-4 py-1.5 rounded-lg shadow hover:bg-green-700 transition text-sm font-medium">
+                  <div class="flex justify-center">
+                    <button onclick="updateResult('${match.id}', '${match.team1}', '${match.team2}')" class="bg-green-600 text-white px-4 py-1.5 rounded-lg shadow hover:bg-green-700 transition text-sm font-medium">
                       <i class="fas fa-save"></i> Update
                     </button>
+                  </div>
                 </div>
               `;
             });
