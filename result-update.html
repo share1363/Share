@@ -27,7 +27,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, query, where, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, query, where, increment, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
@@ -177,6 +177,11 @@
         return;
       }
 
+      // প্রথমে ম্যাচের আগের ডাটা নিয়ে আসা হবে
+      const matchRef = doc(db, "fixers", matchId);
+      const matchSnap = await getDoc(matchRef);
+      const matchData = matchSnap.data();
+
       let winner;
       if (goal1 > goal2) {
         winner = team1;
@@ -186,22 +191,24 @@
         winner = "Draw";
       }
 
-      await updateDoc(doc(db, "fixers", matchId), {
+      await updateDoc(matchRef, {
         team1Goal: goal1,
         team2Goal: goal2,
         winner,
         status: "Completed"
       });
 
-      // ✅ Increment played count for both teams in users collection
-      const uid1 = teamUidMap.get(team1);
-      const uid2 = teamUidMap.get(team2);
+      // ✅ Played increment হবে শুধু যদি আগের status 'Completed' না হয়
+      if (matchData.status !== "Completed") {
+        const uid1 = teamUidMap.get(team1);
+        const uid2 = teamUidMap.get(team2);
 
-      if (uid1) {
-        await updateDoc(doc(db, "users", uid1), { played: increment(1) });
-      }
-      if (uid2) {
-        await updateDoc(doc(db, "users", uid2), { played: increment(1) });
+        if (uid1) {
+          await updateDoc(doc(db, "users", uid1), { played: increment(1) });
+        }
+        if (uid2) {
+          await updateDoc(doc(db, "users", uid2), { played: increment(1) });
+        }
       }
 
       Swal.fire({
