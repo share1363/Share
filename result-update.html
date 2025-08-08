@@ -88,7 +88,7 @@
                     </div>
                   </div>
 
-                  <div class="flex flex-wrap gap-2">
+                  <div class="flex flex-wrap gap-2 items-center">
                     <select id="winner-${match.id}" class="border p-1 rounded text-sm">
                       <option value="None" ${match.winner === "None" ? 'selected' : ''}>None</option>
                       <option value="${match.team1}" ${match.winner === match.team1 ? 'selected' : ''}>${match.team1}</option>
@@ -99,6 +99,10 @@
                     <button onclick="updateResult('${match.id}')" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
                       Update
                     </button>
+
+                    <p class="text-xs font-medium ${match.status === 'Completed' ? 'text-green-600' : 'text-yellow-600'}">
+                      Status: ${match.status || 'Pending'}
+                    </p>
                   </div>
                 </div>
               `;
