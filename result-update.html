@@ -92,12 +92,7 @@
           // For each group inside this date:
           const groups = dateMap[date];
           Object.keys(groups).sort().forEach(groupName => {
-            // Group heading inside matchday
-            html += `
-              <div class="uppercase flex justify-center items-center text-sm w-full text-center font-semibold bg-green-100 text-green-700 rounded-md py-1 mt-4 mb-2 select-none">
-                ${groupName}
-              </div>
-            `;
+            // ** Removed group heading here **
 
             groups[groupName].forEach(match => {
               let resultText = "Result: ";
