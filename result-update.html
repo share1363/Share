@@ -1,210 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Match Results</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Match Results</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen">
 
-  <!-- Header -->
-  <header class="bg-white shadow-md">
-    <div class="max-w-4xl mx-auto px-4 py-2 flex items-center justify-center relative">
-      <h1 class="text-xl font-bold text-gray-800">Sub-Admin Panel</h1>
-    </div>
-  </header>
+  <!-- Header -->
+  <header class="bg-white shadow-md">
+    <div class="max-w-4xl mx-auto px-4 py-2 flex items-center justify-center relative">
+      <h1 class="text-xl font-bold text-gray-800">Sub-Admin Panel</h1>
+    </div>
+  </header>
 
-  <!-- Main -->
-  <main class="max-w-5xl mx-auto p-4">
-    <div id="resultsContainer" class="space-y-6">
-      <p class="text-center text-gray-500 animate-pulse">Loading matches...</p>
-    </div>
-  </main>
+  <!-- Main -->
+  <main class="max-w-5xl mx-auto p-4">
+    <div id="resultsContainer" class="space-y-6">
+      <p class="text-center text-gray-500 animate-pulse">Loading matches...</p>
+    </div>
+  </main>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, updateDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
-      authDomain: "dlstournament-31ac1.firebaseapp.com",
-      projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.firebasestorage.app",
-      messagingSenderId: "874377019055",
-      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
-      measurementId: "G-0DGFJEV6GL"
-    };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.firebasestorage.app",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL"
+    };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    onAuthStateChanged(auth, (user) => {
-      if (!user) window.location.href = "login.html";
-      else loadMatches();
-    });
+    onAuthStateChanged(auth, (user) => {
+      if (!user) window.location.href = "login.html";
+      else loadMatches();
+    });
 
-    function formatDate(dateStr) {
-      const d = new Date(dateStr);
-      if (isNaN(d)) return dateStr;
-      const day = d.getDate();
-      const monthNames = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-      ];
-      const month = monthNames[d.getMonth()];
-      const year = d.getFullYear();
-      return `${day}-${month}-${year}`;
-    }
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr;
+      const day = d.getDate();
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      const month = monthNames[d.getMonth()];
+      const year = d.getFullYear();
+      return `${day}-${month}-${year}`;
+    }
 
-    function loadMatches() {
-      const container = document.getElementById("resultsContainer");
+    function loadMatches() {
+      const container = document.getElementById("resultsContainer");
 
-      onSnapshot(collection(db, "fixers"), (snapshot) => {
-        if (snapshot.empty) {
-          container.innerHTML = `<p class="text-center text-gray-500">No matches found.</p>`;
-          return;
-        }
+      onSnapshot(collection(db, "fixers"), (snapshot) => {
+        if (snapshot.empty) {
+          container.innerHTML = `<p class="text-center text-gray-500">No matches found.</p>`;
+          return;
+        }
 
-        const dateMap = {};
-        snapshot.forEach(docSnap => {
-          const data = { id: docSnap.id, ...docSnap.data() };
-          if (!dateMap[data.date]) dateMap[data.date] = {};
-          if (!dateMap[data.date][data.groupName]) dateMap[data.date][data.groupName] = [];
-          dateMap[data.date][data.groupName].push(data);
-        });
+        const dateMap = {};
+        snapshot.forEach(docSnap => {
+          const data = { id: docSnap.id, ...docSnap.data() };
+          if (!dateMap[data.date]) dateMap[data.date] = {};
+          if (!dateMap[data.date][data.groupName]) dateMap[data.date][data.groupName] = [];
+          dateMap[data.date][data.groupName].push(data);
+        });
 
-        let html = "";
-        const sortedDates = Object.keys(dateMap).sort();
+        let html = "";
+        const sortedDates = Object.keys(dateMap).sort();
 
-        sortedDates.forEach((date, index) => {
-          const formattedDate = formatDate(date);
-          html += `<div class="bg-green-600 uppercase text-white px-4 py-2 rounded-lg shadow font-semibold mt-6 text-center">
-            Match-day-${index + 1} | ${formattedDate}
-          </div>`;
+        sortedDates.forEach((date, index) => {
+          const formattedDate = formatDate(date);
+          html += `<div class="bg-green-600 uppercase text-white px-4 py-2 rounded-lg shadow font-semibold mt-6 text-center">
+            Match-day-${index + 1} | ${formattedDate}
+          </div>`;
 
-          const groups = dateMap[date];
-          Object.keys(groups).sort().forEach(groupName => {
-            groups[groupName].forEach(match => {
-              let resultText = "Result: ";
-              if (match.winner && match.winner !== "None") {
-                resultText += match.winner === "Draw" ? "Draw" : match.winner;
-              } else {
-                resultText += "N/A";
-              }
+          const groups = dateMap[date];
+          Object.keys(groups).sort().forEach(groupName => {
+            groups[groupName].forEach(match => {
+              let resultText = "Result: ";
+              if (match.winner && match.winner !== "None") {
+                resultText += match.winner === "Draw" ? "Draw" : match.winner;
+              } else {
+                resultText += "N/A";
+              }
 
-              html += `
-                <div class="matchCard bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition space-y-4 text-sm">
+              html += `
+                <div class="matchCard bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition space-y-4 text-sm">
 
-                  <div class="uppercase flex justify-center items-center text-sm w-full text-center font-semibold bg-green-100 text-green-700 rounded-md py-1 mb-2 select-none">
-                    ${groupName}
-                  </div>
+                  <div class="uppercase flex justify-center items-center text-sm w-full text-center font-semibold bg-green-100 text-green-700 rounded-md py-1 mb-2 select-none">
+                    ${groupName}
+                  </div>
 
-                  <div class="flex justify-between items-center gap-10">
+                  <div class="flex justify-between items-center gap-10">
 
-                    <div class="flex flex-col items-center gap-1 w-28">
-                      <span class="font-bold text-gray-700">${match.team1}</span>
-                      <input type="number" min="0" id="goal1-${match.id}" value="${match.team1Goal ?? ''}" class="w-full border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
-                    </div>
+                    <div class="flex flex-col items-center gap-1 w-28">
+                      <span class="font-bold text-gray-700">${match.team1}</span>
+                      <input type="number" min="0" id="goal1-${match.id}" value="${match.team1Goal ?? ''}" class="w-full border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
+                    </div>
 
-                    <span class="text-red-500 font-extrabold text-xl select-none">VS</span>
+                    <span class="text-red-500 font-extrabold text-xl select-none">VS</span>
 
-                    <div class="flex flex-col items-center gap-1 w-28">
-                      <span class="font-bold text-gray-700">${match.team2}</span>
-                      <input type="number" min="0" id="goal2-${match.id}" value="${match.team2Goal ?? ''}" class="w-full border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
-                    </div>
+                    <div class="flex flex-col items-center gap-1 w-28">
+                      <span class="font-bold text-gray-700">${match.team2}</span>
+                      <input type="number" min="0" id="goal2-${match.id}" value="${match.team2Goal ?? ''}" class="w-full border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
+                    </div>
 
-                  </div>
+                  </div>
 
-                  <div class="flex justify-between">
+                  <div class="flex justify-between">
 
-                    <p class="text-xs font-medium px-2 py-1 rounded ${match.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
-                      Status: ${match.status || 'Pending'}
-                    </p>
+                    <p class="text-xs font-medium px-2 py-1 rounded ${match.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                      Status: ${match.status || 'Pending'}
+                    </p>
 
-                    <p class="text-xs font-semibold px-2 py-1 rounded bg-blue-100 text-blue-700">
-                      ${resultText}
-                    </p>
+                    <p class="text-xs font-semibold px-2 py-1 rounded bg-blue-100 text-blue-700">
+                      ${resultText}
+                    </p>
 
-                  </div>
-                  <div class="flex justify-center">
-                    <button onclick="updateResult('${match.id}', '${match.team1}', '${match.team2}')" class="bg-green-600 text-white px-4 py-1.5 rounded-lg shadow hover:bg-green-700 transition text-sm font-medium">
-                      <i class="fas fa-save"></i> Update
-                    </button>
-                  </div>
-                </div>
-              `;
-            });
-          });
-        });
+                  </div>
+                  <div class="flex justify-center">
+                    <button onclick="updateResult('${match.id}', '${match.team1}', '${match.team2}')" class="bg-green-600 text-white px-4 py-1.5 rounded-lg shadow hover:bg-green-700 transition text-sm font-medium">
+                      <i class="fas fa-save"></i> Update
+                    </button>
+                  </div>
+                </div>
+              `;
+            });
+          });
+        });
 
-        container.innerHTML = html;
-      });
-    }
+        container.innerHTML = html;
+      });
+    }
 
-    async function incrementPlayedCountForUsers(usernames) {
-      // usernames: Array of usernames (team1, team2)
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("username", "in", usernames));
-      const querySnapshot = await getDocs(q);
-      const batchUpdates = [];
+    window.updateResult = async function (matchId, team1, team2) {
+      const goal1 = parseInt(document.getElementById(`goal1-${matchId}`).value);
+      const goal2 = parseInt(document.getElementById(`goal2-${matchId}`).value);
 
-      querySnapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        const currentPlayed = data.played || 0;
-        const userRef = doc(db, "users", docSnap.id);
-        batchUpdates.push(updateDoc(userRef, { played: currentPlayed + 1 }));
-      });
+      if (isNaN(goal1) || isNaN(goal2)) {
+        Swal.fire({ icon: 'error', title: 'Please enter both goals!' });
+        return;
+      }
 
-      await Promise.all(batchUpdates);
-    }
+      let winner;
+      if (goal1 > goal2) {
+        winner = team1;
+      } else if (goal1 < goal2) {
+        winner = team2;
+      } else {
+        winner = "Draw";
+      }
 
-    window.updateResult = async function (matchId, team1, team2) {
-      const goal1 = parseInt(document.getElementById(`goal1-${matchId}`).value);
-      const goal2 = parseInt(document.getElementById(`goal2-${matchId}`).value);
+      try {
+        // Update match document
+        await updateDoc(doc(db, "fixers", matchId), {
+          team1Goal: goal1,
+          team2Goal: goal2,
+          winner,
+          status: "Completed"
+        });
 
-      if (isNaN(goal1) || isNaN(goal2)) {
-        Swal.fire({ icon: 'error', title: 'Please enter both goals!' });
-        return;
-      }
+        // Increment played count for team1 user
+        await incrementUserPlayedCount(team1);
 
-      let winner;
-      if (goal1 > goal2) {
-        winner = team1;
-      } else if (goal1 < goal2) {
-        winner = team2;
-      } else {
-        winner = "Draw";
-      }
+        // Increment played count for team2 user
+        await incrementUserPlayedCount(team2);
 
-      await updateDoc(doc(db, "fixers", matchId), {
-        team1Goal: goal1,
-        team2Goal: goal2,
-        winner,
-        status: "Completed"
-      });
+        Swal.fire({
+          icon: 'success',
+          title: 'Result updated!',
+          position: 'top-end',
+          toast: true,
+          timer: 2000,
+          showConfirmButton: false
+        });
+      } catch (err) {
+        console.error(err);
+        Swal.fire({ icon: 'error', title: 'Failed to update result' });
+      }
+    };
 
-      // Increment 'played' count for the two users (team1 and team2)
-      try {
-        await incrementPlayedCountForUsers([team1, team2]);
-      } catch (e) {
-        console.error("Failed to update played count:", e);
-      }
+    async function incrementUserPlayedCount(username) {
+      // Find user by username
+      const usersCol = collection(db, "users");
+      const q = (await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js")).query;
+      const where = (await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js")).where;
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Result updated!',
-        position: 'top-end',
-        toast: true,
-        timer: 2000,
-        showConfirmButton: false
-      });
-    };
-  </script>
+      const querySnapshot = await (await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js")).getDocs(
+        q(usersCol, where("username", "==", username))
+      );
+
+      if (querySnapshot.empty) {
+        console.warn(`User with username "${username}" not found.`);
+        return;
+      }
+
+      for (const userDoc of querySnapshot.docs) {
+        const userRef = doc(db, "users", userDoc.id);
+        const userData = userDoc.data();
+        const currentPlayed = userData.played ?? 0;
+
+        await updateDoc(userRef, { played: currentPlayed + 1 });
+      }
+    }
+  </script>
 
 </body>
 </html>
