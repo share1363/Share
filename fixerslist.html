@@ -71,8 +71,6 @@
       deleteDoc,
       doc,
       onSnapshot,
-      query,
-      where
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -90,7 +88,6 @@
     const db = getFirestore(app);
 
     let teamList = [];
-    // Map teamName => uid
     const teamUidMap = new Map();
 
     onAuthStateChanged(auth, (user) => {
@@ -155,7 +152,7 @@
               html += `
                 <div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
                   <div class="flex justify-between items-center px-2">
-                    <div class="text-xs text-gray-500 text-center w-full">${match.id}</div>
+                    <!-- Removed match.id display here -->
                   </div>
                   <div class="flex justify-between items-center px-2">
                     <div class="text-sm font-semibold text-gray-600 text-center">
