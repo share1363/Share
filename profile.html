@@ -71,52 +71,50 @@
     </section>
     
     <!-- Balance Summary Section -->
-<section class="bg-gray-900 bg-opacity-60 border border-t-4 border-green-700 rounded-xl text-center card-glow shadow-lg">
-  <div class="px-4 py-3 space-y-2">
-    <h4 class="text-xs text-gray-400 tracking-widest">AVAILABLE BALANCE</h4>
-    <div class="text-2xl font-bold text-white flex justify-center items-center gap-2">
-      <span>BDT</span>
-      <span id="mainBalance">0</span>
-      <button class="w-6 h-6 rounded-full bg-green-700 text-white flex items-center justify-center text-xs hover:bg-green-600 shadow">
-        <i class="fa-solid fa-plus"></i>
-      </button>
-    </div>
+    <section class="bg-gray-900 bg-opacity-60 border border-t-4 border-green-700 rounded-xl text-center card-glow shadow-lg">
+      <div class="px-4 py-3 space-y-2">
+        <h4 class="text-xs text-gray-400 tracking-widest">AVAILABLE BALANCE</h4>
+        <div class="text-2xl font-bold text-white flex justify-center items-center gap-2">
+          <span>BDT</span>
+          <span id="mainBalance">0</span>
+          <button class="w-6 h-6 rounded-full bg-green-700 text-white flex items-center justify-center text-xs hover:bg-green-600 shadow">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
 
-    <div class="flex justify-between items-center mt-4 text-white text-sm font-medium">
-      <div class="flex-1 text-center">
-        <p class="text-xs text-gray-400 mb-1">PLAYED</p>
-        <p id="matchPlayed" class="text-lg font-semibold">0</p>
+        <div class="flex justify-between items-center mt-4 text-white text-sm font-medium">
+          <div class="flex-1 text-center">
+            <p class="text-xs text-gray-400 mb-1">PLAYED</p>
+            <p id="matchPlayed" class="text-lg font-semibold">0</p>
+          </div>
+          <div class="w-px bg-gray-600 h-6 mx-1.5"></div>
+          <div class="flex-1 text-center">
+            <p class="text-xs text-gray-400 mb-1">WIN</p>
+            <p id="totalWinning" class="text-lg font-semibold">0</p>
+          </div>
+          <div class="w-px bg-gray-600 h-6 mx-1.5"></div>
+          <div class="flex-1 text-center">
+            <p class="text-xs text-gray-400 mb-1">DRAW</p>
+            <p id="totaldraw" class="text-lg font-semibold">0</p>
+          </div>
+          <div class="w-px bg-gray-600 h-6 mx-1.5"></div>
+          <div class="flex-1 text-center">
+            <p class="text-xs text-gray-400 mb-1">LOST</p>
+            <p id="totalLost" class="text-lg font-semibold">0</p>
+          </div>
+        </div>
       </div>
-      <div class="w-px bg-gray-600 h-6 mx-1.5"></div>
-      <div class="flex-1 text-center">
-        <p class="text-xs text-gray-400 mb-1">WIN</p>
-        <p id="totalWinning" class="text-lg font-semibold">0</p>
-      </div>
-      <div class="w-px bg-gray-600 h-6 mx-1.5"></div>
-      <div class="flex-1 text-center">
-        <p class="text-xs text-gray-400 mb-1">DRAW</p>
-        <p id="totaldraw" class="text-lg font-semibold">0</p>
-      </div>
-      <div class="w-px bg-gray-600 h-6 mx-1.5"></div>
-      <div class="flex-1 text-center">
-        <p class="text-xs text-gray-400 mb-1">LOST</p>
-        <p id="totalLost" class="text-lg font-semibold">0</p>
-      </div>
-    </div>
-  </div>
 
-  <!-- Actions -->
-  <div class="bg-gray-800 bg-opacity-40 border-t border-gray-700 rounded-b-xl p-3 flex justify-between items-center gap-3">
-    <a href="deposit.html" class="flex-1 bg-green-700 hover:bg-green-700 text-white text-sm font-semibold py-2 rounded-lg flex items-center justify-center gap-2 shadow">
-      <i class="fa-solid fa-circle-down"></i> Deposit
-    </a>
-    <a href="withdraw.html" class="flex-1 bg-blue-500 hover:bg-blue-700 text-white text-sm font-semibold py-2 rounded-lg flex items-center justify-center gap-2 shadow">
-      <i class="fa-solid fa-circle-up"></i> Withdraw
-    </a>
-  </div>
-</section>
-
-
+      <!-- Actions -->
+      <div class="bg-gray-800 bg-opacity-40 border-t border-gray-700 rounded-b-xl p-3 flex justify-between items-center gap-3">
+        <a href="deposit.html" class="flex-1 bg-green-700 hover:bg-green-700 text-white text-sm font-semibold py-2 rounded-lg flex items-center justify-center gap-2 shadow">
+          <i class="fa-solid fa-circle-down"></i> Deposit
+        </a>
+        <a href="withdraw.html" class="flex-1 bg-blue-500 hover:bg-blue-700 text-white text-sm font-semibold py-2 rounded-lg flex items-center justify-center gap-2 shadow">
+          <i class="fa-solid fa-circle-up"></i> Withdraw
+        </a>
+      </div>
+    </section>
 
     <!-- Referral -->
     <section class="bg-gray-900 bg-opacity-50 border border-t-4 border-gray-600 rounded-xl p-1 px-3 space-y-2 text-center">
@@ -234,6 +232,12 @@
         const userId = userData.userId || 'Unavailable';
         document.getElementById("userIdDisplay").textContent = `${userId}`;
         document.getElementById("userIdDisplay").setAttribute("data-userid", userId);
+
+        // New fields display:
+        document.getElementById("matchPlayed").textContent = userData.played ?? 0;
+        document.getElementById("totalWinning").textContent = userData.win ?? 0;
+        document.getElementById("totaldraw").textContent = userData.draw ?? 0;
+        document.getElementById("totalLost").textContent = userData.lost ?? 0;
       }
       hideLoader();
     });
