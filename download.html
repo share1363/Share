@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DCL Games App</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('1971.jpeg') no-repeat center center/cover fixed;
+      background-color: rgba(0,0,0,0.7);
+    }
+    .text-glow {
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+    }
+    /* Mab Section Styles */
+    .text-highlight {
+      color: #3b82f6; /* Tailwind blue-500 */
+    }
+    .card-bg {
+      background: rgba(31, 41, 55, 0.8); /* Tailwind slate-800 with opacity */
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+      color: #e0e7ff;
+      transition: transform 0.3s ease;
+    }
+    .card-bg:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 36px rgba(59, 130, 246, 0.5);
+    }
+    /* Circle Progress */
+    .circle-progress {
+      --size: 140px;
+      --progress: 92;
+      position: relative;
+      width: var(--size);
+      height: var(--size);
+      border-radius: 50%;
+      background: conic-gradient(#3b82f6 calc(var(--progress) * 1%), #1e293b 0);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #3b82f6;
+      font-weight: 700;
+      font-size: 3rem;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
+      margin: 0 auto;
+    }
+    .circle-progress > div:first-child {
+      font-family: 'Audiowide', cursive;
+      font-size: 3.5rem;
+      line-height: 1;
+    }
+    .circle-text {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #a5b4fc; /* lighter blue */
+      font-family: 'Segoe UI', sans-serif;
+      margin-top: -6px;
+    }
+    /* Progress bars */
+    .progress-bar-bg {
+      background-color: #374151; /* Tailwind slate-700 */
+      border-radius: 9999px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      height: 100%;
+      border-radius: 9999px;
+      transition: width 0.5s ease-in-out;
+    }
+  </style>
+</head>
+<body class="text-white min-h-full flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-black bg-opacity-40 py-2 shadow-md fixed top-0 left-0 w-full z-20">
+    <div class="container mx-auto px-4 flex items-center space-x-3">
+      <img src="dcl3.jpeg" alt="Logo" class="w-10 h-10 object-cover rounded-full" />
+      <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-300 via-blue-200 to-yellow-300 bg-clip-text text-transparent"
+        style="font-family: 'Audiowide', cursive;">DCL TOUR</h2>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="relative text-center space-y-4 flex-grow flex flex-col justify-center bg-black bg-opacity-60 pt-24">
+
+    <img src="dcl11.png" alt="Game Character" class="w-2/3 h-40 object-contain mx-auto rounded-xl shadow-lg" />
+    
+    <h2 class="text-3xl font-bold bg-gradient-to-r from-yellow-600 via-blue-200 to-yellow-600 bg-clip-text text-transparent"
+        style="font-family: 'Audiowide', cursive;">DCL TOUR</h2>
+    <h1 class="text-2xl font-extrabold text-white">ডিএলস টুর্নামেন্ট অ্যাপ</h1>
+    <p class="text-blue-300 text-lg font-medium text-glow">খেলুন। জিতুন। আয় করুন।</p>
+    <p class="text-gray-200 text-md px-6 text-glow">প্রফেশনাল টুর্নামেন্টে অংশ নিয়ে জিতুন বিশাল পুরস্কার!</p>
+
+    <div class="flex justify-center">
+      <a href="1003_DCLTOUR.apk" download 
+         class="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-semibold py-3 px-8 rounded-full text-lg shadow-lg inline-block text-center">
+        <i class="fa fa-download mr-2"></i> অ্যাপ ডাউনলোড করুন
+      </a>
+    </div>
+
+    <div class="mt-8 grid grid-cols-3 text-center text-gray-300 text-sm md:text-base">
+      <div>
+        <p class="text-xl font-bold text-blue-400 text-glow">৮১০লক্ষ+</p>
+        <p>পুরস্কার</p>
+      </div>
+      <div>
+        <p class="text-xl font-bold text-blue-400 text-glow">১০০হাজার+</p>
+        <p>খেলোয়াড়</p>
+      </div>
+      <div>
+        <p class="text-xl font-bold text-blue-400 text-glow">২৪/৭</p>
+        <p>সাপোর্ট</p>
+      </div>
+    </div>
+    
+    <!-- Why Us Section -->
+    <section class="py-12 px-4 mt-10 rounded-xl">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-2xl md:text-3xl font-bold text-center mb-10">কেন আমাদের টুর্নামেন্ট প্ল্যাটফর্ম?</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          
+          <!-- Card 1 -->
+          <div class="card-bg rounded-lg p-6 text-center shadow-lg">
+            <img src="winning.png" alt="প্রফেশনাল টুর্নামেন্ট" class="mx-auto mb-4 w-14 h-14">
+            <h3 class="text-blue-400 font-bold mb-2">প্রফেশনাল টুর্নামেন্ট</h3>
+            <p class="text-gray-300 text-sm">প্রতিদিন টুর্নামেন্টে অংশ নিয়ে প্রফেশনাল টিমের সাথে খেলুন এবং জিতুন বড় পুরস্কার।</p>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="card-bg rounded-lg p-6 text-center shadow-lg">
+            <img src="add-group.png" alt="প্রফেশনাল টুর্নামেন্ট" class="mx-auto mb-4 w-14 h-14">
+            <h3 class="text-3xl font-bold text-blue-400 mb-2">122,263+</h3>
+            <p class="text-gray-300 text-sm mb-2">সক্রিয় খেলোয়াড়</p>
+            <p class="text-gray-400 text-sm">বাংলাদেশের সবচেয়ে বড় ফ্রি ফায়ার কমিউনিটিতে যোগ দিন।</p>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="card-bg rounded-lg p-6 text-center shadow-lg">
+            <img src="smartphone.png" alt="পেমেন্ট" class="mx-auto mb-4 w-14 h-14">
+            <h3 class="text-blue-400 font-bold mb-2">তাত্ক্ষণিক পেমেন্ট</h3>
+            <p class="text-gray-300 text-sm">টুর্নামেন্ট জেতার পর সাথে সাথেই পাবেন আপনার পুরস্কারের টাকা।</p>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="card-bg rounded-lg p-6 text-center shadow-lg">
+            <img src="support12.png" alt="সাপোর্ট" class="mx-auto mb-4 w-14 h-14">
+            <h3 class="text-blue-400 font-bold mb-2">২৪/৭ সাপোর্ট</h3>
+            <p class="text-gray-300 text-sm">আমাদের ডেডিকেটেড সাপোর্ট টিম সবসময় আপনার সহায়তায় প্রস্তুত।</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Mab Section - Updated Design -->
+    <section class="py-16 px-4 max-w-7xl mx-auto">
+      <!-- Title -->
+      <div class="text-center mb-16">
+        <p class="text-sm text-highlight uppercase tracking-widest font-semibold mb-2">প্ল্যাটফর্ম পরিসংখ্যান</p>
+        <h1 class="text-4xl font-extrabold text-white mb-4">ডিএলস<span class="text-yellow-400">টুর্নামেন্ট প্ল্যাটফর্ম</span></h1>
+        <p class="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">বিশ্বব্যাপী হাজার হাজার পেশাদার ফ্রি ফায়ার প্লেয়ারদের বিশিষ্ট পছন্দ</p>
+      </div>
+
+      <!-- Stats Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+
+        <!-- Left card: Circular progress -->
+        <div class="card-bg p-10 flex flex-col items-center">
+          <h2 class="text-xl font-semibold mb-8 text-white">ব্যবহারকারী সন্তুষ্টি রেটিং</h2>
+          <div class="circle-progress" style="--progress: 92;">
+            <div>৪.৯</div>
+            <div class="circle-text">৫ এর মধ্যে</div>
+          </div>
+          <p class="mt-8 text-gray-400 text-center text-sm max-w-xs">৫০,০০০+ রিভিউ এর ভিত্তিতে</p>
+        </div>
+
+        <!-- Right card: Progress bars -->
+        <div class="card-bg p-10 space-y-10">
+          <!-- Bar 1 -->
+          <div>
+            <div class="flex justify-between mb-2 text-white font-semibold text-lg">
+              <p>টুর্নামেন্ট সাফল্যের হার</p>
+              <p class="text-highlight">৯৮%</p>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width: 98%;"></div>
+            </div>
+          </div>
+
+          <!-- Bar 2 -->
+          <div>
+            <div class="flex justify-between mb-2 text-white font-semibold text-lg">
+              <p>পুরস্কার বিতরণ</p>
+              <p class="text-highlight">১০০%</p>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- Bar 3 -->
+          <div>
+            <div class="flex justify-between mb-2 text-white font-semibold text-lg">
+              <p>প্লেয়ার রিটেনশন</p>
+              <p class="text-highlight">৯২%</p>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width: 92%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div class="card-bg p-8">
+          <p class="text-highlight font-extrabold text-3xl">৮৫০ লাখ+</p>
+          <p class="text-gray-400 mt-2 text-sm">মাসিক পুরস্কার পুল</p>
+        </div>
+
+        <div class="card-bg p-8">
+          <p class="text-highlight font-extrabold text-3xl">১০০০+</p>
+          <p class="text-gray-400 mt-2 text-sm">দৈনিক টুর্নামেন্ট</p>
+        </div>
+
+        <div class="card-bg p-8">
+          <p class="text-highlight font-extrabold text-3xl">৫০ হাজার+</p>
+          <p class="text-gray-400 mt-2 text-sm">সক্রিয় প্লেয়ার</p>
+        </div>
+
+        <div class="card-bg p-8">
+          <p class="text-highlight font-extrabold text-3xl">১৫ মিনিট</p>
+          <p class="text-gray-400 mt-2 text-sm">গড় পেমেন্ট সময়</p>
+        </div>
+      </div>
+    </section>
+    
+    <section class="max-w-7xl mx-auto mb-8 px-4 flex justify-center">
+  <img src="facilities.png" alt="Facilities" class="rounded-lg shadow-lg w-full max-w-4xl ml-4" />
+  </section>
+
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-60 text-center text-gray-300 py-4 mt-8">
+      <p class="font-semibold text-lg">© 2025 DCL TOUR</p>
+    </footer>
+  </main>
+</body>
+</html>
