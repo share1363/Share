@@ -27,7 +27,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, updateDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
@@ -50,7 +50,7 @@
 
     function formatDate(dateStr) {
       const d = new Date(dateStr);
-      if (isNaN(d)) return dateStr; // fallback if invalid date
+      if (isNaN(d)) return dateStr;
       const day = d.getDate();
       const monthNames = [
         "January", "February", "March", "April", "May", "June",
@@ -70,7 +70,6 @@
           return;
         }
 
-        // Group matches by date, then inside each date group by groupName
         const dateMap = {};
         snapshot.forEach(docSnap => {
           const data = { id: docSnap.id, ...docSnap.data() };
@@ -80,7 +79,6 @@
         });
 
         let html = "";
-        // Sort dates ascending, assign matchday number
         const sortedDates = Object.keys(dateMap).sort();
 
         sortedDates.forEach((date, index) => {
@@ -89,11 +87,8 @@
             Match-day-${index + 1} | ${formattedDate}
           </div>`;
 
-          // For each group inside this date:
           const groups = dateMap[date];
           Object.keys(groups).sort().forEach(groupName => {
-            // ** Removed group heading here **
-
             groups[groupName].forEach(match => {
               let resultText = "Result: ";
               if (match.winner && match.winner !== "None") {
@@ -105,7 +100,6 @@
               html += `
                 <div class="matchCard bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition space-y-4 text-sm">
 
-                  <!-- Group name inside each match card -->
                   <div class="uppercase flex justify-center items-center text-sm w-full text-center font-semibold bg-green-100 text-green-700 rounded-md py-1 mb-2 select-none">
                     ${groupName}
                   </div>
@@ -152,6 +146,23 @@
       });
     }
 
+    async function incrementPlayedCountForUsers(usernames) {
+      // usernames: Array of usernames (team1, team2)
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("username", "in", usernames));
+      const querySnapshot = await getDocs(q);
+      const batchUpdates = [];
+
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const currentPlayed = data.played || 0;
+        const userRef = doc(db, "users", docSnap.id);
+        batchUpdates.push(updateDoc(userRef, { played: currentPlayed + 1 }));
+      });
+
+      await Promise.all(batchUpdates);
+    }
+
     window.updateResult = async function (matchId, team1, team2) {
       const goal1 = parseInt(document.getElementById(`goal1-${matchId}`).value);
       const goal2 = parseInt(document.getElementById(`goal2-${matchId}`).value);
@@ -176,6 +187,13 @@
         winner,
         status: "Completed"
       });
+
+      // Increment 'played' count for the two users (team1 and team2)
+      try {
+        await incrementPlayedCountForUsers([team1, team2]);
+      } catch (e) {
+        console.error("Failed to update played count:", e);
+      }
 
       Swal.fire({
         icon: 'success',
