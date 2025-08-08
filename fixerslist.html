@@ -26,7 +26,7 @@
         <div class="text-xl font-semibold text-green-700">Football Match Fixers</div>
         <div class="flex flex-col gap-1">
           <div class="flex items-center gap-2 flex-wrap">
-            <select id="teamSelector" multiple class="border border-gray-300 rounded p-2 text-sm w-26 h-9 overflow-y-auto" size="8"></select>
+            <select id="teamSelector" multiple class="border border-gray-300 rounded p-2 text-sm w-52 h-36 overflow-y-auto"></select>
             <label class="text-sm text-gray-600 flex items-center gap-2 pl-1">
               <input type="checkbox" id="selectAllTeams" class="accent-green-600" />
               Select All Teams
@@ -70,7 +70,9 @@
       addDoc,
       deleteDoc,
       doc,
-      onSnapshot
+      onSnapshot,
+      query,
+      where
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -87,25 +89,44 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let teamList = [];
+    // This will hold team to array of UIDs map
+    let teamUidMap = new Map();
 
     onAuthStateChanged(auth, (user) => {
       if (!user) window.location.href = "login.html";
       else {
-        loadTeams();
+        loadTeamsAndUIDs();
         loadFixers();
       }
     });
 
-    async function loadTeams() {
+    async function loadTeamsAndUIDs() {
       const snapshot = await getDocs(collection(db, "playersform"));
       const teams = new Set();
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.team) teams.add(data.team);
+      teamUidMap.clear();
+
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        if (data.team) {
+          teams.add(data.team);
+          // Add uid for the team
+          if (!teamUidMap.has(data.team)) teamUidMap.set(data.team, []);
+          // Assuming uid is stored as 'uid' in document, if not adjust accordingly
+          if(data.uid) teamUidMap.get(data.team).push(data.uid);
+        }
       });
-      teamList = Array.from(teams);
-      document.getElementById("teamSelector").innerHTML = teamList.map(t => `<option value="${t}">${t}</option>`).join("");
+
+      const teamList = Array.from(teams).sort();
+
+      // Build options with team names and UIDs
+      const optionsHTML = teamList.map(team => {
+        const uids = teamUidMap.get(team) || [];
+        // Join all UIDs comma separated or "No UID"
+        const uidText = uids.length ? uids.join(", ") : "No UID";
+        return `<option value="${team}">${team} [UIDs: ${uidText}]</option>`;
+      }).join("");
+
+      document.getElementById("teamSelector").innerHTML = optionsHTML;
     }
 
     function addDays(dateStr, days) {
@@ -148,11 +169,15 @@
                   </div>
                   <div class="flex justify-between items-center px-2">
                     <div class="text-sm font-semibold text-gray-600 text-center">
-                      ${match.team1} <span class="text-black">(${match.team1Goal ?? "-"})</span>
+                      ${match.team1} 
+                      <span class="text-black">(${match.team1Goal ?? "-"})</span><br/>
+                      <small class="text-gray-400">UIDs: ${teamUidMap.get(match.team1)?.join(", ") || "No UID"}</small>
                     </div>
                     <div class="text-base font-bold text-red-500">VS</div>
                     <div class="text-sm font-semibold text-gray-600 text-center">
-                      ${match.team2} <span class="text-black">(${match.team2Goal ?? "-"})</span>
+                      ${match.team2} 
+                      <span class="text-black">(${match.team2Goal ?? "-"})</span><br/>
+                      <small class="text-gray-400">UIDs: ${teamUidMap.get(match.team2)?.join(", ") || "No UID"}</small>
                     </div>
                   </div>
                   <div class="text-center text-green-600 text-xs font-medium">Winner: ${match.winner}</div>
