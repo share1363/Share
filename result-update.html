@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Update Match Results</title>
+  <title>Match Results</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -27,13 +27,13 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, query, where, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
       authDomain: "dlstournament-31ac1.firebaseapp.com",
       projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.firebasestorage.app",
+      storageBucket: "dlstournament-31ac1.appspot.com",
       messagingSenderId: "874377019055",
       appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
       measurementId: "G-0DGFJEV6GL"
@@ -67,7 +67,7 @@
 
     function formatDate(dateStr) {
       const d = new Date(dateStr);
-      if (isNaN(d)) return dateStr; // fallback if invalid date
+      if (isNaN(d)) return dateStr;
       const day = d.getDate();
       const monthNames = [
         "January", "February", "March", "April", "May", "June",
@@ -87,7 +87,6 @@
           return;
         }
 
-        // Group matches by date, then inside each date group by groupName
         const dateMap = {};
         snapshot.forEach(docSnap => {
           const data = { id: docSnap.id, ...docSnap.data() };
@@ -97,7 +96,6 @@
         });
 
         let html = "";
-        // Sort dates ascending, assign matchday number
         const sortedDates = Object.keys(dateMap).sort();
 
         sortedDates.forEach((date, index) => {
@@ -106,7 +104,6 @@
             Match-day-${index + 1} | ${formattedDate}
           </div>`;
 
-          // For each group inside this date:
           const groups = dateMap[date];
           Object.keys(groups).sort().forEach(groupName => {
             groups[groupName].forEach(match => {
@@ -123,7 +120,6 @@
               html += `
                 <div class="matchCard bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition space-y-4 text-sm">
 
-                  <!-- Group name inside each match card -->
                   <div class="uppercase flex justify-center items-center text-sm w-full text-center font-semibold bg-green-100 text-green-700 rounded-md py-1 mb-2 select-none">
                     ${groupName}
                   </div>
@@ -196,6 +192,17 @@
         winner,
         status: "Completed"
       });
+
+      // ✅ Increment played count for both teams in users collection
+      const uid1 = teamUidMap.get(team1);
+      const uid2 = teamUidMap.get(team2);
+
+      if (uid1) {
+        await updateDoc(doc(db, "users", uid1), { played: increment(1) });
+      }
+      if (uid2) {
+        await updateDoc(doc(db, "users", uid2), { played: increment(1) });
+      }
 
       Swal.fire({
         icon: 'success',
