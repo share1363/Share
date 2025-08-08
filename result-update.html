@@ -27,7 +27,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
@@ -43,10 +43,27 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    onAuthStateChanged(auth, (user) => {
+    // Map teamName => uid
+    let teamUidMap = new Map();
+
+    onAuthStateChanged(auth, async (user) => {
       if (!user) window.location.href = "login.html";
-      else loadMatches();
+      else {
+        await loadTeamUIDs();
+        loadMatches();
+      }
     });
+
+    async function loadTeamUIDs() {
+      teamUidMap.clear();
+      const snapshot = await getDocs(collection(db, "playersform"));
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        if (data.team && data.uid) {
+          teamUidMap.set(data.team, data.uid);
+        }
+      });
+    }
 
     function formatDate(dateStr) {
       const d = new Date(dateStr);
@@ -92,8 +109,6 @@
           // For each group inside this date:
           const groups = dateMap[date];
           Object.keys(groups).sort().forEach(groupName => {
-            // ** Removed group heading here **
-
             groups[groupName].forEach(match => {
               let resultText = "Result: ";
               if (match.winner && match.winner !== "None") {
@@ -101,6 +116,9 @@
               } else {
                 resultText += "N/A";
               }
+
+              const uid1 = teamUidMap.get(match.team1) ?? "UID N/A";
+              const uid2 = teamUidMap.get(match.team2) ?? "UID N/A";
 
               html += `
                 <div class="matchCard bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition space-y-4 text-sm">
@@ -114,6 +132,7 @@
 
                     <div class="flex flex-col items-center gap-1 w-28">
                       <span class="font-bold text-gray-700">${match.team1}</span>
+                      <span class="text-gray-400 text-[10px] select-none">UID: ${uid1}</span>
                       <input type="number" min="0" id="goal1-${match.id}" value="${match.team1Goal ?? ''}" class="w-full border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
                     </div>
 
@@ -121,6 +140,7 @@
 
                     <div class="flex flex-col items-center gap-1 w-28">
                       <span class="font-bold text-gray-700">${match.team2}</span>
+                      <span class="text-gray-400 text-[10px] select-none">UID: ${uid2}</span>
                       <input type="number" min="0" id="goal2-${match.id}" value="${match.team2Goal ?? ''}" class="w-full border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
                     </div>
 
