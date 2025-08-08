@@ -96,7 +96,7 @@
                       <option value="Draw" ${match.winner === "Draw" ? 'selected' : ''}>Draw</option>
                     </select>
 
-                    <button onclick="updateResult('${match.id}')" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                    <button onclick="updateResult('${match.id}', '${match.team1}', '${match.team2}')" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
                       Update
                     </button>
 
@@ -114,14 +114,28 @@
       });
     }
 
-    window.updateResult = async function (matchId) {
-      const goal1 = document.getElementById(`goal1-${matchId}`).value;
-      const goal2 = document.getElementById(`goal2-${matchId}`).value;
-      const winner = document.getElementById(`winner-${matchId}`).value;
+    window.updateResult = async function (matchId, team1, team2) {
+      const goal1 = parseInt(document.getElementById(`goal1-${matchId}`).value);
+      const goal2 = parseInt(document.getElementById(`goal2-${matchId}`).value);
+      let winner = document.getElementById(`winner-${matchId}`).value;
+
+      // Auto winner detection if none selected or mismatch
+      if (isNaN(goal1) || isNaN(goal2)) {
+        Swal.fire({ icon: 'error', title: 'Please enter both goals!' });
+        return;
+      }
+
+      if (goal1 > goal2) {
+        winner = team1;
+      } else if (goal1 < goal2) {
+        winner = team2;
+      } else {
+        winner = "Draw";
+      }
 
       await updateDoc(doc(db, "fixers", matchId), {
-        team1Goal: goal1 === "" ? null : parseInt(goal1),
-        team2Goal: goal2 === "" ? null : parseInt(goal2),
+        team1Goal: goal1,
+        team2Goal: goal2,
         winner,
         status: "Completed"
       });
