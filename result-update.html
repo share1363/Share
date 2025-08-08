@@ -84,6 +84,7 @@
                 resultText += "N/A";
               }
 
+              // Add a placeholder div for the "Updated" message, initially hidden
               html += `
                 <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition space-y-4 text-sm">
 
@@ -118,6 +119,9 @@
                     </p>
 
                   </div>
+
+                  <p id="updated-msg-${match.id}" class="text-center text-green-700 font-semibold mt-2 hidden">Updated</p>
+
                 </div>
               `;
             });
@@ -152,6 +156,15 @@
         winner,
         status: "Completed"
       });
+
+      // Show the "Updated" message centered under Status and Result
+      const updatedMsg = document.getElementById(`updated-msg-${matchId}`);
+      if (updatedMsg) {
+        updatedMsg.classList.remove('hidden');
+        setTimeout(() => {
+          updatedMsg.classList.add('hidden');
+        }, 2000);
+      }
 
       Swal.fire({
         icon: 'success',
