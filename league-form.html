@@ -109,7 +109,7 @@
       measurementId: "G-0DGFJEV6GL"
     };
 
-    const app = initializeApp(firebaseConfig); // ✅ This line was missing
+    const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
@@ -142,7 +142,8 @@
       return {
         username: data?.username ?? "",
         photoUrl: data?.photoUrl ?? "",
-        balance: data?.balance ?? 0
+        balance: data?.balance ?? 0,
+        tour: data?.tour ?? 0
       };
     }
 
@@ -194,7 +195,7 @@
         return Swal.fire({ icon: 'error', title: 'Team Exists', text: 'Team name already used.', confirmButtonColor: '#EF4444' });
       }
 
-      const { username, photoUrl, balance } = await getUserInfo(currentUser.uid);
+      const { username, photoUrl, balance, tour } = await getUserInfo(currentUser.uid);
       if (balance < joiningFee) {
         Swal.close();
         return Swal.fire({ icon: 'error', title: 'Insufficient Balance', text: `Current balance: ৳${balance.toFixed(0)}`, confirmButtonColor: '#EF4444' });
@@ -219,7 +220,8 @@
           });
 
           transaction.update(doc(db, "users", currentUser.uid), {
-            balance: balance - joiningFee
+            balance: balance - joiningFee,
+            tour: (tour || 0) + 1   // 🔹 এখানে ইউজারের tour কাউন্ট আপডেট হচ্ছে
           });
 
           slotUsed = data.slotUsed + 1;
