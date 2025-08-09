@@ -202,7 +202,10 @@
         const uid2 = teamUidMap.get(team2);
 
         if (uid1) {
-          await updateDoc(doc(db, "users", uid1), { played: increment(1) });
+          await updateDoc(doc(db, "users", uid1), { 
+            played: increment(1), 
+            goal: increment(goal1)  // গোল সংখ্যা যোগ করা হলো 
+          });
           if (winner === team1) {
             await updateDoc(doc(db, "users", uid1), { win: increment(1) });
           } else if (winner === team2) {
@@ -213,7 +216,10 @@
         }
 
         if (uid2) {
-          await updateDoc(doc(db, "users", uid2), { played: increment(1) });
+          await updateDoc(doc(db, "users", uid2), { 
+            played: increment(1), 
+            goal: increment(goal2)  // গোল সংখ্যা যোগ করা হলো 
+          });
           if (winner === team2) {
             await updateDoc(doc(db, "users", uid2), { win: increment(1) });
           } else if (winner === team1) {
