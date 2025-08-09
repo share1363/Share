@@ -46,6 +46,9 @@
     // Map teamName => uid
     let teamUidMap = new Map();
 
+    // Cache match data locally for checking status before update
+    let matchDataCache = new Map();
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) window.location.href = "login.html";
       else {
@@ -87,10 +90,14 @@
           return;
         }
 
+        // Clear cache & rebuild it on each update
+        matchDataCache.clear();
+
         // Group matches by date, then inside each date group by groupName
         const dateMap = {};
         snapshot.forEach(docSnap => {
           const data = { id: docSnap.id, ...docSnap.data() };
+          matchDataCache.set(docSnap.id, data);
           if (!dateMap[data.date]) dateMap[data.date] = {};
           if (!dateMap[data.date][data.groupName]) dateMap[data.date][data.groupName] = [];
           dateMap[data.date][data.groupName].push(data);
@@ -206,6 +213,10 @@
         winner = "Draw";
       }
 
+      // Check if match was already completed before update
+      const matchBefore = matchDataCache.get(matchId);
+      const wasCompletedBefore = matchBefore && matchBefore.status === "Completed";
+
       // Update match document
       await updateDoc(doc(db, "fixers", matchId), {
         team1Goal: goal1,
@@ -214,14 +225,16 @@
         status: "Completed"
       });
 
-      // Increment played count for both teams' users
-      const uid1 = teamUidMap.get(team1);
-      const uid2 = teamUidMap.get(team2);
+      // Only increment played count if match was NOT completed before
+      if (!wasCompletedBefore) {
+        const uid1 = teamUidMap.get(team1);
+        const uid2 = teamUidMap.get(team2);
 
-      await Promise.all([
-        incrementPlayedCount(uid1),
-        incrementPlayedCount(uid2)
-      ]);
+        await Promise.all([
+          incrementPlayedCount(uid1),
+          incrementPlayedCount(uid2)
+        ]);
+      }
 
       Swal.fire({
         icon: 'success',
