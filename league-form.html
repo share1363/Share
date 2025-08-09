@@ -215,18 +215,16 @@
           });
 
           transaction.update(slotRef, {
-            slotUsed: data.slotUsed + 1,
-            slot: data.slot - 1
+            slotUsed: data.slotUsed + 1
           });
 
           transaction.update(doc(db, "users", currentUser.uid), {
             balance: balance - joiningFee,
-            tour: (tour || 0) + 1   // 🔹 এখানে ইউজারের tour কাউন্ট আপডেট হচ্ছে
+            tour: (tour || 0) + 1
           });
 
           slotUsed = data.slotUsed + 1;
-          slot = data.slot - 1;
-          joiningSlot.textContent = `Slot: ${slotUsed}/${slot}`;
+          joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
         });
 
         Swal.close();
