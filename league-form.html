@@ -109,7 +109,7 @@
       measurementId: "G-0DGFJEV6GL"
     };
 
-    const app = initializeApp(firebaseConfig); // ✅ This line was missing
+    const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
@@ -142,7 +142,8 @@
       return {
         username: data?.username ?? "",
         photoUrl: data?.photoUrl ?? "",
-        balance: data?.balance ?? 0
+        balance: data?.balance ?? 0,
+        tour: data?.tour ?? 0
       };
     }
 
@@ -194,7 +195,7 @@
         return Swal.fire({ icon: 'error', title: 'Team Exists', text: 'Team name already used.', confirmButtonColor: '#EF4444' });
       }
 
-      const { username, photoUrl, balance } = await getUserInfo(currentUser.uid);
+      const { username, photoUrl, balance, tour } = await getUserInfo(currentUser.uid);
       if (balance < joiningFee) {
         Swal.close();
         return Swal.fire({ icon: 'error', title: 'Insufficient Balance', text: `Current balance: ৳${balance.toFixed(0)}`, confirmButtonColor: '#EF4444' });
@@ -207,21 +208,34 @@
           const data = slotSnap.data();
           if (data.slotUsed >= data.slot) throw new Error("Slot full.");
 
+          // Update playersform collection
           transaction.set(doc(collection(db, "playersform")), {
             team, dlsRating, age, yearsPlayed,
             uid: currentUser.uid, username, photoUrl,
             createdAt: new Date()
           });
 
+          // Update slot settings
           transaction.update(slotRef, {
             slotUsed: data.slotUsed + 1,
             slot: data.slot - 1
           });
 
-          transaction.update(doc(db, "users", currentUser.uid), {
-            balance: balance - joiningFee
+          // Get user doc ref
+          const userRef = doc(db, "users", currentUser.uid);
+          const userSnap = await transaction.get(userRef);
+          const userData = userSnap.data();
+
+          const currentTourCount = userData?.tour ?? 0;
+          const newTourCount = currentTourCount + 1;
+
+          // Update user balance and increment tour count
+          transaction.update(userRef, {
+            balance: balance - joiningFee,
+            tour: newTourCount
           });
 
+          // Update local variables and UI text
           slotUsed = data.slotUsed + 1;
           slot = data.slot - 1;
           joiningSlot.textContent = `Slot: ${slotUsed}/${slot}`;
