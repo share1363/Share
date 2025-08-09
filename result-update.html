@@ -27,7 +27,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, query, where, increment, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, increment, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
@@ -178,7 +178,10 @@
 
       const matchRef = doc(db, "fixers", matchId);
       const matchSnap = await getDoc(matchRef);
-      const matchData = matchSnap.data();
+      const matchData = matchSnap.data() || {};
+
+      // চেক করুন আগের status "Completed" কিনা
+      const wasCompleted = (matchData.status === "Completed");
 
       let winner;
       if (goal1 > goal2) {
@@ -189,6 +192,7 @@
         winner = "Draw";
       }
 
+      // আপডেট করুন ম্যাচ ডকুমেন্ট
       await updateDoc(matchRef, {
         team1Goal: goal1,
         team2Goal: goal2,
@@ -196,13 +200,16 @@
         status: "Completed"
       });
 
-      // ✅ Update stats only first time
-      if (matchData.status !== "Completed") {
+      // যদি আগে completed না হয়, তবে স্ট্যাটস আপডেট করুন
+      if (!wasCompleted) {
         const uid1 = teamUidMap.get(team1);
         const uid2 = teamUidMap.get(team2);
 
         if (uid1) {
-          await updateDoc(doc(db, "users", uid1), { played: increment(1) });
+          await updateDoc(doc(db, "users", uid1), {
+            played: increment(1),
+            goal: increment(goal1)
+          });
           if (winner === team1) {
             await updateDoc(doc(db, "users", uid1), { win: increment(1) });
           } else if (winner === team2) {
@@ -213,7 +220,10 @@
         }
 
         if (uid2) {
-          await updateDoc(doc(db, "users", uid2), { played: increment(1) });
+          await updateDoc(doc(db, "users", uid2), {
+            played: increment(1),
+            goal: increment(goal2)
+          });
           if (winner === team2) {
             await updateDoc(doc(db, "users", uid2), { win: increment(1) });
           } else if (winner === team1) {
