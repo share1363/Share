@@ -70,23 +70,19 @@
         const fixers = [];
         snapshot.forEach(doc => fixers.push(doc.data()));
 
-        const fixersByDate = {};
+        // Grouping by groupName instead of hardcoding
+        const groupsMap = {};
         fixers.forEach(fix => {
-          const key = fix.date;
-          if (!fixersByDate[key]) fixersByDate[key] = [];
-          fixersByDate[key].push(fix);
+          if (!groupsMap[fix.groupName]) groupsMap[fix.groupName] = [];
+          groupsMap[fix.groupName].push(fix);
         });
 
-        const sortedDates = Object.keys(fixersByDate).sort();
-
-        let groupIndex = 0;
         const allGroupsPoints = [];
         const globalPoints = {};
         const globalGoals = {};
 
-        sortedDates.forEach(date => {
-          const groupName = `Group-${String.fromCharCode(65 + groupIndex)}`;
-          const matches = fixersByDate[date].sort((a, b) => a.team1.localeCompare(b.team1));
+        Object.keys(groupsMap).sort().forEach(groupName => {
+          const matches = groupsMap[groupName];
 
           const points = {};
           const goals = {};
@@ -148,9 +144,9 @@
           sortedTeams = sortedTeams.slice(0, 4);
 
           allGroupsPoints.push({ groupName, sortedTeams });
-          groupIndex++;
         });
 
+        // Group tables
         let allPointsHTML = "";
         if (allGroupsPoints.length === 0) {
           allPointsHTML = `<p class="text-gray-500 text-center">No point tables to show.</p>`;
@@ -191,6 +187,7 @@
         }
         pointTablesContainer.innerHTML = allPointsHTML;
 
+        // All teams table
         const allTeams = Object.entries(globalPoints).map(([team, stat]) => ({
           team,
           ...stat,
