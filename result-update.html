@@ -27,7 +27,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, query, where, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
@@ -43,24 +43,25 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Map teamName => uid
-    let teamUidMap = new Map();
+    // Map teamName => playersform document ID (not uid)
+    let teamDocIdMap = new Map();
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) window.location.href = "login.html";
       else {
-        await loadTeamUIDs();
+        await loadTeamDocIDs();
         loadMatches();
       }
     });
 
-    async function loadTeamUIDs() {
-      teamUidMap.clear();
+    async function loadTeamDocIDs() {
+      teamDocIdMap.clear();
       const snapshot = await getDocs(collection(db, "playersform"));
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
-        if (data.team && data.uid) {
-          teamUidMap.set(data.team, data.uid);
+        if (data.team) {
+          // map team name to document id (docSnap.id)
+          teamDocIdMap.set(data.team, docSnap.id);
         }
       });
     }
@@ -117,8 +118,8 @@
                 resultText += "N/A";
               }
 
-              const uid1 = teamUidMap.get(match.team1) ?? "UID N/A";
-              const uid2 = teamUidMap.get(match.team2) ?? "UID N/A";
+              const docId1 = teamDocIdMap.get(match.team1) ?? "N/A";
+              const docId2 = teamDocIdMap.get(match.team2) ?? "N/A";
 
               html += `
                 <div class="matchCard bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition space-y-4 text-sm">
@@ -132,7 +133,7 @@
 
                     <div class="flex flex-col items-center gap-1 w-28">
                       <span class="font-bold text-gray-700">${match.team1}</span>
-                      <span class="hidden text-gray-400 text-[10px] select-none">UID: ${uid1}</span>
+                      <span class="hidden text-gray-400 text-[10px] select-none">DocID: ${docId1}</span>
                       <input type="number" min="0" id="goal1-${match.id}" value="${match.team1Goal ?? ''}" class="w-full border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
                     </div>
 
@@ -140,7 +141,7 @@
 
                     <div class="flex flex-col items-center gap-1 w-28">
                       <span class="font-bold text-gray-700">${match.team2}</span>
-                      <span class="hidden text-gray-400 text-[10px] select-none">UID: ${uid2}</span>
+                      <span class="hidden text-gray-400 text-[10px] select-none">DocID: ${docId2}</span>
                       <input type="number" min="0" id="goal2-${match.id}" value="${match.team2Goal ?? ''}" class="w-full border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
                     </div>
 
@@ -197,19 +198,17 @@
         status: "Completed"
       });
 
-      // Update 'played' field in users collection for both teams
-      // Assuming users collection is "playersform" and uid is document id
-      // Increment played by 1 for both team1 and team2 uids (if exist)
+      // Update 'played' field in playersform collection for both teams
       try {
-        const uid1 = teamUidMap.get(team1);
-        const uid2 = teamUidMap.get(team2);
+        const docId1 = teamDocIdMap.get(team1);
+        const docId2 = teamDocIdMap.get(team2);
 
-        if (uid1) {
-          const userDoc1 = doc(db, "playersform", uid1);
+        if (docId1) {
+          const userDoc1 = doc(db, "playersform", docId1);
           await updateDoc(userDoc1, { played: increment(1) });
         }
-        if (uid2 && uid2 !== uid1) { // avoid double update if same uid somehow
-          const userDoc2 = doc(db, "playersform", uid2);
+        if (docId2 && docId2 !== docId1) { // avoid double update if same doc id
+          const userDoc2 = doc(db, "playersform", docId2);
           await updateDoc(userDoc2, { played: increment(1) });
         }
       } catch (error) {
