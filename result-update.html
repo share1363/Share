@@ -33,7 +33,7 @@
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
       authDomain: "dlstournament-31ac1.firebaseapp.com",
       projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.firebasestorage.app",
+      storageBucket: "dlstournament-31ac1.appspot.com",
       messagingSenderId: "874377019055",
       appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
       measurementId: "G-0DGFJEV6GL"
@@ -172,6 +172,22 @@
       });
     }
 
+    async function incrementPlayedCount(uid) {
+      if (!uid || uid === "UID N/A") return;
+      try {
+        const q = query(collection(db, "users"), where("uid", "==", uid));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const userRef = doc(db, "users", userDoc.id);
+          const currentPlayed = userDoc.data().played || 0;
+          await updateDoc(userRef, { played: currentPlayed + 1 });
+        }
+      } catch (err) {
+        console.error("Failed to increment played for uid:", uid, err);
+      }
+    }
+
     window.updateResult = async function (matchId, team1, team2) {
       const goal1 = parseInt(document.getElementById(`goal1-${matchId}`).value);
       const goal2 = parseInt(document.getElementById(`goal2-${matchId}`).value);
@@ -190,12 +206,22 @@
         winner = "Draw";
       }
 
+      // Update match document
       await updateDoc(doc(db, "fixers", matchId), {
         team1Goal: goal1,
         team2Goal: goal2,
         winner,
         status: "Completed"
       });
+
+      // Increment played count for both teams' users
+      const uid1 = teamUidMap.get(team1);
+      const uid2 = teamUidMap.get(team2);
+
+      await Promise.all([
+        incrementPlayedCount(uid1),
+        incrementPlayedCount(uid2)
+      ]);
 
       Swal.fire({
         icon: 'success',
