@@ -27,7 +27,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, query, where, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
@@ -196,6 +196,25 @@
         winner,
         status: "Completed"
       });
+
+      // Update 'played' field in users collection for both teams
+      // Assuming users collection is "playersform" and uid is document id
+      // Increment played by 1 for both team1 and team2 uids (if exist)
+      try {
+        const uid1 = teamUidMap.get(team1);
+        const uid2 = teamUidMap.get(team2);
+
+        if (uid1) {
+          const userDoc1 = doc(db, "playersform", uid1);
+          await updateDoc(userDoc1, { played: increment(1) });
+        }
+        if (uid2 && uid2 !== uid1) { // avoid double update if same uid somehow
+          const userDoc2 = doc(db, "playersform", uid2);
+          await updateDoc(userDoc2, { played: increment(1) });
+        }
+      } catch (error) {
+        console.error("Error updating played field:", error);
+      }
 
       Swal.fire({
         icon: 'success',
