@@ -35,9 +35,9 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, addDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-     const firebaseConfig = {
+    const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
       authDomain: "dlstournament-31ac1.firebaseapp.com",
       projectId: "dlstournament-31ac1",
@@ -56,7 +56,6 @@
       else loadPointTables();
     });
 
-    // Function to load point tables and save to pointTables collection
     function loadPointTables() {
       const pointTablesContainer = document.getElementById("pointTablesContainer");
       const allPointsContainer = document.getElementById("allPointsContainer");
@@ -86,7 +85,6 @@
         const globalGoals = {};
 
         sortedDates.forEach(date => {
-          // Prefix group name with 'Group-' and a letter (A, B, C, ...)
           const groupName = `Group-${String.fromCharCode(65 + groupIndex)}`;
           const matches = fixersByDate[date].sort((a, b) => a.team1.localeCompare(b.team1));
 
@@ -147,35 +145,12 @@
             return b.goals - a.goals;
           });
 
-          // **Limit to max 4 teams per group here:**
           sortedTeams = sortedTeams.slice(0, 4);
 
           allGroupsPoints.push({ groupName, sortedTeams });
           groupIndex++;
-
-          // Save to pointTables collection (with 'Group-' prefix)
-          const pointTableData = {
-            groupName: groupName,  // Save groupName as 'Group-A', 'Group-B', etc.
-            teams: sortedTeams.map(team => ({
-              team: team.team,
-              played: team.played,
-              win: team.win,
-              loss: team.loss,
-              draw: team.draw,
-              goals: team.goals,
-              points: team.points
-            }))
-          };
-
-          // Save the point table data to Firestore under the pointTables collection
-          setDoc(doc(db, "pointTables", groupName), pointTableData).then(() => {
-            console.log("Point table saved for group: " + groupName);
-          }).catch((error) => {
-            console.error("Error saving point table: ", error);
-          });
         });
 
-        // Group-wise tables
         let allPointsHTML = "";
         if (allGroupsPoints.length === 0) {
           allPointsHTML = `<p class="text-gray-500 text-center">No point tables to show.</p>`;
@@ -216,7 +191,6 @@
         }
         pointTablesContainer.innerHTML = allPointsHTML;
 
-        // All teams consolidated table
         const allTeams = Object.entries(globalPoints).map(([team, stat]) => ({
           team,
           ...stat,
