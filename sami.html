@@ -70,8 +70,7 @@
       <!-- Group-wise point tables will appear here -->
     </div>
   </main>
-
-<script type="module">
+    <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
@@ -114,6 +113,79 @@ function addDays(dateStr, days) {
   return d.toISOString().split("T")[0];
 }
 
+// New helper: get top 8 teams from fixers point tables
+async function getTop8TeamsFromFixers() {
+  const snapshot = await getDocs(collection(db, "fixers"));
+  if (snapshot.empty) return [];
+
+  const fixers = [];
+  snapshot.forEach(doc => fixers.push(doc.data()));
+
+  // Group matches by groupName
+  const groupsMap = {};
+  fixers.forEach(fix => {
+    if (!groupsMap[fix.groupName]) groupsMap[fix.groupName] = [];
+    groupsMap[fix.groupName].push(fix);
+  });
+
+  let allTopTeams = [];
+
+  Object.keys(groupsMap).sort().forEach(groupName => {
+    const matches = groupsMap[groupName];
+
+    const points = {};
+    const goals = {};
+
+    matches.forEach(match => {
+      const g1 = match.team1Goal;
+      const g2 = match.team2Goal;
+
+      if (!points[match.team1]) points[match.team1] = { win: 0, loss: 0, draw: 0 };
+      if (!points[match.team2]) points[match.team2] = { win: 0, loss: 0, draw: 0 };
+      if (!goals[match.team1]) goals[match.team1] = 0;
+      if (!goals[match.team2]) goals[match.team2] = 0;
+
+      if (typeof g1 === "number") {
+        goals[match.team1] += g1;
+      }
+      if (typeof g2 === "number") {
+        goals[match.team2] += g2;
+      }
+
+      if (typeof g1 === "number" && typeof g2 === "number") {
+        if (g1 > g2) {
+          points[match.team1].win++;
+          points[match.team2].loss++;
+        } else if (g2 > g1) {
+          points[match.team2].win++;
+          points[match.team1].loss++;
+        } else {
+          points[match.team1].draw++;
+          points[match.team2].draw++;
+        }
+      }
+    });
+
+    let sortedTeams = Object.entries(points).map(([team, stat]) => ({
+      team,
+      ...stat,
+      points: stat.win * 3 + stat.draw,
+      played: stat.win + stat.loss + stat.draw,
+      goals: goals[team] || 0,
+    })).sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      return b.goals - a.goals;
+    });
+
+    // Get top 2 teams from this group
+    sortedTeams = sortedTeams.slice(0, 2);
+    allTopTeams.push(...sortedTeams.map(t => t.team));
+  });
+
+  // Return exactly 8 teams (if less than 8, return as many as available)
+  return allTopTeams.slice(0, 8);
+}
+
 document.getElementById("addFixerBtn").addEventListener("click", async () => {
   const baseDate = document.getElementById("fixerDate").value;
   const stage = document.getElementById("stageSelect").value;
@@ -125,12 +197,13 @@ document.getElementById("addFixerBtn").addEventListener("click", async () => {
   let added = 0;
 
   if (stage === "knockout") {
-    const winners = [];
-    const snapshot = await getDocs(collection(db, "knockouts"));
-    snapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      if (data.winner !== "None") winners.push(data.winner);
-    });
+    const winners = await getTop8TeamsFromFixers();
+    if (winners.length < 8) {
+      Swal.fire({ icon: 'error', title: 'Not enough teams (need 8) in fixers top teams.', position: 'top-end', toast: true, timer: 3000, showConfirmButton: false });
+      return;
+    }
+    // Create knockout matches from these 8 teams
+    // Assuming pairs: (0 vs 7), (1 vs 6), (2 vs 5), (3 vs 4)
     for (let i = 0; i < 4; i++) {
       await addDoc(collection(db, "knockouts"), {
         team1: winners[i],
@@ -299,7 +372,7 @@ document.getElementById("deleteAllBtn").addEventListener("click", async () => {
   loadPointTables(); // reload top teams
 });
 
-// ======== New function to load top teams from "fixers" collection =======
+// ======== Existing loadPointTables function - unchanged =======
 function loadPointTables() {
   const pointTablesContainer = document.getElementById("topTeamsContainer");
 
@@ -409,5 +482,6 @@ function loadPointTables() {
   });
 }
 </script>
+
 </body>
 </html>
