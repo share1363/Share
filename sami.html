@@ -119,7 +119,8 @@
             return b.goals - a.goals;
           });
 
-          sortedTeams = sortedTeams.slice(0, 4);
+          // Show only top 2 teams per group here (changed from 4)
+          sortedTeams = sortedTeams.slice(0, 2);
 
           allGroupsPoints.push({ groupName, sortedTeams });
         });
