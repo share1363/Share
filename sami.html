@@ -29,7 +29,6 @@
           <!-- Stage Select Dropdown -->
           <select id="stageSelect" class="border border-gray-300 rounded p-2 text-sm h-9">
             <option value="knockout">Knockout Fixers</option>
-            <option value="quarterfinal">Quarterfinal Fixers</option>
             <option value="samifinal">Samifinal Fixers</option>
             <option value="final">Final Fixers</option>
           </select>
@@ -38,7 +37,7 @@
           <input type="date" id="fixerDate" class="border border-gray-300 rounded p-2 text-sm h-9" />
         </div>
 
-        <!-- Action Buttons (Add and Delete) -->
+        <!-- Action Buttons -->
         <div class="flex gap-4 items-center justify-center">
           <button id="addFixerBtn" class="bg-green-600 text-white text-sm px-3 py-2 rounded hover:bg-green-700 whitespace-nowrap">
             <i class="fas fa-plus mr-1"></i> Add Fixers
@@ -50,14 +49,9 @@
       </div>
     </div>
 
-    <!-- Knockouts Display -->
-    <div id="knockoutsContainer" class="space-y-6 max-h-[600px] overflow-y-auto">
+    <!-- Knockout Display -->
+    <div id="knockoutContainer" class="space-y-6 max-h-[600px] overflow-y-auto">
       <p class="text-gray-500 text-center">Loading knockouts...</p>
-    </div>
-
-    <!-- Quarterfinal Display -->
-    <div id="quarterfinalContainer" class="space-y-6 max-h-[600px] overflow-y-auto">
-      <p class="text-gray-500 text-center">Loading quarterfinals...</p>
     </div>
 
     <!-- Samifinal Display -->
@@ -69,423 +63,72 @@
     <div id="finalContainer" class="space-y-6 max-h-[600px] overflow-y-auto">
       <p class="text-gray-500 text-center">Loading finals...</p>
     </div>
-
-    <!-- Top Teams Section -->
-    <div class="bg-white shadow rounded p-4 mt-6">
-      <div class="text-xl font-semibold text-blue-700 mb-4">Top Teams By Group</div>
-      <div id="topteamsContainer" class="space-y-4">
-        <!-- Top teams will be displayed here as small div boxes -->
-      </div>
-    </div>
   </main>
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      getDocs,
-      addDoc,
-      deleteDoc,
-      updateDoc,
-      doc,
-      onSnapshot
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
-      authDomain: "dlstournament-31ac1.firebaseapp.com",
-      projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.firebasestorage.app",
-      messagingSenderId: "874377019055",
-      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
-      measurementId: "G-0DGFJEV6GL"
-    };
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+const firebaseConfig = {
+  apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+  authDomain: "dlstournament-31ac1.firebaseapp.com",
+  projectId: "dlstournament-31ac1",
+  storageBucket: "dlstournament-31ac1.firebasestorage.app",
+  messagingSenderId: "874377019055",
+  appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+  measurementId: "G-0DGFJEV6GL"
+};
 
-    onAuthStateChanged(auth, (user) => {
-      if (!user) window.location.href = "login.html";
-      else {
-        loadKnockouts();
-        loadQuarterfinals();
-        loadSamifinals();
-        loadFinals();
-        loadTopTeams(); // Load top teams only (allTeams removed)
-      }
-    });
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    async function loadKnockouts() {
-      const knockoutsContainer = document.getElementById("knockoutsContainer");
+onAuthStateChanged(auth, (user) => {
+  if (!user) window.location.href = "login.html";
+  else {
+    loadKnockouts();
+    loadSamifinals();
+    loadFinals();
+  }
+});
 
-      // Listen for real-time updates
-      onSnapshot(collection(db, "knockouts"), (snapshot) => {
-        if (snapshot.empty) {
-          knockoutsContainer.innerHTML = `<p class="text-gray-500 text-center">No knockouts found.</p>`;
-          return;
-        }
+function addDays(dateStr, days) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split("T")[0];
+}
 
-        const knockouts = [];
-        snapshot.docs.forEach(docSnap => {
-          const data = docSnap.data();
-          const docRef = doc(db, "knockouts", docSnap.id);
-
-          const g1 = data.team1Goal;
-          const g2 = data.team2Goal;
-          let status = (typeof g1 === 'number' && typeof g2 === 'number') ? "Finished" : "Pending";
-
-          if (data.status !== status) {
-            updateDoc(docRef, { status });
-            data.status = status;
-          }
-
-          let winner = "None";
-          if (typeof g1 === "number" && typeof g2 === "number") {
-            if (g1 > g2) winner = data.team1;
-            else if (g2 > g1) winner = data.team2;
-            else winner = "Draw";
-          }
-
-          // Update the winner field in Firestore if not already set
-          if (winner !== "None" && data.winner !== winner) {
-            updateDoc(docRef, { winner });
-            data.winner = winner;
-          }
-
-          knockouts.push({ ...data, winner });
-        });
-
-        const knockoutsByDate = {};
-        knockouts.forEach(fix => {
-          const key = fix.date;
-          if (!knockoutsByDate[key]) knockoutsByDate[key] = [];
-          knockoutsByDate[key].push(fix);
-        });
-
-        const sortedDates = Object.keys(knockoutsByDate).sort();
-        const baseDate = sortedDates.length > 0 ? sortedDates[0] : null;
-
-        let html = "";
-        sortedDates.forEach(date => {
-          const matches = knockoutsByDate[date].sort((a, b) => a.team1.localeCompare(b.team1));
-
-          matches.forEach((match, idx) => {
-            let displayDate = baseDate ? addDays(baseDate, idx) : match.date;
-
-            html += `
-              <div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
-                <div class="text-center text-[13px] text-gray-500 font-semibold">${displayDate}</div>
-                <div class="flex justify-between items-center px-2">
-                  <div class="text-sm font-semibold text-gray-600">${match.team1} <span class="text-black">(${match.team1Goal ?? "-"})</span></div>
-                  <div class="text-base font-bold text-red-500">VS</div>
-                  <div class="text-sm font-semibold text-gray-600">${match.team2} <span class="text-black">(${match.team2Goal ?? "-"})</span></div>
-                </div>
-                <div class="text-center text-green-600 text-xs font-medium">Winner: ${match.winner}</div>
-                <div class="text-center text-blue-600 text-xs font-medium">Status: ${match.status}</div>
-              </div>`;
-          });
-        });
-
-        knockoutsContainer.innerHTML = html;
-      });
-    }
-
-    async function loadTopTeams() {
-      const snapshot = await getDocs(collection(db, "pointTables"));
-      const topTeamsContainer = document.getElementById("topteamsContainer");
-
-      if (snapshot.empty) {
-        topTeamsContainer.innerHTML = `<div class="text-center text-gray-500">No teams available.</div>`;
-        return;
-      }
-
-      let groupTeams = {};
-
-      snapshot.forEach(doc => {
-        const pointTable = doc.data();
-        const groupName = pointTable.groupName;
-
-        if (!groupTeams[groupName]) {
-          groupTeams[groupName] = [];
-        }
-
-        pointTable.teams.forEach((team) => {
-          groupTeams[groupName].push({ name: team.team, points: team.points, goals: team.goals || 0 });
-        });
-      });
-
-      const sortedGroups = Object.keys(groupTeams).sort();
-
-      let topTeamsHtml = "";
-
-      sortedGroups.forEach(group => {
-        const teams = groupTeams[group];
-
-        topTeamsHtml += `
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold text-gray-700">${group}</h3>
-            <div class="border p-4 rounded-lg shadow-md bg-white">
-              <div class="space-y-2">
-        `;
-
-        const topTeams = teams.sort((a, b) => {
-          if (b.points === a.points) {
-            return b.goals - a.goals;
-          }
-          return b.points - a.points;
-        }).slice(0, 2);
-
-        topTeams.forEach((team, idx) => {
-          topTeamsHtml += `
-            <div class="flex justify-between text-sm text-gray-700">
-              <div>${idx + 1}. ${team.name}</div>
-              <div>Points: ${team.points}, Goals: ${team.goals || 0}</div>
-            </div>
-          `;
-        });
-
-        topTeamsHtml += `
-              </div>
-            </div>
-          </div>
-        `;
-      });
-
-      document.getElementById("topteamsContainer").innerHTML = topTeamsHtml;
-    }
-
-    async function loadQuarterfinals() {
-      const quarterfinalContainer = document.getElementById("quarterfinalContainer");
-
-      // Listen for real-time updates for quarterfinals
-      onSnapshot(collection(db, "quarterfinals"), (snapshot) => {
-        if (snapshot.empty) {
-          quarterfinalContainer.innerHTML = `<p class="text-gray-500 text-center">No quarterfinals found.</p>`;
-          return;
-        }
-
-        const quarterfinals = [];
-        snapshot.docs.forEach(docSnap => {
-          const data = docSnap.data();
-          const docRef = doc(db, "quarterfinals", docSnap.id);
-
-          const g1 = data.team1Goal;
-          const g2 = data.team2Goal;
-          let status = (typeof g1 === 'number' && typeof g2 === 'number') ? "Finished" : "Pending";
-
-          if (data.status !== status) {
-            updateDoc(docRef, { status });
-            data.status = status;
-          }
-
-          let winner = "None";
-          if (typeof g1 === "number" && typeof g2 === "number") {
-            if (g1 > g2) winner = data.team1;
-            else if (g2 > g1) winner = data.team2;
-            else winner = "Draw";
-          }
-
-          // Update the winner field in Firestore if not already set
-          if (winner !== "None" && data.winner !== winner) {
-            updateDoc(docRef, { winner });
-            data.winner = winner;
-          }
-
-          quarterfinals.push({ ...data, winner });
-        });
-
-        const quarterfinalsByDate = {};
-        quarterfinals.forEach(fix => {
-          const key = fix.date;
-          if (!quarterfinalsByDate[key]) quarterfinalsByDate[key] = [];
-          quarterfinalsByDate[key].push(fix);
-        });
-
-        const sortedDates = Object.keys(quarterfinalsByDate).sort();
-        const baseDate = sortedDates.length > 0 ? sortedDates[0] : null;
-
-        let html = "";
-        sortedDates.forEach(date => {
-          const matches = quarterfinalsByDate[date].sort((a, b) => a.team1.localeCompare(b.team1));
-
-          matches.forEach((match, idx) => {
-            let displayDate = baseDate ? addDays(baseDate, idx) : match.date;
-
-            html += `
-              <div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
-                <div class="text-center text-[13px] text-gray-500 font-semibold">${displayDate}</div>
-                <div class="flex justify-between items-center px-2">
-                  <div class="text-sm font-semibold text-gray-600">${match.team1} <span class="text-black">(${match.team1Goal ?? "-"})</span></div>
-                  <div class="text-base font-bold text-red-500">VS</div>
-                  <div class="text-sm font-semibold text-gray-600">${match.team2} <span class="text-black">(${match.team2Goal ?? "-"})</span></div>
-                </div>
-                <div class="text-center text-green-600 text-xs font-medium">Winner: ${match.winner}</div>
-                <div class="text-center text-blue-600 text-xs font-medium">Status: ${match.status}</div>
-              </div>`;
-          });
-        });
-
-        quarterfinalContainer.innerHTML = html;
-      });
-    }
-
-    async function loadSamifinals() {
-      const samifinalContainer = document.getElementById("samifinalContainer");
-
-      // Listen for real-time updates for samifinals
-      onSnapshot(collection(db, "samifinals"), (snapshot) => {
-        if (snapshot.empty) {
-          samifinalContainer.innerHTML = `<p class="text-gray-500 text-center">No samifinals found.</p>`;
-          return;
-        }
-
-        const samifinals = [];
-        snapshot.docs.forEach(docSnap => {
-          const data = docSnap.data();
-          const docRef = doc(db, "samifinals", docSnap.id);
-
-          const g1 = data.team1Goal;
-          const g2 = data.team2Goal;
-          let status = (typeof g1 === 'number' && typeof g2 === 'number') ? "Finished" : "Pending";
-
-          if (data.status !== status) {
-            updateDoc(docRef, { status });
-            data.status = status;
-          }
-
-          let winner = "None";
-          if (typeof g1 === "number" && typeof g2 === "number") {
-            if (g1 > g2) winner = data.team1;
-            else if (g2 > g1) winner = data.team2;
-            else winner = "Draw";
-          }
-
-          // Update the winner field in Firestore if not already set
-          if (winner !== "None" && data.winner !== winner) {
-            updateDoc(docRef, { winner });
-            data.winner = winner;
-          }
-
-          samifinals.push({ ...data, winner });
-        });
-
-        const samifinalsByDate = {};
-        samifinals.forEach(fix => {
-          const key = fix.date;
-          if (!samifinalsByDate[key]) samifinalsByDate[key] = [];
-          samifinalsByDate[key].push(fix);
-        });
-
-        const sortedDates = Object.keys(samifinalsByDate).sort();
-        const baseDate = sortedDates.length > 0 ? sortedDates[0] : null;
-
-        let html = "";
-        sortedDates.forEach(date => {
-          const matches = samifinalsByDate[date].sort((a, b) => a.team1.localeCompare(b.team1));
-
-          matches.forEach((match, idx) => {
-            let displayDate = baseDate ? addDays(baseDate, idx) : match.date;
-
-            html += `
-              <div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
-                <div class="text-center text-[13px] text-gray-500 font-semibold">${displayDate}</div>
-                <div class="flex justify-between items-center px-2">
-                  <div class="text-sm font-semibold text-gray-600">${match.team1} <span class="text-black">(${match.team1Goal ?? "-"})</span></div>
-                  <div class="text-base font-bold text-red-500">VS</div>
-                  <div class="text-sm font-semibold text-gray-600">${match.team2} <span class="text-black">(${match.team2Goal ?? "-"})</span></div>
-                </div>
-                <div class="text-center text-green-600 text-xs font-medium">Winner: ${match.winner}</div>
-                <div class="text-center text-blue-600 text-xs font-medium">Status: ${match.status}</div>
-              </div>`;
-          });
-        });
-
-        samifinalContainer.innerHTML = html;
-      });
-    }
-
-      function addDays(dateStr, days) {
-      const d = new Date(dateStr);
-      d.setDate(d.getDate() + days);
-      return d.toISOString().split("T")[0];
-      }
-
-    document.getElementById("addFixerBtn").addEventListener("click", async () => {
+document.getElementById("addFixerBtn").addEventListener("click", async () => {
   const baseDate = document.getElementById("fixerDate").value;
-  const selectedStage = document.getElementById("stageSelect").value;
-
+  const stage = document.getElementById("stageSelect").value;
   if (!baseDate) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Please fill out all fields.',
-      position: 'top-end',
-      toast: true,
-      timer: 3000,
-      showConfirmButton: false
-    });
+    Swal.fire({ icon: 'warning', title: 'Please fill out all fields.', position: 'top-end', toast: true, timer: 3000, showConfirmButton: false });
     return;
   }
 
   let added = 0;
-  let topTeams = [];
 
-  // Collect teams shown in topteamsContainer
-  const teamElements = document.querySelectorAll("#topteamsContainer .space-y-2 .flex");
-  teamElements.forEach((element) => {
-    const teamName = element.querySelector('div').innerText.split('.')[1].trim();
-    topTeams.push({ name: teamName });
-  });
-
-  // Handle knockout stage
-  if (selectedStage === "knockout") {
-    topTeams = topTeams.slice(0, 16);
-    for (let i = 0; i < 8; i++) {
-      const team1 = topTeams[i];
-      const team2 = topTeams[15 - i];
-      const matchDate = new Date(baseDate);
-
-      await addDoc(collection(db, "knockouts"), {
-        team1: team1.name,
-        team2: team2.name,
-        date: matchDate.toISOString().split("T")[0],
-        team1Goal: null,
-        team2Goal: null,
-        status: "Pending",
-        winner: "None"  // Adding winner field here
-      });
-      added++;
-    }
-    Swal.fire({
-      icon: 'success',
-      title: `${added} knockout match fixers added!`,
-      position: 'top-end',
-      toast: true,
-      timer: 3000,
-      showConfirmButton: false
-    });
-  }
-
-  // Handle quarterfinal stage
-  if (selectedStage === "quarterfinal") {
-    const knockoutSnapshot = await getDocs(collection(db, "knockouts"));
-    const knockoutWinners = [];
-
-    knockoutSnapshot.forEach(docSnap => {
+  if (stage === "knockout") {
+    const winners = [];
+    const snapshot = await getDocs(collection(db, "knockouts"));
+    snapshot.forEach(docSnap => {
       const data = docSnap.data();
-      if (data.winner !== "None") knockoutWinners.push(data.winner);
+      if (data.winner !== "None") winners.push(data.winner);
     });
-
     for (let i = 0; i < 4; i++) {
-      const team1 = knockoutWinners[i];
-      const team2 = knockoutWinners[7 - i];
-      const matchDate = new Date(baseDate);
-
-      await addDoc(collection(db, "quarterfinals"), {
-        team1: team1,
-        team2: team2,
-        date: matchDate.toISOString().split("T")[0],
+      await addDoc(collection(db, "knockouts"), {
+        team1: winners[i],
+        team2: winners[7 - i],
+        date: baseDate,
         team1Goal: null,
         team2Goal: null,
         status: "Pending",
@@ -493,36 +136,20 @@
       });
       added++;
     }
-
-    Swal.fire({
-      icon: 'success',
-      title: `${added} quarterfinal match fixers added!`,
-      position: 'top-end',
-      toast: true,
-      timer: 3000,
-      showConfirmButton: false
-    });
   }
 
-  // Handle samifinal stage
-  if (selectedStage === "samifinal") {
-    const quarterfinalSnapshot = await getDocs(collection(db, "quarterfinals"));
-    const quarterfinalWinners = [];
-
-    quarterfinalSnapshot.forEach(docSnap => {
+  if (stage === "samifinal") {
+    const winners = [];
+    const snapshot = await getDocs(collection(db, "knockouts"));
+    snapshot.forEach(docSnap => {
       const data = docSnap.data();
-      if (data.winner !== "None") quarterfinalWinners.push(data.winner);
+      if (data.winner !== "None") winners.push(data.winner);
     });
-
     for (let i = 0; i < 2; i++) {
-      const team1 = quarterfinalWinners[i];
-      const team2 = quarterfinalWinners[3 - i];
-      const matchDate = new Date(baseDate);
-
       await addDoc(collection(db, "samifinals"), {
-        team1: team1,
-        team2: team2,
-        date: matchDate.toISOString().split("T")[0],
+        team1: winners[i],
+        team2: winners[3 - i],
+        date: baseDate,
         team1Goal: null,
         team2Goal: null,
         status: "Pending",
@@ -530,135 +157,123 @@
       });
       added++;
     }
-
-    Swal.fire({
-      icon: 'success',
-      title: `${added} samifinal match fixers added!`,
-      position: 'top-end',
-      toast: true,
-      timer: 3000,
-      showConfirmButton: false
-    });
   }
 
-  // Handle final stage
-  if (selectedStage === "final") {
-    // Load winners from the samifinals
-    const samifinalSnapshot = await getDocs(collection(db, "samifinals"));
-    const samifinalWinners = [];
-
-    samifinalSnapshot.forEach(docSnap => {
+  if (stage === "final") {
+    const winners = [];
+    const snapshot = await getDocs(collection(db, "samifinals"));
+    snapshot.forEach(docSnap => {
       const data = docSnap.data();
-      if (data.winner !== "None") samifinalWinners.push(data.winner);
+      if (data.winner !== "None") winners.push(data.winner);
     });
-
-    // Add final match using the winners of the samifinals
-    const team1 = samifinalWinners[0];
-    const team2 = samifinalWinners[1];
-    const matchDate = new Date(baseDate);
-
     await addDoc(collection(db, "finals"), {
-      team1: team1,
-      team2: team2,
-      date: matchDate.toISOString().split("T")[0],
+      team1: winners[0],
+      team2: winners[1],
+      date: baseDate,
       team1Goal: null,
       team2Goal: null,
       status: "Pending",
       winner: "None"
     });
     added++;
-
-    Swal.fire({
-      icon: 'success',
-      title: `${added} final match fixer added!`,
-      position: 'top-end',
-      toast: true,
-      timer: 3000,
-      showConfirmButton: false
-    });
   }
 
-  
+  Swal.fire({ icon: 'success', title: `${added} match fixers added!`, position: 'top-end', toast: true, timer: 3000, showConfirmButton: false });
   loadKnockouts();
-  loadQuarterfinals();
   loadSamifinals();
   loadFinals();
 });
 
-// Function to load final matches
-async function loadFinals() {
-  const finalContainer = document.getElementById("finalContainer");
-
-  // Listen for real-time updates for finals
-  onSnapshot(collection(db, "finals"), (snapshot) => {
+async function loadKnockouts() {
+  const container = document.getElementById("knockoutContainer");
+  onSnapshot(collection(db, "knockouts"), (snapshot) => {
     if (snapshot.empty) {
-      finalContainer.innerHTML = `<p class="text-gray-500 text-center">No finals found.</p>`;
+      container.innerHTML = `<p class="text-gray-500 text-center">No knockouts found.</p>`;
       return;
     }
-
-    const finals = [];
-    snapshot.docs.forEach(docSnap => {
-      const data = docSnap.data();
-      const docRef = doc(db, "finals", docSnap.id);
-
-      const g1 = data.team1Goal;
-      const g2 = data.team2Goal;
-      let status = (typeof g1 === 'number' && typeof g2 === 'number') ? "Finished" : "Pending";
-
-      if (data.status !== status) {
-        updateDoc(docRef, { status });
-        data.status = status;
-      }
-
-      let winner = "None";
-      if (typeof g1 === "number" && typeof g2 === "number") {
-        if (g1 > g2) winner = data.team1;
-        else if (g2 > g1) winner = data.team2;
-        else winner = "Draw";
-      }
-
-      if (winner !== "None" && data.winner !== winner) {
-        updateDoc(docRef, { winner });
-        data.winner = winner;
-      }
-
-      finals.push({ ...data, winner });
+    let html = "";
+    snapshot.forEach(docSnap => {
+      const m = docSnap.data();
+      const g1 = m.team1Goal, g2 = m.team2Goal;
+      m.status = (typeof g1 === 'number' && typeof g2 === 'number') ? "Finished" : "Pending";
+      m.winner = (typeof g1 === 'number' && typeof g2 === 'number') ? (g1 > g2 ? m.team1 : g2 > g1 ? m.team2 : "Draw") : m.winner;
+      html += `<div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
+        <div class="text-center text-[13px] text-gray-500 font-semibold">${m.date}</div>
+        <div class="flex justify-between items-center px-2">
+          <div class="text-sm font-semibold text-gray-600">${m.team1} <span class="text-black">(${m.team1Goal ?? "-"})</span></div>
+          <div class="text-base font-bold text-red-500">VS</div>
+          <div class="text-sm font-semibold text-gray-600">${m.team2} <span class="text-black">(${m.team2Goal ?? "-"})</span></div>
+        </div>
+        <div class="text-center text-green-600 text-xs font-medium">Winner: ${m.winner}</div>
+        <div class="text-center text-blue-600 text-xs font-medium">Status: ${m.status}</div>
+      </div>`;
     });
-
-    const html = finals.map((match) => {
-      return `
-        <div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
-          <div class="text-center text-[13px] text-gray-500 font-semibold">${match.date}</div>
-          <div class="flex justify-between items-center px-2">
-            <div class="text-sm font-semibold text-gray-600">${match.team1} <span class="text-black">(${match.team1Goal ?? "-"})</span></div>
-            <div class="text-base font-bold text-red-500">VS</div>
-            <div class="text-sm font-semibold text-gray-600">${match.team2} <span class="text-black">(${match.team2Goal ?? "-"})</span></div>
-          </div>
-          <div class="text-center text-green-600 text-xs font-medium">Winner: ${match.winner}</div>
-          <div class="text-center text-blue-600 text-xs font-medium">Status: ${match.status}</div>
-        </div>`;
-    }).join("");
-
-    finalContainer.innerHTML = html;
+    container.innerHTML = html;
   });
 }
 
-    document.getElementById("deleteAllBtn").addEventListener("click", async () => {
-  const confirm = await Swal.fire({
-    title: 'Are you sure?',
-    text: "All match fixers will be deleted!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete all!',
+async function loadSamifinals() {
+  const container = document.getElementById("samifinalContainer");
+  onSnapshot(collection(db, "samifinals"), (snapshot) => {
+    if (snapshot.empty) {
+      container.innerHTML = `<p class="text-gray-500 text-center">No samifinals found.</p>`;
+      return;
+    }
+    let html = "";
+    snapshot.forEach(docSnap => {
+      const m = docSnap.data();
+      const g1 = m.team1Goal, g2 = m.team2Goal;
+      m.status = (typeof g1 === 'number' && typeof g2 === 'number') ? "Finished" : "Pending";
+      m.winner = (typeof g1 === 'number' && typeof g2 === 'number') ? (g1 > g2 ? m.team1 : g2 > g1 ? m.team2 : "Draw") : m.winner;
+      html += `<div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
+        <div class="text-center text-[13px] text-gray-500 font-semibold">${m.date}</div>
+        <div class="flex justify-between items-center px-2">
+          <div class="text-sm font-semibold text-gray-600">${m.team1} <span class="text-black">(${m.team1Goal ?? "-"})</span></div>
+          <div class="text-base font-bold text-red-500">VS</div>
+          <div class="text-sm font-semibold text-gray-600">${m.team2} <span class="text-black">(${m.team2Goal ?? "-"})</span></div>
+        </div>
+        <div class="text-center text-green-600 text-xs font-medium">Winner: ${m.winner}</div>
+        <div class="text-center text-blue-600 text-xs font-medium">Status: ${m.status}</div>
+      </div>`;
+    });
+    container.innerHTML = html;
   });
+}
 
+async function loadFinals() {
+  const container = document.getElementById("finalContainer");
+  onSnapshot(collection(db, "finals"), (snapshot) => {
+    if (snapshot.empty) {
+      container.innerHTML = `<p class="text-gray-500 text-center">No finals found.</p>`;
+      return;
+    }
+    let html = "";
+    snapshot.forEach(docSnap => {
+      const m = docSnap.data();
+      const g1 = m.team1Goal, g2 = m.team2Goal;
+      m.status = (typeof g1 === 'number' && typeof g2 === 'number') ? "Finished" : "Pending";
+      m.winner = (typeof g1 === 'number' && typeof g2 === 'number') ? (g1 > g2 ? m.team1 : g2 > g1 ? m.team2 : "Draw") : m.winner;
+      html += `<div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
+        <div class="text-center text-[13px] text-gray-500 font-semibold">${m.date}</div>
+        <div class="flex justify-between items-center px-2">
+          <div class="text-sm font-semibold text-gray-600">${m.team1} <span class="text-black">(${m.team1Goal ?? "-"})</span></div>
+          <div class="text-base font-bold text-red-500">VS</div>
+          <div class="text-sm font-semibold text-gray-600">${m.team2} <span class="text-black">(${m.team2Goal ?? "-"})</span></div>
+        </div>
+        <div class="text-center text-green-600 text-xs font-medium">Winner: ${m.winner}</div>
+        <div class="text-center text-blue-600 text-xs font-medium">Status: ${m.status}</div>
+      </div>`;
+    });
+    container.innerHTML = html;
+  });
+}
+
+document.getElementById("deleteAllBtn").addEventListener("click", async () => {
+  const confirm = await Swal.fire({ title: 'Are you sure?', text: "All match fixers will be deleted!", icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete all!' });
   if (!confirm.isConfirmed) return;
 
   const snapshotKnockouts = await getDocs(collection(db, "knockouts"));
   const deletionsKnockouts = snapshotKnockouts.docs.map(docSnap => deleteDoc(doc(db, "knockouts", docSnap.id)));
-
-  const snapshotQuarterfinals = await getDocs(collection(db, "quarterfinals"));
-  const deletionsQuarterfinals = snapshotQuarterfinals.docs.map(docSnap => deleteDoc(doc(db, "quarterfinals", docSnap.id)));
 
   const snapshotSamifinals = await getDocs(collection(db, "samifinals"));
   const deletionsSamifinals = snapshotSamifinals.docs.map(docSnap => deleteDoc(doc(db, "samifinals", docSnap.id)));
@@ -666,28 +281,14 @@ async function loadFinals() {
   const snapshotFinals = await getDocs(collection(db, "finals"));
   const deletionsFinals = snapshotFinals.docs.map(docSnap => deleteDoc(doc(db, "finals", docSnap.id)));
 
-  await Promise.all([
-    ...deletionsKnockouts,
-    ...deletionsQuarterfinals,
-    ...deletionsSamifinals,
-    ...deletionsFinals
-  ]);
+  await Promise.all([...deletionsKnockouts, ...deletionsSamifinals, ...deletionsFinals]);
 
-  Swal.fire({
-    icon: 'success',
-    title: 'All match fixers deleted.',
-    position: 'top-end',
-    toast: true,
-    timer: 3000,
-    showConfirmButton: false
-  });
+  Swal.fire({ icon: 'success', title: 'All match fixers deleted.', position: 'top-end', toast: true, timer: 3000, showConfirmButton: false });
 
   loadKnockouts();
-  loadQuarterfinals();
   loadSamifinals();
   loadFinals();
 });
-
-  </script>
+</script>
 </body>
-  </html>
+</html>
