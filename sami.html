@@ -119,7 +119,7 @@
             return b.goals - a.goals;
           });
 
-          // Show only top 2 teams per group here (changed from 4)
+          // Show only top 2 teams per group
           sortedTeams = sortedTeams.slice(0, 2);
 
           allGroupsPoints.push({ groupName, sortedTeams });
@@ -138,10 +138,6 @@
                   <tr class="bg-gray-200">
                     <th class="px-2 py-1 border">#</th>
                     <th class="px-2 py-1 border">Team</th>
-                    <th class="px-2 py-1 border text-center">Played</th>
-                    <th class="px-2 py-1 border text-center">Win</th>
-                    <th class="px-2 py-1 border text-center">Loss</th>
-                    <th class="px-2 py-1 border text-center">Draw</th>
                     <th class="px-2 py-1 border text-center">Goals</th>
                     <th class="px-2 py-1 border text-center">Points</th>
                   </tr>
@@ -151,10 +147,6 @@
                     <tr>
                       <td class="px-2 py-1 border text-center">${i + 1}</td>
                       <td class="px-2 py-1 border">${team.team}</td>
-                      <td class="px-2 py-1 border text-center font-semibold">${team.played}</td>
-                      <td class="px-2 py-1 border text-center">${team.win}</td>
-                      <td class="px-2 py-1 border text-center">${team.loss}</td>
-                      <td class="px-2 py-1 border text-center">${team.draw}</td>
                       <td class="px-2 py-1 border text-center font-semibold">${team.goals}</td>
                       <td class="px-2 py-1 border text-center font-bold">${team.points}</td>
                     </tr>
