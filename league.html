@@ -179,9 +179,8 @@
           const dateOnly = firstMatchDate ? formatDateAndTime(firstMatchDate).split("Time:")[0].trim() : "";
 
           html += `
-            <div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-lg font-semibold uppercase text-yellow-300 mb-2 flex justify-between items-center">
-              <span>Match-day-${md} ||</span>
-              <span class="text-white text-sm">${dateOnly}</span>
+            <div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-lg font-semibold uppercase text-yellow-300 mb-2 flex justify-center items-center">
+              <span>Match-day-${md} || ${dateOnly}</span>
             </div>
           `;
 
