@@ -120,6 +120,11 @@
           const formattedDate = formatDate(date);
           const matchdayId = `matchday-${index + 1}`;
 
+          // ✅ Default hidden if not set yet
+          if (!(matchdayId in userSettings.hiddenMatchdays)) {
+            userSettings.hiddenMatchdays[matchdayId] = true;
+          }
+
           const isHidden = userSettings.hiddenMatchdays[matchdayId] === true;
 
           html += `
