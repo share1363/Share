@@ -174,7 +174,7 @@
         const sortedMatchdays = Object.keys(matchdays).map(Number).sort((a,b) => a - b);
 
         sortedMatchdays.forEach(md => {
-          html += `<div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-center text-lg font-semibold uppercase text-yellow-300 mb-2">Match-day-${md} || ${formatDateAndTime(match.date).split('Time:')[0]}</div>`;
+          html += `<div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-center text-lg font-semibold uppercase text-yellow-300 mb-2">Match-day-${md} ||</div>`;
 
           const matches = matchdays[md].sort((a, b) => a.team1.localeCompare(b.team1));
 
@@ -197,7 +197,7 @@
                 </div>
 
                 <div style="background: #af1f42; top: 60px;" class="flex justify-between w-3/4 py-1 px-3 absolute left-1/8 rounded-t-xl uppercase text-sm font-extrabold border-t border-l border-r border-gray-400 z-10 opacity-70">
-                  <div></div>
+                  <div>${formatDateAndTime(match.date).split('Time:')[0]}</div>
                   <div>Time 24 Hours</div>
                 </div>
 
