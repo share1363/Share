@@ -105,23 +105,8 @@
       else loadPointTables();
     });
 
-    async function loadPointTables() {
+    function loadPointTables() {
       const pointTablesContainer = document.getElementById("pointTablesContainer");
-
-      // Fetch playersform collection once, to map teamName -> photoUrl
-      const playersSnapshot = await new Promise((resolve, reject) => {
-        onSnapshot(collection(db, "playersform"), (snapshot) => {
-          resolve(snapshot);
-        }, (error) => reject(error));
-      });
-
-      const teamPhotos = {};
-      playersSnapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.teamName && data.photoUrl) {
-          teamPhotos[data.teamName] = data.photoUrl;
-        }
-      });
 
       onSnapshot(collection(db, "fixers"), (snapshot) => {
         if (snapshot.empty) {
@@ -183,7 +168,6 @@
             points: stat.win * 3 + stat.draw,
             played: stat.win + stat.loss + stat.draw,
             goals: goals[team] || 0,
-            photoUrl: teamPhotos[team] || null,  // add photoUrl here
           })).sort((a, b) => {
             if (b.points !== a.points) return b.points - a.points;
             return b.goals - a.goals;
@@ -219,14 +203,7 @@
                   ${sortedTeams.map((team, i) => `
                     <tr class="even:bg-gray-900 odd:bg-gray-800 hover:bg-yellow-900 hover:text-yellow-300">
                       <td class="px-1 py-1 border border-gray-700 text-center">${i + 1}</td>
-                      <td class="px-1 py-1 border border-gray-700 flex items-center space-x-2">
-                        ${
-                          team.photoUrl 
-                          ? `<img src="${team.photoUrl}" alt="${team.team}" class="w-6 h-6 rounded-full border border-yellow-400 object-cover" />`
-                          : `<div class="w-6 h-6 rounded-full border border-yellow-400 bg-gray-700 flex items-center justify-center text-yellow-400 text-[10px] font-semibold">N/A</div>`
-                        }
-                        <span>${team.team}</span>
-                      </td>
+                      <td class="px-1 py-1 border border-gray-700">${team.team}</td>
                       <td class="px-1 py-1 border border-gray-700 text-center font-semibold">${team.played}</td>
                       <td class="px-1 py-1 border border-gray-700 text-center">${team.win}</td>
                       <td class="px-1 py-1 border border-gray-700 text-center">${team.loss}</td>
