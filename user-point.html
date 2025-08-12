@@ -12,70 +12,70 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 </head>
-<body class="bg-black text-white">
+<body class="bg-gradient-to-b from-gray-900 via-black to-gray-900 text-yellow-300">
 
   <!-- Header -->
   <header
-    class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
+    class="bg-gradient-to-r from-yellow-900 via-yellow-800 to-yellow-900 w-full max-w-md shadow-lg py-2 px-3 mb-3 mx-auto border-b border-yellow-700 flex items-center justify-between header-glow rounded-b-xl">
     <div class="flex items-center space-x-2">
       <img src="dcl1.jpeg" alt="Logo" class="w-8 h-8 rounded-full border border-yellow-400" />
-      <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-300 via-blue-200 to-yellow-300 bg-clip-text text-transparent"
+      <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 bg-clip-text text-transparent"
         style="font-family: 'Audiowide', cursive;">DCL TOUR</h2>
     </div>
     <div class="flex space-x-4">
       <a href="#">
-        <i class="fa-solid fa-bell text-yellow-300 text-shadow text-xl"></i>
+        <i class="fa-solid fa-bell text-yellow-400 text-shadow text-xl"></i>
       </a>
       
       <a href="https://facebook.com" target="_blank">
-        <i class="fa-brands fa-facebook text-white text-shadow text-xl"></i>
+        <i class="fa-brands fa-facebook text-yellow-300 text-shadow text-xl"></i>
       </a>
     </div>
   </header>
 
   <!-- Main content -->
   <main class="max-w-4xl mx-auto p-4 space-y-6">
-    <div id="pointTablesContainer" class="bg-white shadow rounded p-4 max-h-[400px] overflow-y-auto">
-      <p class="text-xs text-gray-300 mb-3">Loading...</h2>
+    <div id="pointTablesContainer" class="bg-gray-800 shadow-lg rounded p-4 max-h-[400px] overflow-y-auto border border-yellow-600">
+      <p class="text-sm text-yellow-400 mb-3">Loading...</p>
       <!-- Group-wise point tables will appear here -->
     </div>
   </main>
 
   <!-- Bottom Navigation -->
   <nav
-    class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-50">
-    <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+    class="fixed bottom-0 left-0 right-0 bg-yellow-900 border-t border-yellow-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-yellow-300 h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-50">
+    <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline hover:text-yellow-100 transition-colors duration-200">
       <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
+        class="bg-yellow-800 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-yellow-600">
+        <i class="fa-solid fa-house text-lg"></i>
       </div>
       Home
     </a>
-    <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+    <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline hover:text-yellow-100 transition-colors duration-200">
       <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-gamepad text-lg text-gray-300 hover:text-yellow-400"></i>
+        class="bg-yellow-800 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-yellow-600">
+        <i class="fa-solid fa-gamepad text-lg"></i>
       </div>
       Matches
     </a>
-    <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+    <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline hover:text-yellow-100 transition-colors duration-200">
       <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-trophy text-lg text-gray-300 hover:text-yellow-400"></i>
+        class="bg-yellow-800 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-yellow-600">
+        <i class="fa-solid fa-trophy text-lg"></i>
       </div>
       League
     </a>
-    <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+    <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline hover:text-yellow-100 transition-colors duration-200">
       <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-ranking-star text-lg text-gray-300 hover:text-yellow-400"></i>
+        class="bg-yellow-800 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-yellow-600">
+        <i class="fa-solid fa-ranking-star text-lg"></i>
       </div>
       Ranking
     </a>
-    <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+    <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline hover:text-yellow-100 transition-colors duration-200">
       <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
-        <i class="fa-solid fa-user text-lg text-gray-400 hover:text-yellow-400"></i>
+        class="bg-yellow-800 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-yellow-500">
+        <i class="fa-solid fa-user text-lg"></i>
       </div>
       Profile
     </a>
@@ -110,7 +110,7 @@
 
       onSnapshot(collection(db, "fixers"), (snapshot) => {
         if (snapshot.empty) {
-          pointTablesContainer.innerHTML = `<p class="text-gray-500 text-center">No point tables to show.</p>`;
+          pointTablesContainer.innerHTML = `<p class="text-yellow-400 text-center">No point tables to show.</p>`;
           return;
         }
 
@@ -181,35 +181,35 @@
         // Render group tables
         let allPointsHTML = "";
         if (allGroupsPoints.length === 0) {
-          allPointsHTML = `<p class="text-gray-500 text-center">No point tables to show.</p>`;
+          allPointsHTML = `<p class="text-yellow-400 text-center">No point tables to show.</p>`;
         } else {
           allPointsHTML = allGroupsPoints.map(({ groupName, sortedTeams }) => `
             <div class="mb-4">
-              <div class="font-semibold mb-1 text-blue-700">Point Table - ${groupName}</div>
-              <table class="text-sm w-full table-auto border border-gray-200">
+              <div class="font-semibold mb-1 text-yellow-300">Point Table - ${groupName}</div>
+              <table class="text-sm w-full table-auto border border-yellow-600 rounded-md overflow-hidden">
                 <thead>
-                  <tr class="bg-gray-200">
-                    <th class="px-2 py-1 border">#</th>
-                    <th class="px-2 py-1 border">Team</th>
-                    <th class="px-2 py-1 border text-center">Played</th>
-                    <th class="px-2 py-1 border text-center">Win</th>
-                    <th class="px-2 py-1 border text-center">Loss</th>
-                    <th class="px-2 py-1 border text-center">Draw</th>
-                    <th class="px-2 py-1 border text-center">Goals</th>
-                    <th class="px-2 py-1 border text-center">Points</th>
+                  <tr class="bg-yellow-700 text-black">
+                    <th class="px-2 py-1 border border-yellow-600">#</th>
+                    <th class="px-2 py-1 border border-yellow-600 text-left">Team</th>
+                    <th class="px-2 py-1 border border-yellow-600 text-center">Played</th>
+                    <th class="px-2 py-1 border border-yellow-600 text-center">Win</th>
+                    <th class="px-2 py-1 border border-yellow-600 text-center">Loss</th>
+                    <th class="px-2 py-1 border border-yellow-600 text-center">Draw</th>
+                    <th class="px-2 py-1 border border-yellow-600 text-center">Goals</th>
+                    <th class="px-2 py-1 border border-yellow-600 text-center">Points</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${sortedTeams.map((team, i) => `
-                    <tr>
-                      <td class="px-2 py-1 border text-center">${i + 1}</td>
-                      <td class="px-2 py-1 border">${team.team}</td>
-                      <td class="px-2 py-1 border text-center font-semibold">${team.played}</td>
-                      <td class="px-2 py-1 border text-center">${team.win}</td>
-                      <td class="px-2 py-1 border text-center">${team.loss}</td>
-                      <td class="px-2 py-1 border text-center">${team.draw}</td>
-                      <td class="px-2 py-1 border text-center font-semibold">${team.goals}</td>
-                      <td class="px-2 py-1 border text-center font-bold">${team.points}</td>
+                    <tr class="odd:bg-yellow-900 even:bg-yellow-800/70">
+                      <td class="px-2 py-1 border border-yellow-600 text-center">${i + 1}</td>
+                      <td class="px-2 py-1 border border-yellow-600">${team.team}</td>
+                      <td class="px-2 py-1 border border-yellow-600 text-center font-semibold">${team.played}</td>
+                      <td class="px-2 py-1 border border-yellow-600 text-center">${team.win}</td>
+                      <td class="px-2 py-1 border border-yellow-600 text-center">${team.loss}</td>
+                      <td class="px-2 py-1 border border-yellow-600 text-center">${team.draw}</td>
+                      <td class="px-2 py-1 border border-yellow-600 text-center font-semibold">${team.goals}</td>
+                      <td class="px-2 py-1 border border-yellow-600 text-center font-bold">${team.points}</td>
                     </tr>
                   `).join('')}
                 </tbody>
