@@ -125,7 +125,7 @@
           html += `
             <div class="flex justify-between items-center bg-green-600 uppercase text-white px-4 py-2 rounded-lg shadow font-semibold mt-6">
               <span>Match-day-${index + 1} | ${formattedDate}</span>
-              <button id="${matchdayId}-btn" onclick="toggleMatchday('${matchdayId}')" class="bg-white text-yellow-400 px-3 py-1 rounded text-xs font-medium hover:bg-gray-100 flex items-center gap-1">
+              <button id="${matchdayId}-btn" onclick="toggleMatchday('${matchdayId}')" class="bg-white text-red-400 px-3 py-1 rounded text-xs font-medium hover:bg-gray-100 flex items-center gap-1">
                 ${isHidden ? '<i class="fa-solid fa-lock"></i>' : '<i class="fa-solid fa-lock-open"></i>'}
               </button>
             </div>
