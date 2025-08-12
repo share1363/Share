@@ -36,7 +36,7 @@
   <!-- Main content -->
   <main class="max-w-4xl mx-auto p-4 space-y-6">
     <div id="pointTablesContainer" class="bg-gray-900 shadow rounded p-4 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-yellow-400 scrollbar-track-gray-800">
-      <p class="text-xs text-gray-400 mb-3">Loading...</p>
+      <p class="text-xs text-center text-gray-400 mb-3">Loading...</p>
       <!-- Group-wise point tables will appear here -->
     </div>
   </main>
@@ -199,7 +199,7 @@
         } else {
           allPointsHTML = allGroupsPoints.map(({ groupName, sortedTeams }) => `
             <div class="mb-4">
-              <div class="font-semibold mb-1 text-yellow-400 text-xs">Point Table - ${groupName}</div>
+              <div class="font-semibold mb-1 text-yellow-400 text-xs uppercase text-center">Point Table - ${groupName}</div>
               <table class="text-xs w-full table-auto border border-gray-700">
                 <thead>
                   <tr class="bg-gray-800 text-gray-300">
@@ -219,7 +219,7 @@
                     return `
                       <tr class="even:bg-gray-900 odd:bg-gray-800 hover:bg-yellow-900 hover:text-yellow-300">
                         <td class="px-1 py-1 border border-gray-700 text-center">
-                          <img src="${photoUrl}" alt="${team.team}" class="inline-block w-6 h-6 rounded-full object-cover" />
+                          <img src="${photoUrl}" alt="${team.team}" class="inline-block w-6 h-6 rounded-full object-cover border border-yellow-400 p-[1px]" />
                         </td>
                         <td class="px-1 py-1 border border-gray-700">${team.team}</td>
                         <td class="px-1 py-1 border border-gray-700 text-center font-semibold">${team.played}</td>
