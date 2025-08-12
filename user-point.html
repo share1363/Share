@@ -178,38 +178,38 @@
           allGroupsPoints.push({ groupName, sortedTeams });
         });
 
-        // Render group tables
+        // Render group tables with very small font size (text-xs)
         let allPointsHTML = "";
         if (allGroupsPoints.length === 0) {
           allPointsHTML = `<p class="text-gray-500 text-center">No point tables to show.</p>`;
         } else {
           allPointsHTML = allGroupsPoints.map(({ groupName, sortedTeams }) => `
             <div class="mb-4">
-              <div class="font-semibold mb-1 text-yellow-400">Point Table - ${groupName}</div>
-              <table class="text-sm w-full table-auto border border-gray-700">
+              <div class="font-semibold mb-1 text-yellow-400 text-xs">Point Table - ${groupName}</div>
+              <table class="text-xs w-full table-auto border border-gray-700">
                 <thead>
                   <tr class="bg-gray-800 text-gray-300">
-                    <th class="px-2 py-1 border border-gray-700">#</th>
-                    <th class="px-2 py-1 border border-gray-700">Team</th>
-                    <th class="px-2 py-1 border border-gray-700 text-center">Played</th>
-                    <th class="px-2 py-1 border border-gray-700 text-center">Win</th>
-                    <th class="px-2 py-1 border border-gray-700 text-center">Loss</th>
-                    <th class="px-2 py-1 border border-gray-700 text-center">Draw</th>
-                    <th class="px-2 py-1 border border-gray-700 text-center">Goals</th>
-                    <th class="px-2 py-1 border border-gray-700 text-center">Points</th>
+                    <th class="px-1 py-1 border border-gray-700">#</th>
+                    <th class="px-1 py-1 border border-gray-700">Team</th>
+                    <th class="px-1 py-1 border border-gray-700 text-center">Played</th>
+                    <th class="px-1 py-1 border border-gray-700 text-center">Win</th>
+                    <th class="px-1 py-1 border border-gray-700 text-center">Loss</th>
+                    <th class="px-1 py-1 border border-gray-700 text-center">Draw</th>
+                    <th class="px-1 py-1 border border-gray-700 text-center">Goals</th>
+                    <th class="px-1 py-1 border border-gray-700 text-center">Points</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${sortedTeams.map((team, i) => `
                     <tr class="even:bg-gray-900 odd:bg-gray-800 hover:bg-yellow-900 hover:text-yellow-300">
-                      <td class="px-2 py-1 border border-gray-700 text-center">${i + 1}</td>
-                      <td class="px-2 py-1 border border-gray-700">${team.team}</td>
-                      <td class="px-2 py-1 border border-gray-700 text-center font-semibold">${team.played}</td>
-                      <td class="px-2 py-1 border border-gray-700 text-center">${team.win}</td>
-                      <td class="px-2 py-1 border border-gray-700 text-center">${team.loss}</td>
-                      <td class="px-2 py-1 border border-gray-700 text-center">${team.draw}</td>
-                      <td class="px-2 py-1 border border-gray-700 text-center font-semibold">${team.goals}</td>
-                      <td class="px-2 py-1 border border-gray-700 text-center font-bold">${team.points}</td>
+                      <td class="px-1 py-1 border border-gray-700 text-center">${i + 1}</td>
+                      <td class="px-1 py-1 border border-gray-700">${team.team}</td>
+                      <td class="px-1 py-1 border border-gray-700 text-center font-semibold">${team.played}</td>
+                      <td class="px-1 py-1 border border-gray-700 text-center">${team.win}</td>
+                      <td class="px-1 py-1 border border-gray-700 text-center">${team.loss}</td>
+                      <td class="px-1 py-1 border border-gray-700 text-center">${team.draw}</td>
+                      <td class="px-1 py-1 border border-gray-700 text-center font-semibold">${team.goals}</td>
+                      <td class="px-1 py-1 border border-gray-700 text-center font-bold">${team.points}</td>
                     </tr>
                   `).join('')}
                 </tbody>
