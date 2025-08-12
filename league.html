@@ -74,7 +74,7 @@
 
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, query, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, onSnapshot, query, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -92,8 +92,6 @@
   const auth = getAuth(app);
 
   let teamPhotos = {};
-  let userSettingsRef;
-  let userSettings = { hiddenMatchdays: {} };
 
   async function loadTeamPhotos() {
     const snap = await getDocs(collection(db, "playersform"));
@@ -103,22 +101,6 @@
         teamPhotos[data.team.trim().toLowerCase()] = data.photoUrl;
       }
     });
-  }
-
-  async function loadUserSettings(uid) {
-    userSettingsRef = doc(db, "users", uid);
-    const snap = await getDoc(userSettingsRef);
-    if (snap.exists()) {
-      const data = snap.data();
-      userSettings.hiddenMatchdays = data.hiddenMatchdays || {};
-    } else {
-      userSettings.hiddenMatchdays = {};
-    }
-  }
-
-  async function saveUserSettings() {
-    if (!userSettingsRef) return;
-    await updateDoc(userSettingsRef, { hiddenMatchdays: userSettings.hiddenMatchdays });
   }
 
   function formatDateAndTime(dateStr) {
@@ -136,7 +118,6 @@
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       await loadTeamPhotos();
-      await loadUserSettings(user.uid);
       loadFixers();
 
       const userRef = doc(db, "users", user.uid);
@@ -151,20 +132,6 @@
     }
   });
 
-  // Toggle matchday visibility and save user settings
-  window.toggleMatchday = async function (matchdayId) {
-    const el = document.getElementById(matchdayId);
-    if (!el) return;
-    if (el.classList.contains("hidden")) {
-      el.classList.remove("hidden");
-      userSettings.hiddenMatchdays[matchdayId] = false;
-    } else {
-      el.classList.add("hidden");
-      userSettings.hiddenMatchdays[matchdayId] = true;
-    }
-    await saveUserSettings();
-  };
-
   function loadFixers() {
     const fixersRef = collection(db, "fixers");
     onSnapshot(query(fixersRef), (snapshot) => {
@@ -177,7 +144,7 @@
       const fixers = [];
       snapshot.forEach(docSnap => fixers.push(docSnap.data()));
 
-      // Find earliest date per group for matchday calculation
+      // Find earliest date across all groups for each matchday calculation
       const earliestByGroup = {};
       fixers.forEach(fix => {
         if (!earliestByGroup[fix.groupName] || new Date(fix.date) < new Date(earliestByGroup[fix.groupName])) {
@@ -185,7 +152,7 @@
         }
       });
 
-      // Group by matchday number
+      // Group by matchday (across all groups)
       const matchdaysMap = {};
       fixers.forEach(fix => {
         const baseDate = new Date(earliestByGroup[fix.groupName]);
@@ -201,23 +168,11 @@
 
       sortedMatchdays.forEach(md => {
         const firstDate = matchdaysMap[md][0]?.date || "";
-        const matchdayId = `matchday-${md}`;
+        html += `<div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-lg font-semibold uppercase text-yellow-300 mb-2 flex justify-center items-center">
+                  Match-day-${md} || ${firstDate ? formatDateAndTime(firstDate) : ""}
+                </div>`;
 
-        // Check if this matchday should be hidden or shown based on user settings
-        const isHidden = userSettings.hiddenMatchdays[matchdayId] === true;
-
-        html += `
-          <div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-lg font-semibold uppercase text-yellow-300 mb-2 flex justify-between items-center cursor-pointer select-none"
-               onclick="toggleMatchday('${matchdayId}')">
-            <span>Match-day-${md} || ${firstDate ? formatDateAndTime(firstDate) : ""}</span>
-            <button class="px-3 py-0.5 bg-yellow-600 rounded text-xs font-semibold">
-              ${isHidden ? "Show" : "Hide"}
-            </button>
-          </div>
-          <div id="${matchdayId}" class="${isHidden ? "hidden" : ""}">
-        `;
-
-        // Sort matches inside matchday by groupName then team1
+        // Inside matchday, sort by groupName then team1
         matchdaysMap[md].sort((a,b) => a.groupName.localeCompare(b.groupName) || a.team1.localeCompare(b.team1))
         .forEach(match => {
           const team1Img = teamPhotos[match.team1.trim().toLowerCase()] || "";
@@ -226,7 +181,7 @@
           const t2GoalVal = match.team2Goal ?? "-";
 
           html += `
-          <section class="mx-auto py-10 flex justify-center items-center relative rounded-lg px-4 border border-gray-500 mb-6" style="background-image: url('stadium.jpeg'); background-size: cover; background-position: center; height: 207px;">
+          <section class="mx-auto py-10 flex justify-center items-center relative rounded-lg px-4 border border-gray-500" style="background-image: url('stadium.jpeg'); background-size: cover; background-position: center; height: 207px;">
             <div class="absolute inset-0 bg-black opacity-60"></div>
             <div style="background: #af1f42;" class="absolute top-0 left-1/8 w-full py-1 px-4 rounded-t-lg uppercase text-lg font-extrabold z-10 opacity-70 bg-gray-800 text-center border-b border-gray-400">
               DCL CHAMPIONS LEAGUE S-2
@@ -260,8 +215,6 @@
           </section>
           `;
         });
-
-        html += `</div>`;
       });
 
       fixersContainer.innerHTML = html;
