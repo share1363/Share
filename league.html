@@ -74,7 +74,7 @@
 
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, query, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, onSnapshot, query, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -92,15 +92,26 @@
   const auth = getAuth(app);
 
   let teamPhotos = {};
+  let hiddenMatchdays = {};
 
   async function loadTeamPhotos() {
     const snap = await getDocs(collection(db, "playersform"));
-    snap.forEach(doc => {
-      const data = doc.data();
+    snap.forEach(docSnap => {
+      const data = docSnap.data();
       if (data.team && data.photoUrl) {
         teamPhotos[data.team.trim().toLowerCase()] = data.photoUrl;
       }
     });
+  }
+
+  async function loadHiddenMatchdays(uid) {
+    const userRef = doc(db, "users", uid);
+    const snap = await getDoc(userRef);
+    if (snap.exists()) {
+      hiddenMatchdays = snap.data().hiddenMatchdays || {};
+    } else {
+      hiddenMatchdays = {};
+    }
   }
 
   function formatDateAndTime(dateStr) {
@@ -118,6 +129,7 @@
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       await loadTeamPhotos();
+      await loadHiddenMatchdays(user.uid);
       loadFixers();
 
       const userRef = doc(db, "users", user.uid);
@@ -144,7 +156,6 @@
       const fixers = [];
       snapshot.forEach(docSnap => fixers.push(docSnap.data()));
 
-      // Find earliest date across all groups for each matchday calculation
       const earliestByGroup = {};
       fixers.forEach(fix => {
         if (!earliestByGroup[fix.groupName] || new Date(fix.date) < new Date(earliestByGroup[fix.groupName])) {
@@ -152,13 +163,11 @@
         }
       });
 
-      // Group by matchday (across all groups)
       const matchdaysMap = {};
       fixers.forEach(fix => {
         const baseDate = new Date(earliestByGroup[fix.groupName]);
         const diffDays = Math.floor((new Date(fix.date) - baseDate) / (1000*60*60*24));
         const matchdayNum = diffDays + 1;
-
         if (!matchdaysMap[matchdayNum]) matchdaysMap[matchdayNum] = [];
         matchdaysMap[matchdayNum].push(fix);
       });
@@ -167,12 +176,14 @@
       let html = "";
 
       sortedMatchdays.forEach(md => {
+        const matchdayId = `matchday-${md}`;
+        if (hiddenMatchdays[matchdayId]) return; // skip hidden matchdays
+
         const firstDate = matchdaysMap[md][0]?.date || "";
         html += `<div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-lg font-semibold uppercase text-yellow-300 mb-2 flex justify-center items-center">
                   Match-day-${md} || ${firstDate ? formatDateAndTime(firstDate) : ""}
                 </div>`;
 
-        // Inside matchday, sort by groupName then team1
         matchdaysMap[md].sort((a,b) => a.groupName.localeCompare(b.groupName) || a.team1.localeCompare(b.team1))
         .forEach(match => {
           const team1Img = teamPhotos[match.team1.trim().toLowerCase()] || "";
