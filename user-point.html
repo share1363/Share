@@ -84,7 +84,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
@@ -100,9 +100,27 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    onAuthStateChanged(auth, (user) => {
-      if (!user) window.location.href = "login.html";
-      else loadPointTables();
+    let photoMap = {};
+
+    async function loadPlayersPhotos() {
+      // Load photoUrl of each team/player from playersform collection into photoMap
+      const playersSnap = await getDocs(collection(db, "playersform"));
+      photoMap = {};
+      playersSnap.forEach(doc => {
+        const data = doc.data();
+        if (data.team && data.photoUrl) {
+          photoMap[data.team.trim().toLowerCase()] = data.photoUrl;
+        }
+      });
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        await loadPlayersPhotos();
+        loadPointTables();
+      }
     });
 
     function loadPointTables() {
@@ -117,7 +135,7 @@
         const fixers = [];
         snapshot.forEach(doc => fixers.push(doc.data()));
 
-        // Grouping by groupName dynamically
+        // Group by groupName dynamically
         const groupsMap = {};
         fixers.forEach(fix => {
           if (!groupsMap[fix.groupName]) groupsMap[fix.groupName] = [];
@@ -141,12 +159,8 @@
             if (!goals[match.team1]) goals[match.team1] = 0;
             if (!goals[match.team2]) goals[match.team2] = 0;
 
-            if (typeof g1 === "number") {
-              goals[match.team1] += g1;
-            }
-            if (typeof g2 === "number") {
-              goals[match.team2] += g2;
-            }
+            if (typeof g1 === "number") goals[match.team1] += g1;
+            if (typeof g2 === "number") goals[match.team2] += g2;
 
             if (typeof g1 === "number" && typeof g2 === "number") {
               if (g1 > g2) {
@@ -189,7 +203,7 @@
               <table class="text-xs w-full table-auto border border-gray-700">
                 <thead>
                   <tr class="bg-gray-800 text-gray-300">
-                    <th class="px-1 py-1 border border-gray-700">#</th>
+                    <th class="px-1 py-1 border border-gray-700">Player</th>
                     <th class="px-1 py-1 border border-gray-700">Team</th>
                     <th class="px-1 py-1 border border-gray-700 text-center">P</th>
                     <th class="px-1 py-1 border border-gray-700 text-center">W</th>
@@ -200,18 +214,23 @@
                   </tr>
                 </thead>
                 <tbody>
-                  ${sortedTeams.map((team, i) => `
-                    <tr class="even:bg-gray-900 odd:bg-gray-800 hover:bg-yellow-900 hover:text-yellow-300">
-                      <td class="px-1 py-1 border border-gray-700 text-center">${i + 1}</td>
-                      <td class="px-1 py-1 border border-gray-700">${team.team}</td>
-                      <td class="px-1 py-1 border border-gray-700 text-center font-semibold">${team.played}</td>
-                      <td class="px-1 py-1 border border-gray-700 text-center">${team.win}</td>
-                      <td class="px-1 py-1 border border-gray-700 text-center">${team.loss}</td>
-                      <td class="px-1 py-1 border border-gray-700 text-center">${team.draw}</td>
-                      <td class="px-1 py-1 border border-gray-700 text-center font-semibold">${team.goals}</td>
-                      <td class="px-1 py-1 border border-gray-700 text-center font-bold">${team.points}</td>
-                    </tr>
-                  `).join('')}
+                  ${sortedTeams.map((team, i) => {
+                    const photoUrl = photoMap[team.team.trim().toLowerCase()] || "default-player.png";
+                    return `
+                      <tr class="even:bg-gray-900 odd:bg-gray-800 hover:bg-yellow-900 hover:text-yellow-300">
+                        <td class="px-1 py-1 border border-gray-700 text-center">
+                          <img src="${photoUrl}" alt="${team.team}" class="inline-block w-6 h-6 rounded-full object-cover" />
+                        </td>
+                        <td class="px-1 py-1 border border-gray-700">${team.team}</td>
+                        <td class="px-1 py-1 border border-gray-700 text-center font-semibold">${team.played}</td>
+                        <td class="px-1 py-1 border border-gray-700 text-center">${team.win}</td>
+                        <td class="px-1 py-1 border border-gray-700 text-center">${team.loss}</td>
+                        <td class="px-1 py-1 border border-gray-700 text-center">${team.draw}</td>
+                        <td class="px-1 py-1 border border-gray-700 text-center font-semibold">${team.goals}</td>
+                        <td class="px-1 py-1 border border-gray-700 text-center font-bold">${team.points}</td>
+                      </tr>
+                    `;
+                  }).join('')}
                 </tbody>
               </table>
             </div>
