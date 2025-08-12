@@ -1,248 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Match Fixers</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Match Fixers</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-black text-white">
 
-  <!-- Header Section -->
-  <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
-    <div class="flex items-center gap-2">
-      <div class="bg-yellow-600 bg-opacity-50 border border-yellow-500 text-yellow-300 w-8 h-8 flex items-center justify-center font-bold rounded-full shadow" style="font-family: 'Audiowide', cursive;">KD</div>
-      <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent" style="font-family: 'Audiowide', cursive;">Khelo Dls</h2>
-    </div>
-    <div style="height: 30px;"
-      class="flex items-center gap-1 bg-black px-1 py-1 rounded-full shadow-lg border border-gray-600 ml-8">
-      <div class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
-        <i class="fa-solid fa-bangladeshi-taka-sign text-white text-sm"></i>
-      </div>
-      <p id="mainBalance" class="text-sm font-bold text-yellow-300">0</p>
-      <button class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center shadow-md">
-        <i class="fa-solid fa-plus text-gray-100 text-sm"></i>
-      </button>
-    </div>
-  </header>
+  <!-- Header Section -->
+  <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
+    <div class="flex items-center gap-2">
+      <div class="bg-yellow-600 bg-opacity-50 border border-yellow-500 text-yellow-300 w-8 h-8 flex items-center justify-center font-bold rounded-full shadow" style="font-family: 'Audiowide', cursive;">KD</div>
+      <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent" style="font-family: 'Audiowide', cursive;">Khelo Dls</h2>
+    </div>
+    <div style="height: 30px;"
+      class="flex items-center gap-1 bg-black px-1 py-1 rounded-full shadow-lg border border-gray-600 ml-8">
+      <div class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
+        <i class="fa-solid fa-bangladeshi-taka-sign text-white text-sm"></i>
+      </div>
+      <p id="mainBalance" class="text-sm font-bold text-yellow-300">0</p>
+      <button class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center shadow-md">
+        <i class="fa-solid fa-plus text-gray-100 text-sm"></i>
+      </button>
+    </div>
+  </header>
 
-  
-  <main class="max-w-3xl mx-auto px-4 mt-6 mb-20">
+  
+  <main class="max-w-3xl mx-auto px-4 mt-6 mb-20">
+    <!-- Fixers List Section -->
+    <div id="fixers-list" class="space-y-8">
+      <p class="text-center text-gray-400">Loading...</p>
+    </div>
+  </main>
 
-    <!-- Buttons Section Above Fixers List -->
-    <div class="flex justify-center space-x-6 mb-4">
-      <button id="allMatchBtn" class="px-5 py-2 bg-yellow-500 hover:bg-yellow-600 rounded-full font-semibold text-black shadow-lg transition duration-300">
-        All Match
-      </button>
-      <button id="pointTableBtn" class="px-5 py-2 bg-yellow-500 hover:bg-yellow-600 rounded-full font-semibold text-black shadow-lg transition duration-300">
-        Point Table
-      </button>
-    </div>
+  <!-- Bottom Nav -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-40">
+    <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      Home
+    </a>
+    <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-gamepad text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      Matches
+    </a>
+    <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-trophy text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      League
+    </a>
+    <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-ranking-star text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      Ranking
+    </a>
+    <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
+        <i class="fa-solid fa-user text-lg text-gray-400 hover:text-yellow-400"></i>
+      </div>
+      Profile
+    </a>
+  </nav>
 
-    <!-- Fixers List Section -->
-    <div id="fixers-list" class="space-y-8">
-      <p class="text-center text-gray-400">Loading...</p>
-    </div>
-  </main>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, query, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  <!-- Bottom Nav -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-40">
-    <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
-      </div>
-      Home
-    </a>
-    <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-gamepad text-lg text-gray-300 hover:text-yellow-400"></i>
-      </div>
-      Matches
-    </a>
-    <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-trophy text-lg text-gray-300 hover:text-yellow-400"></i>
-      </div>
-      League
-    </a>
-    <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-ranking-star text-lg text-gray-300 hover:text-yellow-400"></i>
-      </div>
-      Ranking
-    </a>
-    <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
-        <i class="fa-solid fa-user text-lg text-gray-400 hover:text-yellow-400"></i>
-      </div>
-      Profile
-    </a>
-  </nav>
+  const firebaseConfig = {
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.firebasestorage.app",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL"
+    };
 
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, query, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
 
-  const firebaseConfig = {
-      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
-      authDomain: "dlstournament-31ac1.firebaseapp.com",
-      projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.firebasestorage.app",
-      messagingSenderId: "874377019055",
-      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
-      measurementId: "G-0DGFJEV6GL"
-    };
+  let teamPhotos = {};
+  let hiddenMatchdays = {};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
+  async function loadTeamPhotos() {
+    const snap = await getDocs(collection(db, "playersform"));
+    snap.forEach(docSnap => {
+      const data = docSnap.data();
+      if (data.team && data.photoUrl) {
+        teamPhotos[data.team.trim().toLowerCase()] = data.photoUrl;
+      }
+    });
+  }
 
-  let teamPhotos = {};
-  let hiddenMatchdays = {};
+  async function loadHiddenMatchdays(uid) {
+    const userRef = doc(db, "users", uid);
+    const snap = await getDoc(userRef);
+    if (snap.exists()) {
+      hiddenMatchdays = snap.data().hiddenMatchdays || {};
+    } else {
+      hiddenMatchdays = {};
+    }
+  }
 
-  async function loadTeamPhotos() {
-    const snap = await getDocs(collection(db, "playersform"));
-    snap.forEach(docSnap => {
-      const data = docSnap.data();
-      if (data.team && data.photoUrl) {
-        teamPhotos[data.team.trim().toLowerCase()] = data.photoUrl;
-      }
-    });
-  }
+  function formatDateAndTime(dateStr) {
+    const date = new Date(dateStr);
+    const day = date.getDate();
+    const month = date.toLocaleString('default', { month: 'long' });
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
 
-  async function loadHiddenMatchdays(uid) {
-    const userRef = doc(db, "users", uid);
-    const snap = await getDoc(userRef);
-    if (snap.exists()) {
-      hiddenMatchdays = snap.data().hiddenMatchdays || {};
-    } else {
-      hiddenMatchdays = {};
-    }
-  }
+  function formatBalance(amount) {
+    return (+amount.toFixed(2)).toString();
+  }
 
-  function formatDateAndTime(dateStr) {
-    const date = new Date(dateStr);
-    const day = date.getDate();
-    const month = date.toLocaleString('default', { month: 'long' });
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  }
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      await loadTeamPhotos();
+      await loadHiddenMatchdays(user.uid);
+      loadFixers();
 
-  function formatBalance(amount) {
-    return (+amount.toFixed(2)).toString();
-  }
+      const userRef = doc(db, "users", user.uid);
+      onSnapshot(userRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const userBalance = docSnap.data().balance || 0;
+          document.getElementById("mainBalance").textContent = formatBalance(userBalance);
+        }
+      });
+    } else {
+      window.location.href = "login.html";
+    }
+  });
 
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      await loadTeamPhotos();
-      await loadHiddenMatchdays(user.uid);
-      loadFixers();
+  function loadFixers() {
+    const fixersRef = collection(db, "fixers");
+    onSnapshot(query(fixersRef), (snapshot) => {
+      const fixersContainer = document.getElementById("fixers-list");
+      if (snapshot.empty) {
+        fixersContainer.innerHTML = `<p class="text-center text-gray-400">No fixers available.</p>`;
+        return;
+      }
 
-      const userRef = doc(db, "users", user.uid);
-      onSnapshot(userRef, (docSnap) => {
-        if (docSnap.exists()) {
-          const userBalance = docSnap.data().balance || 0;
-          document.getElementById("mainBalance").textContent = formatBalance(userBalance);
-        }
-      });
-    } else {
-      window.location.href = "login.html";
-    }
-  });
+      const fixers = [];
+      snapshot.forEach(docSnap => fixers.push(docSnap.data()));
 
-  function loadFixers() {
-    const fixersRef = collection(db, "fixers");
-    onSnapshot(query(fixersRef), (snapshot) => {
-      const fixersContainer = document.getElementById("fixers-list");
-      if (snapshot.empty) {
-        fixersContainer.innerHTML = `<p class="text-center text-gray-400">No fixers available.</p>`;
-        return;
-      }
+      const earliestByGroup = {};
+      fixers.forEach(fix => {
+        if (!earliestByGroup[fix.groupName] || new Date(fix.date) < new Date(earliestByGroup[fix.groupName])) {
+          earliestByGroup[fix.groupName] = fix.date;
+        }
+      });
 
-      const fixers = [];
-      snapshot.forEach(docSnap => fixers.push(docSnap.data()));
+      const matchdaysMap = {};
+      fixers.forEach(fix => {
+        const baseDate = new Date(earliestByGroup[fix.groupName]);
+        const diffDays = Math.floor((new Date(fix.date) - baseDate) / (1000*60*60*24));
+        const matchdayNum = diffDays + 1;
+        if (!matchdaysMap[matchdayNum]) matchdaysMap[matchdayNum] = [];
+        matchdaysMap[matchdayNum].push(fix);
+      });
 
-      const earliestByGroup = {};
-      fixers.forEach(fix => {
-        if (!earliestByGroup[fix.groupName] || new Date(fix.date) < new Date(earliestByGroup[fix.groupName])) {
-          earliestByGroup[fix.groupName] = fix.date;
-        }
-      });
+      const sortedMatchdays = Object.keys(matchdaysMap).map(Number).sort((a,b) => a-b);
+      let html = "";
 
-      const matchdaysMap = {};
-      fixers.forEach(fix => {
-        const baseDate = new Date(earliestByGroup[fix.groupName]);
-        const diffDays = Math.floor((new Date(fix.date) - baseDate) / (1000*60*60*24));
-        const matchdayNum = diffDays + 1;
-        if (!matchdaysMap[matchdayNum]) matchdaysMap[matchdayNum] = [];
-        matchdaysMap[matchdayNum].push(fix);
-      });
+      sortedMatchdays.forEach(md => {
+        const matchdayId = `matchday-${md}`;
+        if (hiddenMatchdays[matchdayId]) return; // skip hidden matchdays
 
-      const sortedMatchdays = Object.keys(matchdaysMap).map(Number).sort((a,b) => a-b);
-      let html = "";
+        const firstDate = matchdaysMap[md][0]?.date || "";
+        html += `<div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-lg font-semibold uppercase text-yellow-300 mb-2 flex justify-center items-center">
+                  Match-day-${md} || ${firstDate ? formatDateAndTime(firstDate) : ""}
+                </div>`;
 
-      sortedMatchdays.forEach(md => {
-        const matchdayId = `matchday-${md}`;
-        if (hiddenMatchdays[matchdayId]) return; // skip hidden matchdays
+        matchdaysMap[md].sort((a,b) => a.groupName.localeCompare(b.groupName) || a.team1.localeCompare(b.team1))
+        .forEach(match => {
+          const team1Img = teamPhotos[match.team1.trim().toLowerCase()] || "";
+          const team2Img = teamPhotos[match.team2.trim().toLowerCase()] || "";
+          const t1GoalVal = match.team1Goal ?? "-";
+          const t2GoalVal = match.team2Goal ?? "-";
 
-        const firstDate = matchdaysMap[md][0]?.date || "";
-        html += `<div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-lg font-semibold uppercase text-yellow-300 mb-2 flex justify-center items-center">
-                  Match-day-${md} || ${firstDate ? formatDateAndTime(firstDate) : ""}
-                </div>`;
+          html += `
+          <section class="mx-auto py-10 flex justify-center items-center relative rounded-lg px-4 border border-gray-500" style="background-image: url('stadium.jpeg'); background-size: cover; background-position: center; height: 207px;">
+            <div class="absolute inset-0 bg-black opacity-60"></div>
+            <div style="background: #af1f42;" class="absolute top-0 left-1/8 w-full py-1 px-4 rounded-t-lg uppercase text-lg font-extrabold z-10 opacity-70 bg-gray-800 text-center border-b border-gray-400">
+              DCL CHAMPIONS LEAGUE S-2
+            </div>
+            <div style="background: #af1f42; top: 36px;" class="flex justify-center items-center w-2/4 py-1 px-4 absolute left-1/8 rounded-b-xl uppercase text-xs font-extrabold border-b border-l border-r border-gray-400 z-10 opacity-70">
+              <div>${match.groupName}</div>
+            </div>
+            <div style="background: #af1f42; top: 82px;" class="flex justify-between w-3/4 py-1.5 px-3 absolute left-1/8 rounded-t-xl uppercase text-xs font-extrabold border-t border-l border-r border-gray-400 z-10 opacity-70">
+              <div>${formatDateAndTime(match.date)}</div>
+              <div>Time 24 Hours</div>
+            </div>
+            <div style="background: #a81d3f; top: 35px;" class="rounded-lg shadow-lg w-full max-w-lg relative h-14 border-t border-l border-r border-gray-400 opacity-80">
+              <div class="flex justify-between p-2 uppercase mb-1">
+                <div class="text-left w-full"><h2 class="text-xs font-semibold">${match.team1}</h2></div>
+                <div class="text-right w-full"><h2 class="text-xs font-semibold">${match.team2}</h2></div>
+              </div>
+              <div class="flex justify-center items-center space-x-6 bg-white py-3 px-2 rounded-b-lg h-10 border-b border-gray-400 opacity-80">
+                <div class="text-center"><p class="text-4xl font-medium text-black">${t1GoalVal}</p></div>
+                <div class="text-center" style="position: relative; top: -16px; color: #7f152e;">
+                  <i class="fas fa-futbol text-6xl bg-white rounded-full border border-gray-400"></i>
+                </div>
+                <div class="text-center"><p class="text-4xl font-medium text-black">${t2GoalVal}</p></div>
+              </div>
+              <div style="position: relative; top: -50px; right: 10px;" class="flex justify-between">
+                ${team1Img ? `<img style="border: 4px solid #f34871;" src="${team1Img}" class="w-14 h-14 rounded-full" alt="${match.team1}" />` : ""}
+              </div>
+              <div style="position: absolute; right: -10px; top: 26px;" class="text-center">
+                ${team2Img ? `<img style="border: 4px solid #f34871;" src="${team2Img}" class="w-14 h-14 rounded-full" alt="${match.team2}" />` : ""}
+              </div>
+            </div>
+          </section>
+          `;
+        });
+      });
 
-        matchdaysMap[md].sort((a,b) => a.groupName.localeCompare(b.groupName) || a.team1.localeCompare(b.team1))
-        .forEach(match => {
-          const team1Img = teamPhotos[match.team1.trim().toLowerCase()] || "";
-          const team2Img = teamPhotos[match.team2.trim().toLowerCase()] || "";
-          const t1GoalVal = match.team1Goal ?? "-";
-          const t2GoalVal = match.team2Goal ?? "-";
-
-          html += `
-          <section class="mx-auto py-10 flex justify-center items-center relative rounded-lg px-4 border border-gray-500" style="background-image: url('stadium.jpeg'); background-size: cover; background-position: center; height: 207px;">
-            <div class="absolute inset-0 bg-black opacity-60"></div>
-            <div style="background: #af1f42;" class="absolute top-0 left-1/8 w-full py-1 px-4 rounded-t-lg uppercase text-lg font-extrabold z-10 opacity-70 bg-gray-800 text-center border-b border-gray-400">
-              DCL CHAMPIONS LEAGUE S-2
-            </div>
-            <div style="background: #af1f42; top: 36px;" class="flex justify-center items-center w-2/4 py-1 px-4 absolute left-1/8 rounded-b-xl uppercase text-xs font-extrabold border-b border-l border-r border-gray-400 z-10 opacity-70">
-              <div>${match.groupName}</div>
-            </div>
-            <div style="background: #af1f42; top: 82px;" class="flex justify-between w-3/4 py-1.5 px-3 absolute left-1/8 rounded-t-xl uppercase text-xs font-extrabold border-t border-l border-r border-gray-400 z-10 opacity-70">
-              <div>${formatDateAndTime(match.date)}</div>
-              <div>Time 24 Hours</div>
-            </div>
-            <div style="background: #a81d3f; top: 35px;" class="rounded-lg shadow-lg w-full max-w-lg relative h-14 border-t border-l border-r border-gray-400 opacity-80">
-              <div class="flex justify-between p-2 uppercase mb-1">
-                <div class="text-left w-full"><h2 class="text-xs font-semibold">${match.team1}</h2></div>
-                <div class="text-right w-full"><h2 class="text-xs font-semibold">${match.team2}</h2></div>
-              </div>
-              <div class="flex justify-center items-center space-x-6 bg-white py-3 px-2 rounded-b-lg h-10 border-b border-gray-400 opacity-80">
-                <div class="text-center"><p class="text-4xl font-medium text-black">${t1GoalVal}</p></div>
-                <div class="text-center" style="position: relative; top: -16px; color: #7f152e;">
-                  <i class="fas fa-futbol text-6xl bg-white rounded-full border border-gray-400"></i>
-                </div>
-                <div class="text-center"><p class="text-4xl font-medium text-black">${t2GoalVal}</p></div>
-              </div>
-              <div style="position: relative; top: -50px; right: 10px;" class="flex justify-between">
-                ${team1Img ? `<img style="border: 4px solid #f34871;" src="${team1Img}" class="w-14 h-14 rounded-full" alt="${match.team1}" />` : ""}
-              </div>
-              <div style="position: absolute; right: -10px; top: 26px;" class="text-center">
-                ${team2Img ? `<img style="border: 4px solid #f34871;" src="${team2Img}" class="w-14 h-14 rounded-full" alt="${match.team2}" />` : ""}
-              </div>
-            </div>
-          </section>
-          `;
-        });
-      });
-
-      fixersContainer.innerHTML = html;
-    });
-  }
+      fixersContainer.innerHTML = html;
+    });
+  }
 </script>
 </body>
 </html>
