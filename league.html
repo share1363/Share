@@ -71,7 +71,8 @@
       Profile
     </a>
   </nav>
-     <script type="module">
+
+  <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, onSnapshot, query, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -174,7 +175,15 @@
         const sortedMatchdays = Object.keys(matchdays).map(Number).sort((a,b) => a - b);
 
         sortedMatchdays.forEach(md => {
-          html += `<div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-center text-lg font-semibold uppercase text-yellow-300 mb-2">Match-day-${md} ||</div>`;
+          const firstMatchDate = matchdays[md][0]?.date || "";
+          const dateOnly = firstMatchDate ? formatDateAndTime(firstMatchDate).split("Time:")[0].trim() : "";
+
+          html += `
+            <div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-lg font-semibold uppercase text-yellow-300 mb-2 flex justify-between items-center">
+              <span>Match-day-${md} ||</span>
+              <span class="text-white text-sm">${dateOnly}</span>
+            </div>
+          `;
 
           const matches = matchdays[md].sort((a, b) => a.team1.localeCompare(b.team1));
 
