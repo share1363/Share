@@ -1,241 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Point Tables</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Point Tables</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-  <!-- Header -->
-  <header class="bg-white shadow-md relative">
-    <div class="max-w-4xl mx-auto px-4 py-3 relative flex items-center justify-center">
-      <p onclick="window.location.href='admin.html'" class="absolute left-4 text-gray-700 cursor-pointer">
-        <i class="fas fa-arrow-left text-2xl"></i>
-      </p>
-      <h1 class="text-xl font-bold text-gray-800">Point Tables</h1>
-    </div>
-  </header>
+  <!-- Header -->
+  <header class="bg-white shadow-md relative">
+    <div class="max-w-4xl mx-auto px-4 py-3 relative flex items-center justify-center">
+      <p onclick="window.location.href='admin.html'" class="absolute left-4 text-gray-700 cursor-pointer">
+        <i class="fas fa-arrow-left text-2xl"></i>
+      </p>
+      <h1 class="text-xl font-bold text-gray-800">Point Tables</h1>
+    </div>
+  </header>
 
-  <!-- Main content -->
-  <main class="max-w-4xl mx-auto p-4 space-y-6">
-    <div id="pointTablesContainer" class="bg-white shadow rounded p-4 max-h-[400px] overflow-y-auto">
-      <h2 class="text-lg font-semibold text-green-700 mb-3">Point Tables</h2>
-      <!-- Group-wise point tables will appear here -->
-    </div>
+  <!-- Main content -->
+  <main class="max-w-4xl mx-auto p-4 space-y-6">
+    <div id="pointTablesContainer" class="bg-white shadow rounded p-4 max-h-[400px] overflow-y-auto">
+      <h2 class="text-lg font-semibold text-green-700 mb-3">Point Tables</h2>
+      <!-- Group-wise point tables will appear here -->
+    </div>
+  </main>
 
-    <div id="allPointsContainer" class="bg-white shadow rounded p-4 max-h-[500px] overflow-y-auto">
-      <h2 class="text-lg font-semibold text-green-700 mb-3">All Teams Point Table</h2>
-      <!-- All teams consolidated point table will appear here -->
-    </div>
-  </main>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.firebasestorage.app",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL"
+    };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
-      authDomain: "dlstournament-31ac1.firebaseapp.com",
-      projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.firebasestorage.app",
-      messagingSenderId: "874377019055",
-      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
-      measurementId: "G-0DGFJEV6GL"
-    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    onAuthStateChanged(auth, (user) => {
+      if (!user) window.location.href = "login.html";
+      else loadPointTables();
+    });
 
-    onAuthStateChanged(auth, (user) => {
-      if (!user) window.location.href = "login.html";
-      else loadPointTables();
-    });
+    function loadPointTables() {
+      const pointTablesContainer = document.getElementById("pointTablesContainer");
 
-    function loadPointTables() {
-      const pointTablesContainer = document.getElementById("pointTablesContainer");
-      const allPointsContainer = document.getElementById("allPointsContainer");
+      onSnapshot(collection(db, "fixers"), (snapshot) => {
+        if (snapshot.empty) {
+          pointTablesContainer.innerHTML = `<p class="text-gray-500 text-center">No point tables to show.</p>`;
+          return;
+        }
 
-      onSnapshot(collection(db, "fixers"), (snapshot) => {
-        if (snapshot.empty) {
-          pointTablesContainer.innerHTML = `<p class="text-gray-500 text-center">No point tables to show.</p>`;
-          allPointsContainer.innerHTML = `<p class="text-gray-500 text-center">No overall point table to show.</p>`;
-          return;
-        }
+        const fixers = [];
+        snapshot.forEach(doc => fixers.push(doc.data()));
 
-        const fixers = [];
-        snapshot.forEach(doc => fixers.push(doc.data()));
+        // Grouping by groupName instead of hardcoding
+        const groupsMap = {};
+        fixers.forEach(fix => {
+          if (!groupsMap[fix.groupName]) groupsMap[fix.groupName] = [];
+          groupsMap[fix.groupName].push(fix);
+        });
 
-        // Grouping by groupName instead of hardcoding
-        const groupsMap = {};
-        fixers.forEach(fix => {
-          if (!groupsMap[fix.groupName]) groupsMap[fix.groupName] = [];
-          groupsMap[fix.groupName].push(fix);
-        });
+        const allGroupsPoints = [];
 
-        const allGroupsPoints = [];
-        const globalPoints = {};
-        const globalGoals = {};
+        Object.keys(groupsMap).sort().forEach(groupName => {
+          const matches = groupsMap[groupName];
 
-        Object.keys(groupsMap).sort().forEach(groupName => {
-          const matches = groupsMap[groupName];
+          const points = {};
+          const goals = {};
 
-          const points = {};
-          const goals = {};
+          matches.forEach(match => {
+            const g1 = match.team1Goal;
+            const g2 = match.team2Goal;
 
-          matches.forEach(match => {
-            const g1 = match.team1Goal;
-            const g2 = match.team2Goal;
+            if (!points[match.team1]) points[match.team1] = { win: 0, loss: 0, draw: 0 };
+            if (!points[match.team2]) points[match.team2] = { win: 0, loss: 0, draw: 0 };
+            if (!goals[match.team1]) goals[match.team1] = 0;
+            if (!goals[match.team2]) goals[match.team2] = 0;
 
-            if (!points[match.team1]) points[match.team1] = { win: 0, loss: 0, draw: 0 };
-            if (!points[match.team2]) points[match.team2] = { win: 0, loss: 0, draw: 0 };
-            if (!goals[match.team1]) goals[match.team1] = 0;
-            if (!goals[match.team2]) goals[match.team2] = 0;
+            if (typeof g1 === "number") {
+              goals[match.team1] += g1;
+            }
+            if (typeof g2 === "number") {
+              goals[match.team2] += g2;
+            }
 
-            if (!globalPoints[match.team1]) globalPoints[match.team1] = { win: 0, loss: 0, draw: 0 };
-            if (!globalPoints[match.team2]) globalPoints[match.team2] = { win: 0, loss: 0, draw: 0 };
-            if (!globalGoals[match.team1]) globalGoals[match.team1] = 0;
-            if (!globalGoals[match.team2]) globalGoals[match.team2] = 0;
+            if (typeof g1 === "number" && typeof g2 === "number") {
+              if (g1 > g2) {
+                points[match.team1].win++;
+                points[match.team2].loss++;
+              } else if (g2 > g1) {
+                points[match.team2].win++;
+                points[match.team1].loss++;
+              } else {
+                points[match.team1].draw++;
+                points[match.team2].draw++;
+              }
+            }
+          });
 
-            if (typeof g1 === "number") {
-              goals[match.team1] += g1;
-              globalGoals[match.team1] += g1;
-            }
-            if (typeof g2 === "number") {
-              goals[match.team2] += g2;
-              globalGoals[match.team2] += g2;
-            }
+          let sortedTeams = Object.entries(points).map(([team, stat]) => ({
+            team,
+            ...stat,
+            points: stat.win * 3 + stat.draw,
+            played: stat.win + stat.loss + stat.draw,
+            goals: goals[team] || 0,
+          })).sort((a, b) => {
+            if (b.points !== a.points) return b.points - a.points;
+            return b.goals - a.goals;
+          });
 
-            if (typeof g1 === "number" && typeof g2 === "number") {
-              if (g1 > g2) {
-                points[match.team1].win++;
-                points[match.team2].loss++;
-                globalPoints[match.team1].win++;
-                globalPoints[match.team2].loss++;
-              } else if (g2 > g1) {
-                points[match.team2].win++;
-                points[match.team1].loss++;
-                globalPoints[match.team2].win++;
-                globalPoints[match.team1].loss++;
-              } else {
-                points[match.team1].draw++;
-                points[match.team2].draw++;
-                globalPoints[match.team1].draw++;
-                globalPoints[match.team2].draw++;
-              }
-            }
-          });
+          sortedTeams = sortedTeams.slice(0, 4);
 
-          let sortedTeams = Object.entries(points).map(([team, stat]) => ({
-            team,
-            ...stat,
-            points: stat.win * 3 + stat.draw,
-            played: stat.win + stat.loss + stat.draw,
-            goals: goals[team] || 0,
-          })).sort((a, b) => {
-            if (b.points !== a.points) return b.points - a.points;
-            return b.goals - a.goals;
-          });
+          allGroupsPoints.push({ groupName, sortedTeams });
+        });
 
-          sortedTeams = sortedTeams.slice(0, 4);
-
-          allGroupsPoints.push({ groupName, sortedTeams });
-        });
-
-        // Group tables
-        let allPointsHTML = "";
-        if (allGroupsPoints.length === 0) {
-          allPointsHTML = `<p class="text-gray-500 text-center">No point tables to show.</p>`;
-        } else {
-          allPointsHTML = allGroupsPoints.map(({ groupName, sortedTeams }) => `
-            <div class="mb-4">
-              <div class="font-semibold mb-1 text-blue-700">Point Table - ${groupName}</div>
-              <table class="text-sm w-full table-auto border border-gray-200">
-                <thead>
-                  <tr class="bg-gray-200">
-                    <th class="px-2 py-1 border">#</th>
-                    <th class="px-2 py-1 border">Team</th>
-                    <th class="px-2 py-1 border text-center">Played</th>
-                    <th class="px-2 py-1 border text-center">Win</th>
-                    <th class="px-2 py-1 border text-center">Loss</th>
-                    <th class="px-2 py-1 border text-center">Draw</th>
-                    <th class="px-2 py-1 border text-center">Goals</th>
-                    <th class="px-2 py-1 border text-center">Points</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${sortedTeams.map((team, i) => `
-                    <tr>
-                      <td class="px-2 py-1 border text-center">${i + 1}</td>
-                      <td class="px-2 py-1 border">${team.team}</td>
-                      <td class="px-2 py-1 border text-center font-semibold">${team.played}</td>
-                      <td class="px-2 py-1 border text-center">${team.win}</td>
-                      <td class="px-2 py-1 border text-center">${team.loss}</td>
-                      <td class="px-2 py-1 border text-center">${team.draw}</td>
-                      <td class="px-2 py-1 border text-center font-semibold">${team.goals}</td>
-                      <td class="px-2 py-1 border text-center font-bold">${team.points}</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          `).join('');
-        }
-        pointTablesContainer.innerHTML = allPointsHTML;
-
-        // All teams table
-        const allTeams = Object.entries(globalPoints).map(([team, stat]) => ({
-          team,
-          ...stat,
-          points: stat.win * 3 + stat.draw,
-          played: stat.win + stat.loss + stat.draw,
-          goals: globalGoals[team] || 0,
-        })).sort((a, b) => {
-          if (b.points !== a.points) return b.points - a.points;
-          return b.goals - a.goals;
-        });
-
-        let allTeamsHTML = "";
-        if (allTeams.length === 0) {
-          allTeamsHTML = `<p class="text-gray-500 text-center">No overall point table to show.</p>`;
-        } else {
-          allTeamsHTML = `
-            <table class="text-sm w-full table-auto border border-gray-200">
-              <thead>
-                <tr class="bg-gray-200">
-                  <th class="px-2 py-1 border">#</th>
-                  <th class="px-2 py-1 border">Team</th>
-                  <th class="px-2 py-1 border text-center">Played</th>
-                  <th class="px-2 py-1 border text-center">Win</th>
-                  <th class="px-2 py-1 border text-center">Loss</th>
-                  <th class="px-2 py-1 border text-center">Draw</th>
-                  <th class="px-2 py-1 border text-center">Goals</th>
-                  <th class="px-2 py-1 border text-center">Points</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${allTeams.map((team, i) => `
-                  <tr>
-                    <td class="px-2 py-1 border text-center">${i + 1}</td>
-                    <td class="px-2 py-1 border">${team.team}</td>
-                    <td class="px-2 py-1 border text-center font-semibold">${team.played}</td>
-                    <td class="px-2 py-1 border text-center">${team.win}</td>
-                    <td class="px-2 py-1 border text-center">${team.loss}</td>
-                    <td class="px-2 py-1 border text-center">${team.draw}</td>
-                    <td class="px-2 py-1 border text-center font-semibold">${team.goals}</td>
-                    <td class="px-2 py-1 border text-center font-bold">${team.points}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>`;
-        }
-        allPointsContainer.innerHTML = allTeamsHTML;
-      });
-    }
-  </script>
+        // Group tables
+        let allPointsHTML = "";
+        if (allGroupsPoints.length === 0) {
+          allPointsHTML = `<p class="text-gray-500 text-center">No point tables to show.</p>`;
+        } else {
+          allPointsHTML = allGroupsPoints.map(({ groupName, sortedTeams }) => `
+            <div class="mb-4">
+              <div class="font-semibold mb-1 text-blue-700">Point Table - ${groupName}</div>
+              <table class="text-sm w-full table-auto border border-gray-200">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-2 py-1 border">#</th>
+                    <th class="px-2 py-1 border">Team</th>
+                    <th class="px-2 py-1 border text-center">Played</th>
+                    <th class="px-2 py-1 border text-center">Win</th>
+                    <th class="px-2 py-1 border text-center">Loss</th>
+                    <th class="px-2 py-1 border text-center">Draw</th>
+                    <th class="px-2 py-1 border text-center">Goals</th>
+                    <th class="px-2 py-1 border text-center">Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${sortedTeams.map((team, i) => `
+                    <tr>
+                      <td class="px-2 py-1 border text-center">${i + 1}</td>
+                      <td class="px-2 py-1 border">${team.team}</td>
+                      <td class="px-2 py-1 border text-center font-semibold">${team.played}</td>
+                      <td class="px-2 py-1 border text-center">${team.win}</td>
+                      <td class="px-2 py-1 border text-center">${team.loss}</td>
+                      <td class="px-2 py-1 border text-center">${team.draw}</td>
+                      <td class="px-2 py-1 border text-center font-semibold">${team.goals}</td>
+                      <td class="px-2 py-1 border text-center font-bold">${team.points}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          `).join('');
+        }
+        pointTablesContainer.innerHTML = allPointsHTML;
+      });
+    }
+  </script>
 </body>
 </html>
