@@ -44,14 +44,33 @@
     const db = getFirestore(app);
 
     let teamUidMap = new Map();
+    let userSettingsRef;
+    let userSettings = { hiddenMatchdays: {} };
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) window.location.href = "login.html";
       else {
+        userSettingsRef = doc(db, "users", user.uid);
+        await loadUserSettings();
         await loadTeamUIDs();
         loadMatches();
       }
     });
+
+    async function loadUserSettings() {
+      const snap = await getDoc(userSettingsRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        userSettings.hiddenMatchdays = data.hiddenMatchdays || {};
+      } else {
+        userSettings.hiddenMatchdays = {};
+      }
+    }
+
+    async function saveUserSettings() {
+      if (!userSettingsRef) return;
+      await updateDoc(userSettingsRef, { hiddenMatchdays: userSettings.hiddenMatchdays });
+    }
 
     async function loadTeamUIDs() {
       teamUidMap.clear();
@@ -101,12 +120,16 @@
           const formattedDate = formatDate(date);
           const matchdayId = `matchday-${index + 1}`;
 
+          const isHidden = userSettings.hiddenMatchdays[matchdayId] === true;
+
           html += `
             <div class="flex justify-between items-center bg-green-600 uppercase text-white px-4 py-2 rounded-lg shadow font-semibold mt-6">
               <span>Match-day-${index + 1} | ${formattedDate}</span>
-              <button id="${matchdayId}-btn" onclick="toggleMatchday('${matchdayId}')" class="bg-white text-green-700 px-2 py-1 rounded text-xs font-medium hover:bg-gray-100">Hide</button>
+              <button id="${matchdayId}-btn" onclick="toggleMatchday('${matchdayId}')" class="bg-white text-green-700 px-2 py-1 rounded text-xs font-medium hover:bg-gray-100">
+                ${isHidden ? 'Show' : 'Hide'}
+              </button>
             </div>
-            <div id="${matchdayId}" class="space-y-4">
+            <div id="${matchdayId}" class="space-y-4 ${isHidden ? 'hidden' : ''}">
           `;
 
           const groups = dateMap[date];
@@ -228,17 +251,20 @@
       Swal.fire({ icon: 'success', title: 'Result updated and stats counted!', position: 'top-end', toast: true, timer: 2000, showConfirmButton: false });
     };
 
-    window.toggleMatchday = function (id) {
+    window.toggleMatchday = async function (id) {
       const el = document.getElementById(id);
       const btn = document.getElementById(`${id}-btn`);
       if (el && btn) {
         if (el.classList.contains("hidden")) {
           el.classList.remove("hidden");
           btn.textContent = "Hide";
+          userSettings.hiddenMatchdays[id] = false;
         } else {
           el.classList.add("hidden");
           btn.textContent = "Show";
+          userSettings.hiddenMatchdays[id] = true;
         }
+        await saveUserSettings();
       }
     };
   </script>
