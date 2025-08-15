@@ -116,6 +116,14 @@
       text-align: center;
     }
 
+     .team-pts {
+      background: linear-gradient(135deg, rgba(155, 81, 224, 0.3), rgba(108, 92, 231, 0.3));
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 5px;
+      box-shadow: 0 4px 12px rgba(155, 81, 224, 0.3);
+      text-align: center;
+     }
+
     .middle-card {
       position: relative;
       background: rgba(76, 29, 149, 0.2);
