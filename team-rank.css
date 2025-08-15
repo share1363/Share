@@ -109,20 +109,20 @@
     }
 
     .status-card {
-      background: linear-gradient(135deg, rgba(155, 81, 224, 0.6), rgba(108, 92, 231, 0.6));
+      background: linear-gradient(135deg, rgba(155, 81, 224, 0.4), rgba(108, 92, 231, 0.4));
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 5px;
       box-shadow: 0 4px 12px rgba(155, 81, 224, 0.3);
       text-align: center;
     }
-
-     .team-pts {
-      background: linear-gradient(135deg, rgba(155, 81, 224, 0.3), rgba(108, 92, 231, 0.3));
+    
+    .team-pts {
+      background: linear-gradient(135deg, rgba(155, 81, 224, 0.2), rgba(108, 92, 231, 0.2));
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 5px;
       box-shadow: 0 4px 12px rgba(155, 81, 224, 0.3);
       text-align: center;
-     }
+    }
 
     .middle-card {
       position: relative;
