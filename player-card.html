@@ -20,7 +20,6 @@
       background: linear-gradient(135deg, #1e3a8a, #2563eb);
       transition: transform 0.3s ease-in-out;
     }
-
     .card-header {
       background-color: #1e40af;
       padding: 5px;
@@ -29,34 +28,29 @@
       font-size: 1.1rem;
       font-weight: bold;
     }
-
     .card-img {
       background-color: rgba(0, 0, 0, 0.5);
       padding: 10px 25px 0px;
       text-align: center;
       position: relative;
     }
-
     .card-body {
       padding: 5px;
       text-align: center;
       background-color: rgba(0, 0, 0, 0.6);
     }
-
     .card-footer {
       background-color: #1e3a8a;
       padding: 10px;
       text-align: center;
       color: white;
     }
-
     .card img {
       width: 100%;
       height: 300px;
       border-radius: 5px;
       object-fit: cover;
     }
-
     .card-title {
       width: 280px;
       font-size: 1.1rem;
@@ -72,26 +66,22 @@
       padding: 2px, 2px;
       text-transform: uppercase;
     }
-
     .card-text {
       font-size: 1rem;
       margin-top: 10px;
       color: #e5e5e5;
     }
-
     .info {
       font-size: 1rem;
       color: #e5e5e5;
       margin-top: 5px;
     }
-
     .card-info {
       display: flex;
       align-items: center;
       margin-bottom: 5px;
       justify-content: space-between;
     }
-
     .card-item {
       background-color: #04585e;
       border-radius: 15px 0px 15px;
@@ -103,7 +93,6 @@
       text-align: center;
       text-transform: uppercase;
     }
-
     .card-item2 {
       background-color: #7c3aed;
       border-radius: 15px 0px;
@@ -114,7 +103,6 @@
       text-transform: uppercase;
     }
   </style>
-  
 </head>
 <body class="bg-black text-white min-h-screen">
 
@@ -143,60 +131,54 @@
     </div>
   </main>
 
-    <!-- Bottom Nav -->
-  <nav
-    class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-40">
+  <!-- Bottom Nav -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-40">
     <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
       </div>
       Home
     </a>
     <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-gamepad text-lg text-gray-300 hover:text-yellow-400"></i>
       </div>
       Matches
     </a>
     <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-trophy text-lg text-gray-300 hover:text-yellow-400"></i>
       </div>
       League
     </a>
     <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-ranking-star text-lg text-gray-300 hover:text-yellow-400"></i>
       </div>
-         Ranking
-      </a>
-
+      Ranking
+    </a>
     <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div
-        class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
         <i class="fa-solid fa-user text-lg text-gray-400 hover:text-yellow-400"></i>
       </div>
       Profile
     </a>
   </nav>
-     <script type="module">
+
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
-  apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
-  authDomain: "dlstournament-31ac1.firebaseapp.com",
-  projectId: "dlstournament-31ac1",
-  storageBucket: "dlstournament-31ac1.firebasestorage.app",
-  messagingSenderId: "874377019055",
-  appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
-  measurementId: "G-0DGFJEV6GL"
-};
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.firebasestorage.app",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -219,54 +201,37 @@
           return;
         }
 
-        let count = 1;
         snapshot.forEach((doc) => {
           const data = doc.data();
           const photo = data.photoUrl && data.photoUrl.trim() !== "" ? data.photoUrl : "https://via.placeholder.com/100?text=No+Image";
 
           const card = `
             <div class="flex justify-center items-center">
-    <div class="card">
-      <div class="card-header">
-        DCL CHAMPIONS LEAGUE S-1
-      </div>
-      <div class="card-img">
-        <img src="${photo}" alt="Card Image">
-        <div class="card-title flex items-center justify-between px-1">
-          <div>${data.username || "No Username"}</div>
-          <div style="background-color: #ff6347;" class="px-1">${count}</div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="card-info">
-          <div class="card-item">
-            <div class="card-item2">Team</div>
-            <p>${data.team || "N/A"}</p>
-          </div>
-          <div class="card-item">
-            <div class="card-item2">Rating</div>
-            <p>${data.dlsRating ?? "N/A"}</p>
-          </div>
-        </div>
-        <div class="card-info">
-          <div class="card-item">
-            <div class="card-item2">Experience</div>
-            <p>${data.yearsPlayed ?? "N/A"} year</p>
-          </div>
-          <div class="card-item">
-            <div class="card-item2">Your age</div>
-            <p>${data.age ?? "N/A"} year</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+              <div class="card">
+                <div class="card-header">
+                  DCL CHAMPIONS LEAGUE S-1
+                </div>
+                <div class="card-img">
+                  <img src="${photo}" alt="Card Image">
+                  <div class="card-title flex items-center justify-center px-1">
+                    <div>${data.username || "No Username"}</div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="card-info">
+                    <div class="card-item">
+                      <div class="card-item2">Team</div>
+                      <p>${data.team || "N/A"}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           `;
           playersList.insertAdjacentHTML("beforeend", card);
-          count++;
         });
       });
     });
-     </script>
+  </script>
 </body>
 </html>
