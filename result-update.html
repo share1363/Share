@@ -188,7 +188,7 @@
       });
     }
 
-    // 🔹 Updated with draw = 1 point each
+    // 🔹 Updated with minus 2 pts for losing team
     async function updateUserStats(uid, isWinner, goalsScored, isDraw) {
       if (!uid || uid === "UID N/A") return;
 
@@ -214,6 +214,7 @@
         updatedStats.pts += 3; // ✅ 3 points for win
       } else {
         updatedStats.lost += 1;
+        updatedStats.pts -= 2; // ✅ -2 points for losing
       }
 
       await updateDoc(userRef, updatedStats);
