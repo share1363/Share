@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Referral</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-black text-white">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-3 px-4 mb-4 mx-auto border-b border-gray-700 flex items-center justify-between rounded-b-xl">
+    <h2 class="text-xl font-bold text-yellow-400">Referral</h2>
+    <a href="profile.html" class="text-sm text-yellow-300"><i class="fa-solid fa-arrow-left"></i> Back</a>
+  </header>
+
+  <!-- Referral Section -->
+  <main class="max-w-md mx-auto px-3 space-y-6">
+    <section class="bg-gray-900 bg-opacity-50 border border-t-4 border-gray-600 rounded-xl p-4 space-y-4 text-center">
+      <div>
+        <h4 class="text-yellow-400 font-semibold text-base">Your Refer Link</h4>
+        <div class="mt-2 flex gap-2">
+          <input id="referLink" readonly class="bg-gray-800 border border-yellow-400 w-full text-yellow-300 rounded-lg p-2 text-sm" />
+          <button onclick="copyReferLink()" class="bg-yellow-400 hover:bg-yellow-500 text-black px-3 rounded-lg text-sm">
+            <i class="fa-solid fa-copy"></i>
+          </button>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-yellow-400 font-semibold text-base">Total Refers</h4>
+        <p id="totalRefers" class="text-2xl font-bold text-yellow-300">0</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Firebase Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.appspot.com",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = "login.html";
+
+      const referralLink = `${window.location.origin}/signup.html?ref=${user.uid}`;
+      document.getElementById("referLink").value = referralLink;
+
+      const referralQuery = query(collection(db, "users"), where("referredBy", "==", user.uid));
+      onSnapshot(referralQuery, (querySnapshot) => {
+        document.getElementById("totalRefers").textContent = querySnapshot.size;
+      });
+    });
+
+    window.copyReferLink = () => {
+      const input = document.getElementById("referLink");
+      navigator.clipboard.writeText(input.value).then(() => {
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Referral link copied!',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          background: '#1a202c',
+          color: '#fff'
+        });
+      });
+    };
+  </script>
+</body>
+</html>
