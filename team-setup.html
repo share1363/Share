@@ -31,6 +31,8 @@
 
   <!-- Main Content -->
   <main class="w-full max-w-md mt-3 px-6 mx-auto mb-20">
+
+    <!-- Team Setup Form -->
     <div id="team-section" class="bg-gray-900 rounded-lg shadow-xl border border-gray-700 bg-cover bg-center" style="background-image: url('863247.jpeg');">
       <div class="bg-black bg-opacity-50 p-4 rounded-md">
 
@@ -46,7 +48,7 @@
       </div>
     </div>
 
-    <!-- Team Info Card (hidden initially) -->
+    <!-- Team Info Card -->
     <div id="team-info" class="hidden mt-6 bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-4 text-gray-200">
       <h2 class="text-center text-xl font-semibold mb-2" style="font-family: 'Audiowide', cursive;">Your Team Info</h2>
       <div class="flex items-center space-x-3 mb-3">
@@ -103,7 +105,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, doc, getDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -121,11 +123,6 @@
     const auth = getAuth(app);
     let currentUser = null;
 
-    onAuthStateChanged(auth, (user) => {
-      if (!user) return window.location.href = "login.html";
-      currentUser = user;
-    });
-
     const form = document.getElementById("team-form");
     const teamSection = document.getElementById("team-section");
     const teamInfo = document.getElementById("team-info");
@@ -135,6 +132,28 @@
     const infoAge = document.getElementById("info-age");
     const infoYears = document.getElementById("info-years");
     const infoPhoto = document.getElementById("info-photo");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = "login.html";
+      currentUser = user;
+
+      // Check if the user already has a team
+      const q = query(collection(db, "playersform"), where("uid", "==", currentUser.uid));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        // Team exists, hide form and show info
+        const teamData = querySnapshot.docs[0].data();
+        teamSection.classList.add("hidden");
+        infoUsername.textContent = teamData.username || "";
+        infoTeam.textContent = teamData.team || "";
+        infoRating.textContent = teamData.dlsRating || "";
+        infoAge.textContent = teamData.age || "";
+        infoYears.textContent = teamData.yearsPlayed || "";
+        infoPhoto.src = teamData.photoUrl || 'dcl1.jpeg';
+        teamInfo.classList.remove("hidden");
+      }
+    });
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -185,7 +204,7 @@
         Swal.close();
         Swal.fire({ icon: 'success', title: 'Success', text: 'Team setup successfully!', confirmButtonColor: '#F59E0B' });
 
-        // Hide form and show team info
+        // Hide form and show info
         teamSection.classList.add("hidden");
         infoUsername.textContent = username;
         infoTeam.textContent = teamName;
