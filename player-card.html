@@ -1,214 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Team Ranking</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link rel="stylesheet" href="team-rank.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Ranking</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+   <link rel="stylesheet" href="team-rank.css">
 </head>
 <body class="bg-black text-white min-h-screen">
 
-  <!-- Header Section -->
-  <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
-    <div class="flex items-center gap-2">
-      <div class="bg-yellow-600 bg-opacity-50 border border-yellow-500 text-yellow-300 w-8 h-8 flex items-center justify-center font-bold rounded-full shadow" style="font-family: 'Audiowide', cursive;">DL</div>
-      <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent" style="font-family: 'Audiowide', cursive;">D.C.L TOUR</h2>
-    </div>
-    <div style="height: 30px;"
-      class="flex items-center gap-1 bg-black px-1 py-1 rounded-full shadow-lg border border-gray-600 ml-8">
-      <div class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
-        <i class="fa-solid fa-bangladeshi-taka-sign text-white text-sm"></i>
-      </div>
-      <p id="mainBalance" class="text-sm font-bold text-yellow-300">0</p>
-      <button class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center shadow-md">
-        <i class="fa-solid fa-plus text-gray-100 text-sm"></i>
-      </button>
-    </div>
-  </header>
+  <!-- Header Section -->
+  <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
+    <div class="flex items-center gap-2">
+      <div class="bg-yellow-600 bg-opacity-50 border border-yellow-500 text-yellow-300 w-8 h-8 flex items-center justify-center font-bold rounded-full shadow" style="font-family: 'Audiowide', cursive;">DL</div>
+      <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent" style="font-family: 'Audiowide', cursive;">D.C.L TOUR</h2>
+    </div>
+    <div style="height: 30px;"
+      class="flex items-center gap-1 bg-black px-1 py-1 rounded-full shadow-lg border border-gray-600 ml-8">
+      <div class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
+        <i class="fa-solid fa-bangladeshi-taka-sign text-white text-sm"></i>
+      </div>
+      <p id="mainBalance" class="text-sm font-bold text-yellow-300">0</p>
+      <button class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center shadow-md">
+        <i class="fa-solid fa-plus text-gray-100 text-sm"></i>
+      </button>
+    </div>
+  </header>
 
-  <!-- Players List -->
-  <main class="max-w-3xl mx-auto px-4 mt-6 mb-20">
-    <div id="players-list" class="space-y-6">
-      <p class="text-center text-gray-400">Loading...</p>
-    </div>
-  </main>
+  <!-- Players List -->
+  <main class="max-w-3xl mx-auto px-4 mt-6 mb-20">
+    <div id="players-list" class="space-y-6">
+      <p class="text-center text-gray-400">Loading...</p>
+    </div>
+  </main>
 
-  <!-- Bottom Nav -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-40">
-    <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
-      </div>
-      Home
-    </a>
-    <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-gamepad text-lg text-gray-300 hover:text-yellow-400"></i>
-      </div>
-      Matches
-    </a>
-    <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-trophy text-lg text-gray-300 hover:text-yellow-400"></i>
-      </div>
-      League
-    </a>
-    <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-ranking-star text-lg text-gray-300 hover:text-yellow-400"></i>
-      </div>
-      Ranking
-    </a>
-    <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
-        <i class="fa-solid fa-user text-lg text-gray-400 hover:text-yellow-400"></i>
-      </div>
-      Profile
-    </a>
-  </nav>
+  <!-- Bottom Nav -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-40">
+    <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      Home
+    </a>
+    <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-gamepad text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      Matches
+    </a>
+    <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-trophy text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      League
+    </a>
+    <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+        <i class="fa-solid fa-ranking-star text-lg text-gray-300 hover:text-yellow-400"></i>
+      </div>
+      Ranking
+    </a>
+    <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
+        <i class="fa-solid fa-user text-lg text-gray-400 hover:text-yellow-400"></i>
+      </div>
+      Profile
+    </a>
+  </nav>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
-      authDomain: "dlstournament-31ac1.firebaseapp.com",
-      projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.firebasestorage.app",
-      messagingSenderId: "874377019055",
-      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
-      measurementId: "G-0DGFJEV6GL"
-    };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.firebasestorage.app",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL"
+    };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-    const playersList = document.getElementById("players-list");
+    const playersList = document.getElementById("players-list");
 
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
 
-      const q = query(collection(db, "playersform"), orderBy("createdAt", "desc"));
-      onSnapshot(q, (snapshot) => {
-        playersList.innerHTML = "";
+      const q = query(collection(db, "playersform"), orderBy("createdAt", "desc"));
+      onSnapshot(q, (snapshot) => {
+        playersList.innerHTML = "";
 
-        if (snapshot.empty) {
-          playersList.innerHTML = `<p class="text-center text-gray-400">No players have registered yet.</p>`;
-          return;
-        }
+        if (snapshot.empty) {
+          playersList.innerHTML = `<p class="text-center text-gray-400">No players have registered yet.</p>`;
+          return;
+        }
 
-        snapshot.forEach(async (docSnap) => {
-          const data = docSnap.data();
-          const photo = data.photoUrl && data.photoUrl.trim() !== "" ? data.photoUrl : "https://via.placeholder.com/100?text=No+Image";
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const photo = data.photoUrl && data.photoUrl.trim() !== "" ? data.photoUrl : "https://via.placeholder.com/100?text=No+Image";
 
-          // Fetch user's pts from users collection
-          let teamPts = 0;
-          try {
-            const userDoc = await db.collection("users").doc(data.uid).get();
-            if (userDoc.exists) {
-              teamPts = userDoc.data().pts || 0;
-            }
-          } catch (e) {
-            console.error("Failed to fetch pts:", e);
-          }
+          const card = `
+            <section class="player-card mb-6">
+      <div class="border rounded-lg p-2 py-4 flex flex-col sm:flex-row items-center gap-4 rank-badge">
+        <div class="bottom-stripe"></div>
+        <div class="flex-shrink-0 team-image-wrapper">
+          <img src="${photo}" alt="Team Logo">
+          <div class="team-text w-full">
+            <div class="team-name">${data.team || "N/A"}</div>
+            <div class="player-name">${data.username || "No Username"}</div>
+          </div>
+        </div>
 
-          const card = `
-            <section class="player-card mb-6">
-              <div class="border rounded-lg p-2 py-4 flex flex-col sm:flex-row items-center gap-4 rank-badge">
-                <div class="bottom-stripe"></div>
-                <div class="flex-shrink-0 team-image-wrapper">
-                  <img src="${photo}" alt="Team Logo">
-                  <div class="team-text w-full">
-                    <div class="team-name">${data.team || "N/A"}</div>
-                    <div class="player-name">${data.username || "No Username"}</div>
-                  </div>
-                </div>
+        <div class="w-full center-text px-2">
+          <section class="mb-3 middle-card">
+            <div class="middle-card-content flex items-center justify-between gap-5">
+              <div class="uppercase">
+                <div class="text-xs text-gray-200 text-center">position</div>
+                <div class="status-card flex justify-center gap-1 items-center text-sm font-bold text-gray-300"><i class="fa-solid fa-medal text-sm text-yellow-400"></i> <span class="text-xl">10</span></div>
+              </div>
 
-                <div class="w-full center-text px-2">
-                  <section class="mb-3 middle-card">
-                    <div class="middle-card-content flex items-center justify-between gap-5">
-                      <div class="uppercase">
-                        <div class="text-xs text-gray-200 text-center">position</div>
-                        <div class="status-card flex justify-center gap-1 items-center text-sm font-bold text-gray-300"><i class="fa-solid fa-medal text-sm text-yellow-400"></i> <span class="text-xl">10</span></div>
-                      </div>
+              <div>
+                <div class="text-xs text-gray-200 text-center">CURRENT BADGE</div>
+                <div class="status-card">
+                  <h2 style="font-size: 16px;" class="py-0.5 font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent">MASTER II</h2>
+                </div>
+              </div>
 
-                      <div>
-                        <div class="text-xs text-gray-200 text-center">CURRENT BADGE</div>
-                        <div class="status-card">
-                          <h2 style="font-size: 16px;" class="py-0.5 font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent">MASTER II</h2>
-                        </div>
-                      </div>
+              <div class="flex flex-col items-center justify-center">
+                <div class="text-xs text-gray-200 text-center">TEAM PTS</div>
+                <div class="status-card w-14 h-7 flex items-center justify-center rounded-md text-gray-300 text-xl font-bold">
+                  ${teamPts}
+                </div>
+              </div>
+            </div>
+          </section>
+          
+          <div class="mt-2 mb-3 w-full">
+            <div class="text-xs text-gray-400 mb-1">Level Rank</div>
+            <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+              <div class="h-2 rounded-full"
+                style="width:90%; background: linear-gradient(90deg,#f6d365,#fda085);"></div>
+            </div>
+          </div>
 
-                      <div class="flex flex-col items-center justify-center">
-                        <div class="text-xs text-gray-200 text-center">TEAM PTS</div>
-                        <div class="status-card w-14 h-7 flex items-center justify-center rounded-md text-gray-300 text-xl font-bold">
-                          ${teamPts}
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-                  
-                  <div class="mt-2 mb-3 w-full">
-                    <div class="text-xs text-gray-400 mb-1">Level Rank</div>
-                    <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
-                      <div class="h-2 rounded-full"
-                        style="width:90%; background: linear-gradient(90deg,#f6d365,#fda085);"></div>
-                    </div>
-                  </div>
+          <div class="mt-2 grid grid-cols-5 gap-3 w-full uppercase">
+            <div class="stat-card">
+              <div class="flex justify-center items-center text-gray-300 text-xs">Draw</div>
+              <div class="text-lg font-bold text-yellow-400">18</div>
+            </div>
+            <div class="stat-card">
+              <div class="flex justify-center items-center text-gray-300 text-xs">Win</div>
+              <div class="text-lg font-bold text-green-500">7</div>
+            </div>
+            <div class="stat-card">
+              <div class="flex justify-center items-center text-gray-300 text-xs">Lost</div>
+              <div class="text-lg font-bold text-red-500">3</div>
+            </div>
+            <div class="stat-card">
+              <div class="flex justify-center items-center text-gray-300 text-xs">Goal</div>
+              <div class="text-lg font-bold text-blue-400">12</div>
+            </div>
+            <div class="stat-card">
+              <div class="flex justify-center items-center text-gray-300 font text-xs">Match</div>
+              <div class="text-lg font-bold text-purple-300">12</div>
+            </div>
+          </div>
 
-                  <div class="mt-2 grid grid-cols-5 gap-3 w-full uppercase">
-                    <div class="stat-card">
-                      <div class="flex justify-center items-center text-gray-300 text-xs">Draw</div>
-                      <div class="text-lg font-bold text-yellow-400">18</div>
-                    </div>
-                    <div class="stat-card">
-                      <div class="flex justify-center items-center text-gray-300 text-xs">Win</div>
-                      <div class="text-lg font-bold text-green-500">7</div>
-                    </div>
-                    <div class="stat-card">
-                      <div class="flex justify-center items-center text-gray-300 text-xs">Lost</div>
-                      <div class="text-lg font-bold text-red-500">3</div>
-                    </div>
-                    <div class="stat-card">
-                      <div class="flex justify-center items-center text-gray-300 text-xs">Goal</div>
-                      <div class="text-lg font-bold text-blue-400">12</div>
-                    </div>
-                    <div class="stat-card">
-                      <div class="flex justify-center items-center text-gray-300 font text-xs">Match</div>
-                      <div class="text-lg font-bold text-purple-300">12</div>
-                    </div>
-                  </div>
-
-                  <div class="mt-2 w-full flex justify-center items-center gap-2">
-                    <div class="text-sm text-gray-300 uppercase font-bold">Last 5 Matches</div>
-                    <div class="flex gap-1">
-                      <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
-                      <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
-                      <span class="px-1 h-4 text-xs rounded-sm bg-red-600 font-semibold">L</span>
-                      <span class="px-1 h-4 text-xs rounded-sm bg-yellow-500 text-black font-semibold">D</span>
-                      <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-          `;
-          playersList.insertAdjacentHTML("beforeend", card);
-        });
-      });
-    });
-  </script>
+          <div class="mt-2 w-full flex justify-center items-center gap-2">
+            <div class="text-sm text-gray-300 uppercase font-bold">Last 5 Matches</div>
+            <div class="flex gap-1">
+              <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
+              <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
+              <span class="px-1 h-4 text-xs rounded-sm bg-red-600 font-semibold">L</span>
+              <span class="px-1 h-4 text-xs rounded-sm bg-yellow-500 text-black font-semibold">D</span>
+              <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+          `;
+          playersList.insertAdjacentHTML("beforeend", card);
+        });
+      });
+    });
+  </script>
 </body>
 </html>
