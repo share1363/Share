@@ -23,7 +23,6 @@
       <a href="#">
         <i class="fa-solid fa-bell text-yellow-300 text-shadow text-xl"></i>
       </a>
-      
       <a href="https://facebook.com" target="_blank">
         <i class="fa-brands fa-facebook text-white text-shadow text-xl"></i>
       </a>
@@ -101,23 +100,23 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
-      authDomain: "dlstournament-31ac1.firebaseapp.com",
-      projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.appspot.com",
-      messagingSenderId: "874377019055",
-      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
-      measurementId: "G-0DGFJEV6GL"
-    };
+      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+      authDomain: "dlstournament-31ac1.firebaseapp.com",
+      projectId: "dlstournament-31ac1",
+      storageBucket: "dlstournament-31ac1.appspot.com",
+      messagingSenderId: "874377019055",
+      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+      measurementId: "G-0DGFJEV6GL"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
     let currentUser = null, slot = null, slotUsed = 0, joiningFee = null;
-    const mainBalance = document.getElementById("mainBalance");
     const joiningSlot = document.getElementById("joiningSlot");
     const joiningFeeDisplay = document.getElementById("joiningFee");
+    const form = document.getElementById("registration-form");
 
     async function loadSlotInfo() {
       const slotDocRef = doc(db, "settings", "slot");
@@ -148,16 +147,24 @@
       };
     }
 
+    async function loadUserForm() {
+      const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        form['team'].value = data.team ?? "";
+        form['dls-rating'].value = data.dlsRating ?? "";
+        form['age'].value = data.age ?? "";
+        form['years-played'].value = data.yearsPlayed ?? "";
+      }
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) return window.location.href = "login.html";
       currentUser = user;
       await loadSlotInfo();
       await loadJoiningFee();
-      const userData = await getUserInfo(user.uid);
-      mainBalance.innerText = userData.balance.toFixed(0);
+      await loadUserForm();
     });
-
-    const form = document.getElementById("registration-form");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
