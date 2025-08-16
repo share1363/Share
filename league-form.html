@@ -97,7 +97,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
       getFirestore, collection, getDocs, doc, getDoc,
-      runTransaction, query, where, updateDoc, setDoc, increment
+      runTransaction, query, where, updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -204,7 +204,7 @@
         const data = snapshot.docs[0].data();
         if (data.type === "free") {
           try {
-            await updateDoc(docRef, { type: "paid", tour: increment(1) });
+            await updateDoc(docRef, { type: "paid" });
             typeDisplay.textContent = "paid";
 
             await runTransaction(db, async (transaction) => {
@@ -245,15 +245,6 @@
           const data = slotSnap.data();
           if (data.slotUsed >= data.slot) throw new Error("Slot full.");
 
-          const newPlayerRef = doc(collection(db, "playersform"));
-          transaction.set(newPlayerRef, {
-            uid: currentUser.uid,
-            team, dlsRating, age, yearsPlayed,
-            type: "paid",
-            tour: 1,
-            createdAt: new Date()
-          });
-
           transaction.update(slotRef, { slotUsed: data.slotUsed + 1 });
           transaction.update(doc(db, "users", currentUser.uid), { balance: userData.balance - joiningFee, tour: (userData.tour || 0) + 1 });
 
@@ -264,7 +255,7 @@
         Swal.close();
         Swal.fire({ icon: 'success', title: 'Success', text: 'You have successfully joined!', confirmButtonColor: '#F59E0B' });
         form.reset();
-        typeDisplay.textContent = "paid";
+        typeDisplay.textContent = "N/A";
 
       } catch (err) {
         Swal.close();
