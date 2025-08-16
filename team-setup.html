@@ -117,235 +117,186 @@
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col items-center pb-20">
 
-  <!-- Header -->
-  <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
-    <div class="flex items-center space-x-2">
-      <img src="dcl1.jpeg" alt="Logo" class="w-8 h-8 rounded-full border border-yellow-400" />
-      <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-300 via-blue-200 to-yellow-300 bg-clip-text text-transparent" style="font-family: 'Audiowide', cursive;">DCL TOUR</h2>
+<header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
+  <div class="flex items-center space-x-2">
+    <img src="dcl1.jpeg" alt="Logo" class="w-8 h-8 rounded-full border border-yellow-400" />
+    <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-300 via-blue-200 to-yellow-300 bg-clip-text text-transparent" style="font-family: 'Audiowide', cursive;">DCL TOUR</h2>
+  </div>
+  <div class="flex space-x-4">
+    <a href="#"><i class="fa-solid fa-bell text-yellow-300 text-shadow text-xl"></i></a>
+    <a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook text-white text-shadow text-xl"></i></a>
+  </div>
+</header>
+
+<main class="w-full max-w-md px-6 mx-auto">
+  <div id="team-section" class="bg-gray-900 rounded-lg shadow-xl border border-gray-700 bg-cover bg-center mt-14" style="background-image: url('863247.jpeg');">
+    <div class="bg-black bg-opacity-50 p-4 rounded-md">
+      <h1 style="font-family: 'Audiowide', cursive;" class="text-center text-xl font-semibold text-gray-200 mb-2">Setup Your Team</h1>
+      <form class="space-y-6" id="team-form">
+        <input type="text" id="team-name" name="team-name" required placeholder="Enter your DLS team name" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
+        <input type="number" step="any" id="dls-rating" name="dls-rating" required placeholder="Enter your DLS rating" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
+        <input type="number" id="age" name="age" required placeholder="Enter your age" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
+        <input type="number" id="years-played" name="years-played" required placeholder="How many years have you played DLS" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
+        <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded-md transition duration-300">Submit</button>
+      </form>
     </div>
-    <div class="flex space-x-4">
-      <a href="#"><i class="fa-solid fa-bell text-yellow-300 text-shadow text-xl"></i></a>
-      <a href="https://facebook.com" target="_blank"><i class="fa-brands fa-facebook text-white text-shadow text-xl"></i></a>
-    </div>
-  </header>
+  </div>
 
-  <!-- Main Content -->
-  <main class="w-full max-w-md px-6 mx-auto">
-    <!-- Team Setup Form -->
-    <div id="team-section" class="bg-gray-900 rounded-lg shadow-xl border border-gray-700 bg-cover bg-center mt-14" style="background-image: url('863247.jpeg');">
-      <div class="bg-black bg-opacity-50 p-4 rounded-md">
-        <h1 style="font-family: 'Audiowide', cursive;" class="text-center text-xl font-semibold text-gray-200 mb-2">Setup Your Team</h1>
-        <form class="space-y-6" id="team-form">
-          <input type="text" id="team-name" name="team-name" required placeholder="Enter your DLS team name" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-          <input type="number" step="any" id="dls-rating" name="dls-rating" required placeholder="Enter your DLS rating" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-          <input type="number" id="age" name="age" required placeholder="Enter your age" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-          <input type="number" id="years-played" name="years-played" required placeholder="How many years have you played DLS" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-          <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded-md transition duration-300">Submit</button>
-        </form>
-      </div>
-    </div>
+  <div id="team-info" class="hidden mt-6 shadow-xl p-4 text-gray-200">
+    <p>Loading...</p>
+  </div>
+</main>
 
-    <!-- Team Info Card -->
-    <div id="team-info" class="hidden mt-6 shadow-xl p-4 text-gray-200">
-      <p>Loading...</p>
-    </div>
-    
-  </main>
+<nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-50">
+  <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+    <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
+    </div>Home
+  </a>
+  <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+    <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <i class="fa-solid fa-gamepad text-lg text-gray-300 hover:text-yellow-400"></i>
+    </div>Matches
+  </a>
+  <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+    <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <i class="fa-solid fa-trophy text-lg text-gray-300 hover:text-yellow-400"></i>
+    </div>League
+  </a>
+  <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+    <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <i class="fa-solid fa-ranking-star text-lg text-gray-300 hover:text-yellow-400"></i>
+    </div>Ranking
+  </a>
+  <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
+    <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
+      <i class="fa-solid fa-user text-lg text-gray-400 hover:text-yellow-400"></i>
+    </div>Profile
+  </a>
+</nav>
 
-  <!-- Bottom Navigation -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 sm:flex sm:justify-between sm:h-14 sm:px-2 z-50">
-    <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
-      </div>Home
-    </a>
-    <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-gamepad text-lg text-gray-300 hover:text-yellow-400"></i>
-      </div>Matches
-    </a>
-    <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-trophy text-lg text-gray-300 hover:text-yellow-400"></i>
-      </div>League
-    </a>
-    <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
-        <i class="fa-solid fa-ranking-star text-lg text-gray-300 hover:text-yellow-400"></i>
-      </div>Ranking
-    </a>
-    <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold no-underline">
-      <div class="bg-gray-900 bg-opacity-70 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
-        <i class="fa-solid fa-user text-lg text-gray-400 hover:text-yellow-400"></i>
-      </div>Profile
-    </a>
-  </nav>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, getDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, doc, getDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
+  authDomain: "dlstournament-31ac1.firebaseapp.com",
+  projectId: "dlstournament-31ac1",
+  storageBucket: "dlstournament-31ac1.appspot.com",
+  messagingSenderId: "874377019055",
+  appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
+  measurementId: "G-0DGFJEV6GL"
+};
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
-      authDomain: "dlstournament-31ac1.firebaseapp.com",
-      projectId: "dlstournament-31ac1",
-      storageBucket: "dlstournament-31ac1.appspot.com",
-      messagingSenderId: "874377019055",
-      appId: "1:874377019055:web:6e38db2ec7f0d541d2de5a",
-      measurementId: "G-0DGFJEV6GL"
-    };
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+let currentUser = null;
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    let currentUser = null;
+const form = document.getElementById("team-form");
+const teamSection = document.getElementById("team-section");
+const teamInfo = document.getElementById("team-info");
 
-    const form = document.getElementById("team-form");
-    const teamSection = document.getElementById("team-section");
-    const teamInfo = document.getElementById("team-info");
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return window.location.href = "login.html";
-      currentUser = user;
-
-      const q = query(collection(db, "playersform"), where("uid", "==", currentUser.uid));
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        const teamData = querySnapshot.docs[0].data();
-        teamSection.style.display = "none";
-
-        const photo = teamData.photoUrl || 'dcl1.jpeg';
-        const username = teamData.username || 'No Username';
-
-        teamInfo.innerHTML = `
-          <div class="flex justify-center items-center">
-            <div class="card">
-              <div class="card-header">MY DCL TEAM'S</div>
-              <div class="card-img">
-                <img src="${photo}" alt="Team Photo">
-                <div class="card-title">${teamData.team || 'No Team'}</div>
+// Helper function to render team card
+async function renderTeamCard(userId) {
+  const q = query(collection(db, "playersform"), where("uid", "==", userId));
+  const querySnapshot = await getDocs(q);
+  if (!querySnapshot.empty) {
+    const teamData = querySnapshot.docs[0].data();
+    const photo = teamData.photoUrl || 'dcl1.jpeg';
+    teamInfo.innerHTML = `
+      <div class="flex justify-center items-center">
+        <div class="card">
+          <div class="card-header">MY DCL TEAM'S</div>
+          <div class="card-img">
+            <img src="${photo}" alt="Team Photo">
+            <div class="card-title">${teamData.team || 'No Team'}</div>
+          </div>
+          <div class="card-body">
+            <div class="card-info">
+              <div class="card-item">
+                <div class="card-item2">Rating</div>
+                <p>${teamData.dlsRating ?? 'N/A'}</p>
               </div>
-              <div class="card-body">
-                <div class="card-info">
-                  <div class="card-item">
-                    <div class="card-item2">Rating</div>
-                    <p>${teamData.dlsRating ?? 'N/A'}</p>
-                  </div>
-                  <div class="card-item">
-                    <div class="card-item2">Experience</div>
-                    <p>${teamData.yearsPlayed ?? 'N/A'} year</p>
-                  </div>
-                </div>
-                <div class="card-info">
-                  <div class="card-item">
-                    <div class="card-item2">Age</div>
-                    <p>${teamData.age ?? 'N/A'} year</p>
-                  </div>
-                  <div class="card-item">
-                    <div class="card-item2">Type</div>
-                    <p>${teamData.type ?? 'Free'}</p>
-                  </div>
-                </div>
+              <div class="card-item">
+                <div class="card-item2">Experience</div>
+                <p>${teamData.yearsPlayed ?? 'N/A'} year</p>
+              </div>
+            </div>
+            <div class="card-info">
+              <div class="card-item">
+                <div class="card-item2">Age</div>
+                <p>${teamData.age ?? 'N/A'} year</p>
+              </div>
+              <div class="card-item">
+                <div class="card-item2">Type</div>
+                <p>${teamData.type ?? 'Free'}</p>
               </div>
             </div>
           </div>
-        `;
-        teamInfo.classList.remove("hidden");
-      } else {
-        teamSection.style.display = "block";
-      }
+        </div>
+      </div>
+    `;
+    teamInfo.classList.remove("hidden");
+    teamSection.style.display = "none";
+  } else {
+    teamSection.style.display = "block";
+  }
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return window.location.href = "login.html";
+  currentUser = user;
+  await renderTeamCard(currentUser.uid);
+});
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!currentUser) return;
+
+  const teamName = form['team-name'].value.trim();
+  const dlsRating = form['dls-rating'].value.trim();
+  const age = form['age'].value.trim();
+  const yearsPlayed = form['years-played'].value.trim();
+
+  if (!teamName || !dlsRating || !age || !yearsPlayed) {
+    return Swal.fire({ icon: 'warning', text: 'All fields are required.', confirmButtonColor: '#F59E0B' });
+  }
+
+  Swal.fire({ title: 'Submitting...', text: 'Please wait...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+
+  try {
+    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+    const username = userDoc.exists() ? userDoc.data()?.username || "" : "";
+    const photoUrl = userDoc.exists() ? userDoc.data()?.photoUrl || "" : "";
+
+    await addDoc(collection(db, "playersform"), {
+      team: teamName,
+      dlsRating: parseFloat(dlsRating),
+      age: parseInt(age),
+      yearsPlayed: parseInt(yearsPlayed),
+      uid: currentUser.uid,
+      username: username,
+      photoUrl: photoUrl,
+      tour: 0, played: 0, win: 0, draw: 0, lost: 0, goal: 0, pts: 0,
+      type: "free",
+      session: "None",
+      createdAt: new Date()
     });
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentUser) return;
+    Swal.close();
+    Swal.fire({ icon: 'success', title: 'Success', text: 'Team setup successfully!', confirmButtonColor: '#F59E0B' });
 
-      const teamName = form['team-name'].value.trim();
-      const dlsRating = form['dls-rating'].value.trim();
-      const age = form['age'].value.trim();
-      const yearsPlayed = form['years-played'].value.trim();
+    // Render the card using the same function
+    await renderTeamCard(currentUser.uid);
 
-      if (!teamName || !dlsRating || !age || !yearsPlayed) {
-        return Swal.fire({ icon: 'warning', text: 'All fields are required.', confirmButtonColor: '#F59E0B' });
-      }
-
-      Swal.fire({ title: 'Submitting...', text: 'Please wait...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
-
-      try {
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-        const username = userDoc.exists() ? userDoc.data()?.username || "" : "";
-        const photoUrl = userDoc.exists() ? userDoc.data()?.photoUrl || "" : "";
-
-        await addDoc(collection(db, "playersform"), {
-          team: teamName,
-          dlsRating: parseFloat(dlsRating),
-          age: parseInt(age),
-          yearsPlayed: parseInt(yearsPlayed),
-          uid: currentUser.uid,
-          username: username,
-          photoUrl: photoUrl,
-          tour: 0, played: 0, win: 0, draw: 0, lost: 0, goal: 0, pts: 0,
-          type: "free",
-          session: "None",
-          createdAt: new Date()
-        });
-
-        Swal.close();
-        Swal.fire({ icon: 'success', title: 'Success', text: 'Team setup successfully!', confirmButtonColor: '#F59E0B' });
-
-        // Display the full card info instead of simplified info
-        teamSection.style.display = "none";
-
-        // Fetch the newly added team data to render card
-        const q = query(collection(db, "playersform"), where("uid", "==", currentUser.uid));
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          const teamData = querySnapshot.docs[0].data();
-          const photo = teamData.photoUrl || 'dcl1.jpeg';
-
-          teamInfo.innerHTML = `
-            <div class="flex justify-center items-center">
-              <div class="card">
-                <div class="card-header">MY DCL TEAM'S</div>
-                <div class="card-img">
-                  <img src="${photo}" alt="Team Photo">
-                  <div class="card-title">${teamData.team || 'No Team'}</div>
-                </div>
-                <div class="card-body">
-                  <div class="card-info">
-                    <div class="card-item">
-                      <div class="card-item2">Rating</div>
-                      <p>${teamData.dlsRating ?? 'N/A'}</p>
-                    </div>
-                    <div class="card-item">
-                      <div class="card-item2">Experience</div>
-                      <p>${teamData.yearsPlayed ?? 'N/A'} year</p>
-                    </div>
-                  </div>
-                  <div class="card-info">
-                    <div class="card-item">
-                      <div class="card-item2">Age</div>
-                      <p>${teamData.age ?? 'N/A'} year</p>
-                    </div>
-                    <div class="card-item">
-                      <div class="card-item2">Type</div>
-                      <p>${teamData.type ?? 'Free'}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-          teamInfo.classList.remove("hidden");
-        }
-
-      } catch (err) {
-        Swal.close();
-        Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Failed to save team.', confirmButtonColor: '#EF4444' });
-      }
-    });
-  </script>
+  } catch (err) {
+    Swal.close();
+    Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Failed to save team.', confirmButtonColor: '#EF4444' });
+  }
+});
+</script>
 </body>
 </html>
