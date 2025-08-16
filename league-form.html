@@ -12,7 +12,8 @@
 <body class="bg-black text-white">
 
   <!-- Header -->
-  <header class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
+  <header
+    class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-3 mx-auto border-b border-gray-700 flex items-center justify-between header-glow rounded-b-xl">
     <div class="flex items-center space-x-2">
       <img src="dcl1.jpeg" alt="Logo" class="w-8 h-8 rounded-full border border-yellow-400" />
       <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-300 via-blue-200 to-yellow-300 bg-clip-text text-transparent"
@@ -94,7 +95,10 @@
   <!-- Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      getFirestore, collection, getDocs, doc, getDoc,
+      runTransaction, query, where, updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -138,16 +142,28 @@
     async function getUserInfo(uid) {
       const docSnap = await getDoc(doc(db, "users", uid));
       const data = docSnap.data();
-      return { balance: data?.balance ?? 0, tour: data?.tour ?? 0 };
+      return {
+        balance: data?.balance ?? 0,
+        tour: data?.tour ?? 0
+      };
     }
 
     async function loadUserForm() {
-      // শুধু UI input ফিল্ড খালি রাখা
-      form['team'].value = "";
-      form['dls-rating'].value = "";
-      form['age'].value = "";
-      form['years-played'].value = "";
-      typeDisplay.textContent = "free";
+      const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
+      if (!snapshot.empty) {
+        const docRef = snapshot.docs[0].ref;
+        const data = snapshot.docs[0].data();
+        form['team'].value = data.team ?? "";
+        form['dls-rating'].value = data.dlsRating ?? "";
+        form['age'].value = data.age ?? "";
+        form['years-played'].value = data.yearsPlayed ?? "";
+        typeDisplay.textContent = data.type ?? "N/A";
+
+        // Store the docRef for updating type later
+        form.dataset.docRef = docRef.path;
+      } else {
+        typeDisplay.textContent = "N/A";
+      }
     }
 
     onAuthStateChanged(auth, async (user) => {
@@ -160,16 +176,6 @@
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-
-      if (typeDisplay.textContent !== "free") {
-        return Swal.fire({ 
-          icon: 'error', 
-          title: 'Cannot Join', 
-          text: 'You have already joined.', 
-          confirmButtonColor: '#EF4444' 
-        });
-      }
-
       Swal.fire({
         title: 'Processing...',
         text: 'Please wait...',
@@ -193,6 +199,34 @@
         return Swal.fire({ icon: 'error', title: 'Slot Full', text: 'All slots are already taken.', timer: 3000, timerProgressBar: true, showConfirmButton: false });
       }
 
+      const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
+      if (!snapshot.empty) {
+        // If existing type is free, update to paid
+        const docRef = snapshot.docs[0].ref;
+        const data = snapshot.docs[0].data();
+        if (data.type === "free") {
+          try {
+            await updateDoc(docRef, { type: "paid" });
+            typeDisplay.textContent = "paid";
+            Swal.close();
+            return Swal.fire({ icon: 'success', title: 'Success', text: 'Your registration type has been updated to paid!', confirmButtonColor: '#F59E0B' });
+          } catch (err) {
+            Swal.close();
+            return Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Failed to update type.', confirmButtonColor: '#EF4444' });
+          }
+        } else {
+          Swal.close();
+          return Swal.fire({ icon: 'error', title: 'Already Registered', text: 'You have already registered.', confirmButtonColor: '#EF4444' });
+        }
+      }
+
+      // Check team name uniqueness
+      const teamSnapshot = await getDocs(query(collection(db, "playersform"), where("team", "==", team)));
+      if (!teamSnapshot.empty) {
+        Swal.close();
+        return Swal.fire({ icon: 'error', title: 'Team Exists', text: 'Team name already used.', confirmButtonColor: '#EF4444' });
+      }
+
       const { balance, tour } = await getUserInfo(currentUser.uid);
       if (balance < joiningFee) {
         Swal.close();
@@ -206,17 +240,23 @@
           const data = slotSnap.data();
           if (data.slotUsed >= data.slot) throw new Error("Slot full.");
 
-          transaction.update(slotRef, { slotUsed: data.slotUsed + 1 });
-          transaction.update(doc(db, "users", currentUser.uid), { balance: balance - joiningFee, tour: (tour || 0) + 1 });
+          transaction.update(slotRef, {
+            slotUsed: data.slotUsed + 1
+          });
+
+          transaction.update(doc(db, "users", currentUser.uid), {
+            balance: balance - joiningFee,
+            tour: (tour || 0) + 1
+          });
 
           slotUsed = data.slotUsed + 1;
           joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
         });
 
         Swal.close();
-        typeDisplay.textContent = "paid"; // UI তে paid দেখানো
         Swal.fire({ icon: 'success', title: 'Success', text: 'You have successfully joined!', confirmButtonColor: '#F59E0B' });
         form.reset();
+        typeDisplay.textContent = "N/A";
 
       } catch (err) {
         Swal.close();
