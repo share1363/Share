@@ -228,6 +228,14 @@
           joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
         });
 
+        // ✅ playersform -> type field update free → paid
+        const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
+        if (!snapshot.empty) {
+          const playerDocRef = snapshot.docs[0].ref;
+          await updateDoc(playerDocRef, { type: "paid" });
+          typeDisplay.textContent = "paid";
+        }
+
         Swal.close();
         Swal.fire({ icon: 'success', title: 'Success', text: 'You have successfully joined!', confirmButtonColor: '#F59E0B' });
 
