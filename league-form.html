@@ -158,8 +158,6 @@
         form['age'].value = data.age ?? "";
         form['years-played'].value = data.yearsPlayed ?? "";
         typeDisplay.textContent = data.type ?? "N/A";
-
-        // Store the docRef for updating type later
         form.dataset.docRef = docRef.path;
       } else {
         typeDisplay.textContent = "N/A";
@@ -194,22 +192,36 @@
         return Swal.fire({ icon: 'warning', text: 'All fields are required.', confirmButtonColor: '#F59E0B' });
       }
 
-      if (slotUsed >= slot) {
-        Swal.close();
-        return Swal.fire({ icon: 'error', title: 'Slot Full', text: 'All slots are already taken.', timer: 3000, timerProgressBar: true, showConfirmButton: false });
-      }
-
       const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
+
       if (!snapshot.empty) {
-        // If existing type is free, update to paid
         const docRef = snapshot.docs[0].ref;
         const data = snapshot.docs[0].data();
+
         if (data.type === "free") {
           try {
             await updateDoc(docRef, { type: "paid" });
             typeDisplay.textContent = "paid";
+
+            // Deduct joiningFee and increment slot
+            const { balance, tour } = await getUserInfo(currentUser.uid);
+            await runTransaction(db, async (transaction) => {
+              const userRef = doc(db, "users", currentUser.uid);
+              const slotRef = doc(db, "settings", "slot");
+              const slotSnap = await transaction.get(slotRef);
+              const slotData = slotSnap.data();
+              if (slotData.slotUsed >= slotData.slot) throw new Error("Slot full.");
+
+              transaction.update(userRef, { balance: balance - joiningFee, tour: (tour || 0) + 1 });
+              transaction.update(slotRef, { slotUsed: slotData.slotUsed + 1 });
+
+              slotUsed = slotData.slotUsed + 1;
+              joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
+            });
+
             Swal.close();
-            return Swal.fire({ icon: 'success', title: 'Success', text: 'Your registration type has been updated to paid!', confirmButtonColor: '#F59E0B' });
+            return Swal.fire({ icon: 'success', title: 'Success', text: 'Your registration is now paid!', confirmButtonColor: '#F59E0B' });
+
           } catch (err) {
             Swal.close();
             return Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Failed to update type.', confirmButtonColor: '#EF4444' });
@@ -227,6 +239,7 @@
         return Swal.fire({ icon: 'error', title: 'Team Exists', text: 'Team name already used.', confirmButtonColor: '#EF4444' });
       }
 
+      // Proceed to register new user
       const { balance, tour } = await getUserInfo(currentUser.uid);
       if (balance < joiningFee) {
         Swal.close();
@@ -240,14 +253,8 @@
           const data = slotSnap.data();
           if (data.slotUsed >= data.slot) throw new Error("Slot full.");
 
-          transaction.update(slotRef, {
-            slotUsed: data.slotUsed + 1
-          });
-
-          transaction.update(doc(db, "users", currentUser.uid), {
-            balance: balance - joiningFee,
-            tour: (tour || 0) + 1
-          });
+          transaction.update(slotRef, { slotUsed: data.slotUsed + 1 });
+          transaction.update(doc(db, "users", currentUser.uid), { balance: balance - joiningFee, tour: (tour || 0) + 1 });
 
           slotUsed = data.slotUsed + 1;
           joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
