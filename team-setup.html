@@ -23,7 +23,6 @@
       <a href="#">
         <i class="fa-solid fa-bell text-yellow-300 text-shadow text-xl"></i>
       </a>
-      
       <a href="https://facebook.com" target="_blank">
         <i class="fa-brands fa-facebook text-white text-shadow text-xl"></i>
       </a>
@@ -80,7 +79,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -126,12 +125,17 @@
       });
 
       try {
+        // Get username from users db
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        const username = userDoc.exists() ? userDoc.data()?.username || "" : "";
+
         await addDoc(collection(db, "playersform"), {
           team: teamName,
           dlsRating: parseFloat(dlsRating),
           age: parseInt(age),
           yearsPlayed: parseInt(yearsPlayed),
           uid: currentUser.uid,
+          username: username,
           createdAt: new Date()
         });
 
