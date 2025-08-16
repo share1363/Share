@@ -200,12 +200,6 @@
         return Swal.fire({ icon: 'error', title: 'Slot Full', text: 'All slots are already taken.', timer: 3000, timerProgressBar: true, showConfirmButton: false });
       }
 
-      const teamSnapshot = await getDocs(query(collection(db, "playersform"), where("team", "==", team)));
-      if (!teamSnapshot.empty) {
-        Swal.close();
-        return Swal.fire({ icon: 'error', title: 'Team Exists', text: 'Team name already used.', confirmButtonColor: '#EF4444' });
-      }
-
       const { balance, tour } = await getUserInfo(currentUser.uid);
       if (balance < joiningFee) {
         Swal.close();
