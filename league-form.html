@@ -23,7 +23,6 @@
       <a href="#">
         <i class="fa-solid fa-bell text-yellow-300 text-shadow text-xl"></i>
       </a>
-      
       <a href="https://facebook.com" target="_blank">
         <i class="fa-brands fa-facebook text-white text-shadow text-xl"></i>
       </a>
@@ -33,10 +32,10 @@
   <!-- Main Content -->
   <main class="w-full max-w-md mt-3 px-4 mx-auto mb-20">
     <!-- Slot & Fee Display Box -->
-          <div class="bg-yellow-900 bg-opacity-20 border border-gray-700 rounded-md p-1 mb-4">
-            <p id="joiningSlot" class="text-center text-yellow-300 mb-1 font-medium">Loading...</p>
-            <p id="joiningFee" class="text-center text-yellow-300 font-medium">Loading...</p>
-          </div>
+    <div class="bg-yellow-900 bg-opacity-20 border border-gray-700 rounded-md p-1 mb-4">
+      <p id="joiningSlot" class="text-center text-yellow-300 mb-1 font-medium">Loading...</p>
+      <p id="joiningFee" class="text-center text-yellow-300 font-medium">Loading...</p>
+    </div>
     <div class="p-2">
       <div class="bg-gray-900 rounded-lg shadow-xl border border-gray-700 bg-cover bg-center" style="background-image: url('863247.jpeg');">
         <div class="bg-black bg-opacity-50 p-4 rounded-md">
@@ -87,8 +86,8 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
-      getFirestore, collection, addDoc, doc, getDoc, getDocs,
-      runTransaction, query, where, updateDoc
+      getFirestore, doc, getDoc,
+      runTransaction
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -107,7 +106,6 @@
     const auth = getAuth(app);
 
     let currentUser = null, slot = null, slotUsed = 0, joiningFee = null;
-    const mainBalance = document.getElementById("mainBalance");
     const joiningSlot = document.getElementById("joiningSlot");
     const joiningFeeDisplay = document.getElementById("joiningFee");
 
@@ -133,11 +131,22 @@
       const docSnap = await getDoc(doc(db, "users", uid));
       const data = docSnap.data();
       return {
-        username: data?.username ?? "",
-        photoUrl: data?.photoUrl ?? "",
         balance: data?.balance ?? 0,
         tour: data?.tour ?? 0
       };
+    }
+
+    // 🔥 New function: Load Player Form Data
+    async function loadPlayerFormData(uid) {
+      const playerRef = doc(db, "playersform", uid);
+      const docSnap = await getDoc(playerRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        document.getElementById("team").value = data?.team || "";
+        document.getElementById("dls-rating").value = data?.dlsRating || "";
+        document.getElementById("age").value = data?.age || "";
+        document.getElementById("years-played").value = data?.yearsPlayed || "";
+      }
     }
 
     onAuthStateChanged(auth, async (user) => {
@@ -145,8 +154,8 @@
       currentUser = user;
       await loadSlotInfo();
       await loadJoiningFee();
-      const userData = await getUserInfo(user.uid);
-      mainBalance.innerText = userData.balance.toFixed(0);
+      await getUserInfo(user.uid);
+      await loadPlayerFormData(user.uid); // 👈 Auto-fill form data
     });
 
     const form = document.getElementById("registration-form");
@@ -176,19 +185,7 @@
         return Swal.fire({ icon: 'error', title: 'Slot Full', text: 'All slots are already taken.', timer: 3000, timerProgressBar: true, showConfirmButton: false });
       }
 
-      const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
-      if (!snapshot.empty) {
-        Swal.close();
-        return Swal.fire({ icon: 'error', title: 'Already Registered', text: 'You have already registered.', confirmButtonColor: '#EF4444' });
-      }
-
-      const teamSnapshot = await getDocs(query(collection(db, "playersform"), where("team", "==", team)));
-      if (!teamSnapshot.empty) {
-        Swal.close();
-        return Swal.fire({ icon: 'error', title: 'Team Exists', text: 'Team name already used.', confirmButtonColor: '#EF4444' });
-      }
-
-      const { username, photoUrl, balance, tour } = await getUserInfo(currentUser.uid);
+      const { balance, tour } = await getUserInfo(currentUser.uid);
       if (balance < joiningFee) {
         Swal.close();
         return Swal.fire({ icon: 'error', title: 'Insufficient Balance', text: `Current balance: ৳${balance.toFixed(0)}`, confirmButtonColor: '#EF4444' });
@@ -200,12 +197,6 @@
           const slotSnap = await transaction.get(slotRef);
           const data = slotSnap.data();
           if (data.slotUsed >= data.slot) throw new Error("Slot full.");
-
-          transaction.set(doc(collection(db, "playersform")), {
-            team, dlsRating, age, yearsPlayed,
-            uid: currentUser.uid, username, photoUrl,
-            createdAt: new Date()
-          });
 
           transaction.update(slotRef, {
             slotUsed: data.slotUsed + 1
