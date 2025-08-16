@@ -95,10 +95,7 @@
   <!-- Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getFirestore, collection, getDocs, doc, getDoc,
-      runTransaction, query, where, updateDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -142,24 +139,11 @@
     async function getUserInfo(uid) {
       const docSnap = await getDoc(doc(db, "users", uid));
       const data = docSnap.data();
-      return {
-        balance: data?.balance ?? 0,
-        tour: data?.tour ?? 0
-      };
+      return { balance: data?.balance ?? 0, tour: data?.tour ?? 0 };
     }
 
     async function loadUserForm() {
-      const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
-      if (!snapshot.empty) {
-        const data = snapshot.docs[0].data();
-        form['team'].value = data.team ?? "";
-        form['dls-rating'].value = data.dlsRating ?? "";
-        form['age'].value = data.age ?? "";
-        form['years-played'].value = data.yearsPlayed ?? "";
-        typeDisplay.textContent = data.type ?? "N/A";
-      } else {
-        typeDisplay.textContent = "free";
-      }
+      typeDisplay.textContent = "free";
     }
 
     onAuthStateChanged(auth, async (user) => {
@@ -174,7 +158,12 @@
       e.preventDefault();
 
       if (typeDisplay.textContent !== "free") {
-        return Swal.fire({ icon: 'error', title: 'Cannot Join', text: 'You have already joined.', confirmButtonColor: '#EF4444' });
+        return Swal.fire({ 
+          icon: 'error', 
+          title: 'Cannot Join', 
+          text: 'You have already joined.', 
+          confirmButtonColor: '#EF4444' 
+        });
       }
 
       Swal.fire({
@@ -213,25 +202,15 @@
           const data = slotSnap.data();
           if (data.slotUsed >= data.slot) throw new Error("Slot full.");
 
-          transaction.update(slotRef, {
-            slotUsed: data.slotUsed + 1
-          });
-
-          transaction.update(doc(db, "users", currentUser.uid), {
-            balance: balance - joiningFee,
-            tour: (tour || 0) + 1
-          });
-
-          // Update type to paid
-          typeDisplay.textContent = "paid";
-          const playerRef = doc(db, "playersform", currentUser.uid);
-          await updateDoc(playerRef, { type: "paid" });
+          transaction.update(slotRef, { slotUsed: data.slotUsed + 1 });
+          transaction.update(doc(db, "users", currentUser.uid), { balance: balance - joiningFee, tour: (tour || 0) + 1 });
 
           slotUsed = data.slotUsed + 1;
           joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
         });
 
         Swal.close();
+        typeDisplay.textContent = "paid"; // UI তে paid দেখানো
         Swal.fire({ icon: 'success', title: 'Success', text: 'You have successfully joined!', confirmButtonColor: '#F59E0B' });
         form.reset();
 
