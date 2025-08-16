@@ -52,7 +52,12 @@
       <!-- Referral Code -->
       <div>
         <h4 class="text-yellow-400 font-semibold text-base">Your Refer Code</h4>
-        <p id="referCode" class="text-lg font-bold text-yellow-300 break-words">---</p>
+        <div class="mt-2 flex gap-2">
+          <input id="referCode" readonly class="bg-gray-800 border border-yellow-400 w-full text-yellow-300 rounded-lg p-2 text-sm" />
+          <button onclick="copyReferCode()" class="bg-yellow-400 hover:bg-yellow-500 text-black px-3 rounded-lg text-sm">
+            <i class="fa-solid fa-copy"></i>
+          </button>
+        </div>
       </div>
 
       <!-- Total Referrals -->
@@ -131,7 +136,7 @@
       document.getElementById("referLink").value = referralLink;
 
       // Referral Code (user UID)
-      document.getElementById("referCode").textContent = user.uid;
+      document.getElementById("referCode").value = user.uid;
 
       // Total Referrals
       const referralQuery = query(collection(db, "users"), where("referredBy", "==", user.uid));
@@ -149,6 +154,24 @@
           position: 'top-end',
           icon: 'success',
           title: 'Referral link copied!',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          background: '#1a202c',
+          color: '#fff'
+        });
+      });
+    };
+
+    // Copy Refer Code Function
+    window.copyReferCode = () => {
+      const input = document.getElementById("referCode");
+      navigator.clipboard.writeText(input.value).then(() => {
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: 'Referral code copied!',
           showConfirmButton: false,
           timer: 2000,
           timerProgressBar: true,
