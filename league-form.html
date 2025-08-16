@@ -207,6 +207,16 @@
         didOpen: () => Swal.showLoading()
       });
 
+      // Check playersform for current type
+      const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
+      if (!snapshot.empty) {
+        const playerData = snapshot.docs[0].data();
+        if (playerData.type === "paid") {
+          Swal.close();
+          return Swal.fire({ icon: 'info', title: 'Already Registered', text: 'You have already completed registration.', confirmButtonColor: '#3B82F6' });
+        }
+      }
+
       const userData = await getUserInfo(currentUser.uid);
       if (userData.balance < joiningFee) {
         Swal.close();
@@ -228,8 +238,7 @@
           joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
         });
 
-        // ✅ playersform -> type field update free → paid
-        const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
+        // Update playersform type → paid
         if (!snapshot.empty) {
           const playerDocRef = snapshot.docs[0].ref;
           await updateDoc(playerDocRef, { type: "paid" });
