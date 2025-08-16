@@ -15,7 +15,6 @@
   <style>
     .swal2-timer-progress-bar { background: #facc15 !important; }
     .glow-yellow { box-shadow: 0 0 8px rgba(234, 179, 8, 0.6); }
-
     .loader {
       width: 48px;
       height: 48px;
@@ -25,9 +24,7 @@
       animation: spin 2s ease-in-out infinite;
       box-shadow: 0 0 8px #facc15, inset 0 0 8px #facc15;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body class="bg-black text-white">
@@ -125,28 +122,15 @@
       </div>
     </section>
     
-    <!-- Referral -->
-    <section class="bg-gray-900 bg-opacity-50 border border-t-4 border-gray-600 rounded-xl p-1 px-3 space-y-2 text-center">
-      <div>
-        <h4 class="text-yellow-400 font-semibold text-base">Your Refer Link</h4>
-        <div class="mt-2 flex gap-2">
-          <input id="referLink" readonly class="bg-gray-800 border border-yellow-400 w-full text-yellow-300 rounded-lg p-2 text-sm" />
-          <button onclick="copyReferLink()" class="bg-yellow-400 hover:bg-yellow-500 text-black px-3 rounded-lg text-sm">
-            <i class="fa-solid fa-copy"></i>
-          </button>
-        </div>
-      </div>
-      <div>
-        <h4 class="text-yellow-400 font-semibold text-base">Total Refers</h4>
-        <p id="totalRefers" class="text-2xl font-bold text-yellow-300">0</p>
-      </div>
-    </section>
-
     <!-- More Options -->
     <section class="bg-gray-900 bg-opacity-50 border border-t-4 border-gray-600 rounded-xl p-4 space-y-3">
       <h4 class="text-yellow-400 text-center font-semibold text-base mb-2">More Options</h4>
       <a href="team-setup.html" class="flex items-center justify-between bg-gray-800 hover:bg-gray-700 rounded-lg px-4 py-2 text-yellow-300">
         <span><i class="fa-solid fa-people-group mr-2"></i>Team Setup</span>
+        <i class="fa-solid fa-angle-right"></i>
+      </a>
+      <a href="refer.html" class="flex items-center justify-between bg-gray-800 hover:bg-gray-700 rounded-lg px-4 py-2 text-yellow-300">
+        <span><i class="fa-solid fa-link mr-2"></i>Referral</span>
         <i class="fa-solid fa-angle-right"></i>
       </a>
       <a href="https://m.me/j/AbYn9awI4qHvdDvW/" class="flex items-center justify-between bg-gray-800 hover:bg-gray-700 rounded-lg px-4 py-2 text-yellow-300">
@@ -223,17 +207,10 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  function hideLoader() {
-    const loader = document.getElementById('loadingOverlay');
-    if (loader) loader.style.display = 'none';
-  }
-
   onAuthStateChanged(auth, async (user) => {
     if (!user) return window.location.href = "login.html";
 
     document.getElementById("email").textContent = user.email || "No Email";
-    const referralLink = `${window.location.origin}/signup.html?ref=${user.uid}`;
-    document.getElementById("referLink").value = referralLink;
 
     const q = query(collection(db, "users"), where("uid", "==", user.uid));
     onSnapshot(q, (querySnapshot) => {
@@ -254,35 +231,12 @@
         document.getElementById("totalLost").textContent = userData.lost ?? 0;
         document.getElementById("totalGoal").textContent = userData.goal ?? 0;
       }
-      hideLoader();
-    });
-
-    const referralQuery = query(collection(db, "users"), where("referredBy", "==", user.uid));
-    onSnapshot(referralQuery, (querySnapshot) => {
-      document.getElementById("totalRefers").textContent = querySnapshot.size;
     });
   });
 
   window.logout = async () => {
     await signOut(auth);
     window.location.href = "index.html";
-  };
-
-  window.copyReferLink = () => {
-    const input = document.getElementById("referLink");
-    navigator.clipboard.writeText(input.value).then(() => {
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: 'Referral link copied!',
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-        background: '#1a202c',
-        color: '#fff'
-      });
-    });
   };
 
   window.copyUserId = () => {
@@ -304,5 +258,5 @@
   };
 </script>
 
-</body>
-</
+</body> 
+</html>
