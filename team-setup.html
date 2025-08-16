@@ -125,9 +125,10 @@
       });
 
       try {
-        // Get username from users db
+        // Get username and photoUrl from users db
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
         const username = userDoc.exists() ? userDoc.data()?.username || "" : "";
+        const photoUrl = userDoc.exists() ? userDoc.data()?.photoUrl || "" : "";
 
         await addDoc(collection(db, "playersform"), {
           team: teamName,
@@ -136,6 +137,7 @@
           yearsPlayed: parseInt(yearsPlayed),
           uid: currentUser.uid,
           username: username,
+          photoUrl: photoUrl,
           createdAt: new Date()
         });
 
