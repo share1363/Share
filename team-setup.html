@@ -31,19 +31,37 @@
 
   <!-- Main Content -->
   <main class="w-full max-w-md mt-3 px-6 mx-auto mb-20">
-      <div class="bg-gray-900 rounded-lg shadow-xl border border-gray-700 bg-cover bg-center" style="background-image: url('863247.jpeg');">
-        <div class="bg-black bg-opacity-50 p-4 rounded-md">
+    <div id="team-section" class="bg-gray-900 rounded-lg shadow-xl border border-gray-700 bg-cover bg-center" style="background-image: url('863247.jpeg');">
+      <div class="bg-black bg-opacity-50 p-4 rounded-md">
 
-          <h1 style="font-family: 'Audiowide', cursive;" class="text-center text-xl font-semibold text-gray-200 mb-2">Setup Your Team</h1>
+        <h1 style="font-family: 'Audiowide', cursive;" class="text-center text-xl font-semibold text-gray-200 mb-2">Setup Your Team</h1>
 
-          <form class="space-y-4" id="team-form">
-            <input type="text" id="team-name" name="team-name" required placeholder="Enter your DLS team name" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <input type="number" step="any" id="dls-rating" name="dls-rating" required placeholder="Enter your DLS rating" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <input type="number" id="age" name="age" required placeholder="Enter your age" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <input type="number" id="years-played" name="years-played" required placeholder="How many years have you played DLS" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded-md transition duration-300">Submit</button>
-          </form>
+        <form class="space-y-6" id="team-form">
+          <input type="text" id="team-name" name="team-name" required placeholder="Enter your DLS team name" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
+          <input type="number" step="any" id="dls-rating" name="dls-rating" required placeholder="Enter your DLS rating" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
+          <input type="number" id="age" name="age" required placeholder="Enter your age" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
+          <input type="number" id="years-played" name="years-played" required placeholder="How many years have you played DLS" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
+          <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded-md transition duration-300">Submit</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Team Info Card (hidden initially) -->
+    <div id="team-info" class="hidden mt-6 bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-4 text-gray-200">
+      <h2 class="text-center text-xl font-semibold mb-2" style="font-family: 'Audiowide', cursive;">Your Team Info</h2>
+      <div class="flex items-center space-x-3 mb-3">
+        <img id="info-photo" src="" alt="User Photo" class="w-12 h-12 rounded-full border border-yellow-400">
+        <div>
+          <p id="info-username" class="font-semibold text-yellow-300"></p>
+          <p id="info-team" class="text-gray-300"></p>
         </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-sm">
+        <p>DLS Rating: <span id="info-rating"></span></p>
+        <p>Age: <span id="info-age"></span></p>
+        <p>Years Played: <span id="info-years"></span></p>
+        <p>Type: <span id="info-type">free</span></p>
+        <p>Session: <span id="info-session">None</span></p>
       </div>
     </div>
   </main>
@@ -109,6 +127,15 @@
     });
 
     const form = document.getElementById("team-form");
+    const teamSection = document.getElementById("team-section");
+    const teamInfo = document.getElementById("team-info");
+    const infoUsername = document.getElementById("info-username");
+    const infoTeam = document.getElementById("info-team");
+    const infoRating = document.getElementById("info-rating");
+    const infoAge = document.getElementById("info-age");
+    const infoYears = document.getElementById("info-years");
+    const infoPhoto = document.getElementById("info-photo");
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!currentUser) return;
@@ -157,7 +184,16 @@
 
         Swal.close();
         Swal.fire({ icon: 'success', title: 'Success', text: 'Team setup successfully!', confirmButtonColor: '#F59E0B' });
-        form.reset();
+
+        // Hide form and show team info
+        teamSection.classList.add("hidden");
+        infoUsername.textContent = username;
+        infoTeam.textContent = teamName;
+        infoRating.textContent = dlsRating;
+        infoAge.textContent = age;
+        infoYears.textContent = yearsPlayed;
+        infoPhoto.src = photoUrl || 'dcl1.jpeg';
+        teamInfo.classList.remove("hidden");
 
       } catch (err) {
         Swal.close();
@@ -166,4 +202,4 @@
     });
   </script>
 </body>
-  </html>
+</html>
