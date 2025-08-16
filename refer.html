@@ -36,7 +36,9 @@
 
   <!-- Referral Section -->
   <main class="max-w-md mx-auto px-3 mt-10 space-y-6">
-    <section class="bg-gray-900 bg-opacity-50 border border-t-4 border-gray-600 rounded-xl p-4 space-y-4 text-center">
+    <section class="bg-gray-900 bg-opacity-50 border border-t-4 border-gray-600 rounded-xl p-4 space-y-6 text-center">
+      
+      <!-- Referral Link -->
       <div>
         <h4 class="text-yellow-400 font-semibold text-base">Your Refer Link</h4>
         <div class="mt-2 flex gap-2">
@@ -46,6 +48,14 @@
           </button>
         </div>
       </div>
+
+      <!-- Referral Code -->
+      <div>
+        <h4 class="text-yellow-400 font-semibold text-base">Your Refer Code</h4>
+        <p id="referCode" class="text-lg font-bold text-yellow-300 break-words">---</p>
+      </div>
+
+      <!-- Total Referrals -->
       <div>
         <h4 class="text-yellow-400 font-semibold text-base">Total Refers</h4>
         <p id="totalRefers" class="text-2xl font-bold text-yellow-300">0</p>
@@ -116,15 +126,21 @@
     onAuthStateChanged(auth, async (user) => {
       if (!user) return window.location.href = "login.html";
 
+      // Referral Link
       const referralLink = `${window.location.origin}/signup.html?ref=${user.uid}`;
       document.getElementById("referLink").value = referralLink;
 
+      // Referral Code (user UID)
+      document.getElementById("referCode").textContent = user.uid;
+
+      // Total Referrals
       const referralQuery = query(collection(db, "users"), where("referredBy", "==", user.uid));
       onSnapshot(referralQuery, (querySnapshot) => {
         document.getElementById("totalRefers").textContent = querySnapshot.size;
       });
     });
 
+    // Copy Refer Link Function
     window.copyReferLink = () => {
       const input = document.getElementById("referLink");
       navigator.clipboard.writeText(input.value).then(() => {
