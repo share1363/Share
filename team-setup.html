@@ -295,23 +295,51 @@
         Swal.close();
         Swal.fire({ icon: 'success', title: 'Success', text: 'Team setup successfully!', confirmButtonColor: '#F59E0B' });
 
+        // Display the full card info instead of simplified info
         teamSection.style.display = "none";
-        teamInfo.innerHTML = `
-          <h2 class="text-center text-xl font-semibold mb-2" style="font-family: 'Audiowide', cursive;">Your Team Info</h2>
-          <div class="flex items-center space-x-3 mb-3">
-            <img src="${photoUrl || 'dcl1.jpeg'}" alt="User Photo" class="w-12 h-12 rounded-full border border-yellow-400">
-            <div>
-              <p class="font-semibold text-yellow-300">${username}</p>
-              <p class="text-gray-300">${teamName}</p>
+
+        // Fetch the newly added team data to render card
+        const q = query(collection(db, "playersform"), where("uid", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const teamData = querySnapshot.docs[0].data();
+          const photo = teamData.photoUrl || 'dcl1.jpeg';
+
+          teamInfo.innerHTML = `
+            <div class="flex justify-center items-center">
+              <div class="card">
+                <div class="card-header">MY DCL TEAM'S</div>
+                <div class="card-img">
+                  <img src="${photo}" alt="Team Photo">
+                  <div class="card-title">${teamData.team || 'No Team'}</div>
+                </div>
+                <div class="card-body">
+                  <div class="card-info">
+                    <div class="card-item">
+                      <div class="card-item2">Rating</div>
+                      <p>${teamData.dlsRating ?? 'N/A'}</p>
+                    </div>
+                    <div class="card-item">
+                      <div class="card-item2">Experience</div>
+                      <p>${teamData.yearsPlayed ?? 'N/A'} year</p>
+                    </div>
+                  </div>
+                  <div class="card-info">
+                    <div class="card-item">
+                      <div class="card-item2">Age</div>
+                      <p>${teamData.age ?? 'N/A'} year</p>
+                    </div>
+                    <div class="card-item">
+                      <div class="card-item2">Type</div>
+                      <p>${teamData.type ?? 'Free'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="grid grid-cols-2 gap-2 text-sm">
-            <p>DLS Rating: ${dlsRating}</p>
-            <p>Age: ${age}</p>
-            <p>Years Played: ${yearsPlayed}</p>
-          </div>
-        `;
-        teamInfo.classList.remove("hidden");
+          `;
+          teamInfo.classList.remove("hidden");
+        }
 
       } catch (err) {
         Swal.close();
