@@ -94,7 +94,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
-      getFirestore, collection, addDoc, doc, getDoc, getDocs,
+      getFirestore, collection, getDocs, doc, getDoc,
       runTransaction, query, where, updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -215,12 +215,6 @@
           const slotSnap = await transaction.get(slotRef);
           const data = slotSnap.data();
           if (data.slotUsed >= data.slot) throw new Error("Slot full.");
-
-          transaction.set(doc(collection(db, "playersform")), {
-            team, dlsRating, age, yearsPlayed,
-            uid: currentUser.uid, username, photoUrl,
-            createdAt: new Date()
-          });
 
           transaction.update(slotRef, {
             slotUsed: data.slotUsed + 1
