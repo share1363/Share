@@ -47,7 +47,7 @@
             <p id="joiningFee" class="text-center text-yellow-300 font-medium">Loading...</p>
           </div>
 
-           <p>Type:<span id="type"></span></p>
+          <p>Type: <span id="type">Loading...</span></p>
 
           <h1 style="font-family: 'Audiowide', cursive;" class="text-center text-sm font-semibold text-gray-200 mb-2">Tournament Joining Form</h1>
 
@@ -97,7 +97,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
       getFirestore, collection, getDocs, doc, getDoc,
-      runTransaction, query, where, updateDoc
+      runTransaction, query, where
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -118,6 +118,7 @@
     let currentUser = null, slot = null, slotUsed = 0, joiningFee = null;
     const joiningSlot = document.getElementById("joiningSlot");
     const joiningFeeDisplay = document.getElementById("joiningFee");
+    const typeDisplay = document.getElementById("type");
     const form = document.getElementById("registration-form");
 
     async function loadSlotInfo() {
@@ -157,6 +158,9 @@
         form['dls-rating'].value = data.dlsRating ?? "";
         form['age'].value = data.age ?? "";
         form['years-played'].value = data.yearsPlayed ?? "";
+        typeDisplay.textContent = data.type ?? "N/A"; // <-- Display type from DB
+      } else {
+        typeDisplay.textContent = "N/A";
       }
     }
 
@@ -205,7 +209,7 @@
         return Swal.fire({ icon: 'error', title: 'Team Exists', text: 'Team name already used.', confirmButtonColor: '#EF4444' });
       }
 
-      const { username, photoUrl, balance, tour } = await getUserInfo(currentUser.uid);
+      const { balance, tour } = await getUserInfo(currentUser.uid);
       if (balance < joiningFee) {
         Swal.close();
         return Swal.fire({ icon: 'error', title: 'Insufficient Balance', text: `Current balance: ৳${balance.toFixed(0)}`, confirmButtonColor: '#EF4444' });
@@ -234,6 +238,7 @@
         Swal.close();
         Swal.fire({ icon: 'success', title: 'Success', text: 'You have successfully joined!', confirmButtonColor: '#F59E0B' });
         form.reset();
+        typeDisplay.textContent = "N/A";
 
       } catch (err) {
         Swal.close();
