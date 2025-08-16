@@ -30,7 +30,7 @@
   </header>
 
   <!-- Main Form Content -->
-  <main class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700">
+  <main class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 w-full max-w-md mx-2">
     <h1 class="text-center text-yellow-400 text-2xl font-bold mb-6" style="font-family: 'Audiowide', cursive;">Team Setup</h1>
 
     <form id="team-form" class="space-y-4">
@@ -125,7 +125,6 @@
       });
 
       try {
-        // Get username and photoUrl from users db
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
         const username = userDoc.exists() ? userDoc.data()?.username || "" : "";
         const photoUrl = userDoc.exists() ? userDoc.data()?.photoUrl || "" : "";
@@ -161,4 +160,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
