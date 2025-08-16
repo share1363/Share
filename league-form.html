@@ -136,12 +136,25 @@
       };
     }
 
+    async function loadPlayerForm(uid) {
+      const formRef = doc(db, "playersform", uid);
+      const formSnap = await getDoc(formRef);
+      if (formSnap.exists()) {
+        const data = formSnap.data();
+        document.getElementById("team").value = data?.team ?? "";
+        document.getElementById("dls-rating").value = data?.dlsRating ?? "";
+        document.getElementById("age").value = data?.age ?? "";
+        document.getElementById("years-played").value = data?.yearsPlayed ?? "";
+      }
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) return window.location.href = "login.html";
       currentUser = user;
       await loadSlotInfo();
       await loadJoiningFee();
       await getUserInfo(user.uid);
+      await loadPlayerForm(user.uid); // 👈 auto-fill form data
     });
 
     const form = document.getElementById("registration-form");
