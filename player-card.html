@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-   <link rel="stylesheet" href="team-rank.css">
+  <link rel="stylesheet" href="team-rank.css">
 </head>
 <body class="bg-black text-white min-h-screen">
 
@@ -110,90 +110,93 @@
           return;
         }
 
-        snapshot.forEach((doc) => {
-          const data = doc.data();
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
           const photo = data.photoUrl && data.photoUrl.trim() !== "" ? data.photoUrl : "https://via.placeholder.com/100?text=No+Image";
+
+          // users collection থেকে teamPts (pts field)
+          const teamPts = data.pts !== undefined ? data.pts : 0;
 
           const card = `
             <section class="player-card mb-6">
-      <div class="border rounded-lg p-2 py-4 flex flex-col sm:flex-row items-center gap-4 rank-badge">
-        <div class="bottom-stripe"></div>
-        <div class="flex-shrink-0 team-image-wrapper">
-          <img src="${photo}" alt="Team Logo">
-          <div class="team-text w-full">
-            <div class="team-name">${data.team || "N/A"}</div>
-            <div class="player-name">${data.username || "No Username"}</div>
-          </div>
-        </div>
+              <div class="border rounded-lg p-2 py-4 flex flex-col sm:flex-row items-center gap-4 rank-badge">
+                <div class="bottom-stripe"></div>
+                <div class="flex-shrink-0 team-image-wrapper">
+                  <img src="${photo}" alt="Team Logo">
+                  <div class="team-text w-full">
+                    <div class="team-name">${data.team || "N/A"}</div>
+                    <div class="player-name">${data.username || "No Username"}</div>
+                  </div>
+                </div>
 
-        <div class="w-full center-text px-2">
-          <section class="mb-3 middle-card">
-            <div class="middle-card-content flex items-center justify-between gap-5">
-              <div class="uppercase">
-                <div class="text-xs text-gray-200 text-center">position</div>
-                <div class="status-card flex justify-center gap-1 items-center text-sm font-bold text-gray-300"><i class="fa-solid fa-medal text-sm text-yellow-400"></i> <span class="text-xl">10</span></div>
-              </div>
+                <div class="w-full center-text px-2">
+                  <section class="mb-3 middle-card">
+                    <div class="middle-card-content flex items-center justify-between gap-5">
+                      <div class="uppercase">
+                        <div class="text-xs text-gray-200 text-center">position</div>
+                        <div class="status-card flex justify-center gap-1 items-center text-sm font-bold text-gray-300"><i class="fa-solid fa-medal text-sm text-yellow-400"></i> <span class="text-xl">10</span></div>
+                      </div>
 
-              <div>
-                <div class="text-xs text-gray-200 text-center">CURRENT BADGE</div>
-                <div class="status-card">
-                  <h2 style="font-size: 16px;" class="py-0.5 font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent">MASTER II</h2>
+                      <div>
+                        <div class="text-xs text-gray-200 text-center">CURRENT BADGE</div>
+                        <div class="status-card">
+                          <h2 style="font-size: 16px;" class="py-0.5 font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent">MASTER II</h2>
+                        </div>
+                      </div>
+
+                      <div class="flex flex-col items-center justify-center">
+                        <div class="text-xs text-gray-200 text-center">TEAM PTS</div>
+                        <div class="status-card w-14 h-7 flex items-center justify-center rounded-md text-gray-300 text-xl font-bold">
+                          ${teamPts}
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                  
+                  <div class="mt-2 mb-3 w-full">
+                    <div class="text-xs text-gray-400 mb-1">Level Rank</div>
+                    <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+                      <div class="h-2 rounded-full"
+                        style="width:90%; background: linear-gradient(90deg,#f6d365,#fda085);"></div>
+                    </div>
+                  </div>
+
+                  <div class="mt-2 grid grid-cols-5 gap-3 w-full uppercase">
+                    <div class="stat-card">
+                      <div class="flex justify-center items-center text-gray-300 text-xs">Draw</div>
+                      <div class="text-lg font-bold text-yellow-400">${data.draw || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                      <div class="flex justify-center items-center text-gray-300 text-xs">Win</div>
+                      <div class="text-lg font-bold text-green-500">${data.win || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                      <div class="flex justify-center items-center text-gray-300 text-xs">Lost</div>
+                      <div class="text-lg font-bold text-red-500">${data.lost || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                      <div class="flex justify-center items-center text-gray-300 text-xs">Goal</div>
+                      <div class="text-lg font-bold text-blue-400">${data.goal || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                      <div class="flex justify-center items-center text-gray-300 font text-xs">Match</div>
+                      <div class="text-lg font-bold text-purple-300">${data.played || 0}</div>
+                    </div>
+                  </div>
+
+                  <div class="mt-2 w-full flex justify-center items-center gap-2">
+                    <div class="text-sm text-gray-300 uppercase font-bold">Last 5 Matches</div>
+                    <div class="flex gap-1">
+                      <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
+                      <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
+                      <span class="px-1 h-4 text-xs rounded-sm bg-red-600 font-semibold">L</span>
+                      <span class="px-1 h-4 text-xs rounded-sm bg-yellow-500 text-black font-semibold">D</span>
+                      <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              <div class="flex flex-col items-center justify-center">
-                <div class="text-xs text-gray-200 text-center">TEAM PTS</div>
-                <div class="status-card w-14 h-7 flex items-center justify-center rounded-md text-gray-300 text-xl font-bold">
-                  ${teamPts}
-                </div>
-              </div>
-            </div>
-          </section>
-          
-          <div class="mt-2 mb-3 w-full">
-            <div class="text-xs text-gray-400 mb-1">Level Rank</div>
-            <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
-              <div class="h-2 rounded-full"
-                style="width:90%; background: linear-gradient(90deg,#f6d365,#fda085);"></div>
-            </div>
-          </div>
-
-          <div class="mt-2 grid grid-cols-5 gap-3 w-full uppercase">
-            <div class="stat-card">
-              <div class="flex justify-center items-center text-gray-300 text-xs">Draw</div>
-              <div class="text-lg font-bold text-yellow-400">18</div>
-            </div>
-            <div class="stat-card">
-              <div class="flex justify-center items-center text-gray-300 text-xs">Win</div>
-              <div class="text-lg font-bold text-green-500">7</div>
-            </div>
-            <div class="stat-card">
-              <div class="flex justify-center items-center text-gray-300 text-xs">Lost</div>
-              <div class="text-lg font-bold text-red-500">3</div>
-            </div>
-            <div class="stat-card">
-              <div class="flex justify-center items-center text-gray-300 text-xs">Goal</div>
-              <div class="text-lg font-bold text-blue-400">12</div>
-            </div>
-            <div class="stat-card">
-              <div class="flex justify-center items-center text-gray-300 font text-xs">Match</div>
-              <div class="text-lg font-bold text-purple-300">12</div>
-            </div>
-          </div>
-
-          <div class="mt-2 w-full flex justify-center items-center gap-2">
-            <div class="text-sm text-gray-300 uppercase font-bold">Last 5 Matches</div>
-            <div class="flex gap-1">
-              <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
-              <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
-              <span class="px-1 h-4 text-xs rounded-sm bg-red-600 font-semibold">L</span>
-              <span class="px-1 h-4 text-xs rounded-sm bg-yellow-500 text-black font-semibold">D</span>
-              <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+            </section>
           `;
           playersList.insertAdjacentHTML("beforeend", card);
         });
