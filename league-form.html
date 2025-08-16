@@ -136,27 +136,12 @@
       };
     }
 
-    // 🔥 Load Player Form Data from "playersform"
-    async function loadPlayerFormData(uid) {
-      const playerRef = doc(db, "playersform", uid);
-      const docSnap = await getDoc(playerRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        // Map fields carefully
-        document.getElementById("team").value = data.team || "";
-        document.getElementById("dls-rating").value = data["dls-rating"] || data.dlsRating || "";
-        document.getElementById("age").value = data.age || "";
-        document.getElementById("years-played").value = data["years-played"] || data.yearsPlayed || "";
-      }
-    }
-
     onAuthStateChanged(auth, async (user) => {
       if (!user) return window.location.href = "login.html";
       currentUser = user;
       await loadSlotInfo();
       await loadJoiningFee();
       await getUserInfo(user.uid);
-      await loadPlayerFormData(user.uid); // 👈 Auto-fill form
     });
 
     const form = document.getElementById("registration-form");
