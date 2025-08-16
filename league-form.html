@@ -38,26 +38,46 @@
           📣 Alert Message : যারা একটিভ থাকবেন এবং প্রতিদিনের ম্যাচ প্রতিদিন খেলতে পারবেন শুধু তারাই টুর্নামেন্টের রেজিস্ট্রেশন করবেন দয়া করে সময় মত না খেলতে পারলে রেজিস্ট্রেশন করবেন না।
         </p>
       </div>
-      <div class="bg-gray-900 rounded-lg shadow-xl border border-gray-700 bg-cover bg-center" style="background-image: url('863247.jpeg');">
-        <div class="bg-black bg-opacity-50 p-4 rounded-md">
-          
+
+      <!-- Card -->
+      <div class="bg-gray-900 rounded-2xl shadow-2xl border border-gray-700 bg-cover bg-center p-4" style="background-image: url('863247.jpeg');">
+        <div class="bg-black bg-opacity-60 p-5 rounded-2xl backdrop-blur-sm">
+
           <!-- Slot & Fee Display Box -->
-          <div class="bg-yellow-900 bg-opacity-20 border border-gray-700 rounded-md p-1 mb-4">
+          <div class="bg-yellow-900 bg-opacity-20 border border-gray-700 rounded-md p-2 mb-4">
             <p id="joiningSlot" class="text-center text-yellow-300 mb-1 font-medium">Loading...</p>
             <p id="joiningFee" class="text-center text-yellow-300 font-medium">Loading...</p>
           </div>
 
-          <p>Type: <span id="type">Loading...</span></p>
+          <p class="text-center mb-2">Type: <span id="type" class="font-semibold text-yellow-400">Loading...</span></p>
 
-          <h1 style="font-family: 'Audiowide', cursive;" class="text-center text-sm font-semibold text-gray-200 mb-2">Tournament Joining Form</h1>
+          <h1 style="font-family: 'Audiowide', cursive;" class="text-center text-lg font-bold text-yellow-300 mb-4">Tournament Joining Card</h1>
 
-          <form class="space-y-4" id="registration-form">
-            <input type="text" id="team" name="team" required placeholder="Enter your DLS team name" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <input type="number" step="any" id="dls-rating" name="dls-rating" required placeholder="Enter your DLS rating" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <input type="number" id="age" name="age" required placeholder="Enter your age" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <input type="number" id="years-played" name="years-played" required placeholder="How many years have you played DLS" class="w-full px-4 py-2 border border-gray-600 rounded-md bg-black bg-opacity-60 text-white text-sm outline-none">
-            <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded-md transition duration-300">Join Now</button>
-          </form>
+          <!-- Card Info -->
+          <div class="grid grid-cols-1 gap-3">
+            <div class="bg-gray-800 bg-opacity-40 rounded-xl shadow-md p-3 text-center">
+              <p class="text-sm text-gray-300">Team Name</p>
+              <p id="team" class="text-lg font-semibold text-yellow-300">Loading...</p>
+            </div>
+            <div class="bg-gray-800 bg-opacity-40 rounded-xl shadow-md p-3 text-center">
+              <p class="text-sm text-gray-300">DLS Rating</p>
+              <p id="dls-rating" class="text-lg font-semibold text-yellow-300">Loading...</p>
+            </div>
+            <div class="bg-gray-800 bg-opacity-40 rounded-xl shadow-md p-3 text-center">
+              <p class="text-sm text-gray-300">Age</p>
+              <p id="age" class="text-lg font-semibold text-yellow-300">Loading...</p>
+            </div>
+            <div class="bg-gray-800 bg-opacity-40 rounded-xl shadow-md p-3 text-center">
+              <p class="text-sm text-gray-300">Years Played</p>
+              <p id="years-played" class="text-lg font-semibold text-yellow-300">Loading...</p>
+            </div>
+          </div>
+
+          <!-- Join Button -->
+          <button id="joinBtn"
+            class="w-full mt-5 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-semibold py-2 px-4 rounded-xl transition duration-300 shadow-lg">
+            Join Now
+          </button>
         </div>
       </div>
     </div>
@@ -119,7 +139,11 @@
     const joiningSlot = document.getElementById("joiningSlot");
     const joiningFeeDisplay = document.getElementById("joiningFee");
     const typeDisplay = document.getElementById("type");
-    const form = document.getElementById("registration-form");
+
+    const teamDiv = document.getElementById("team");
+    const ratingDiv = document.getElementById("dls-rating");
+    const ageDiv = document.getElementById("age");
+    const yearsPlayedDiv = document.getElementById("years-played");
 
     async function loadSlotInfo() {
       const slotDocRef = doc(db, "settings", "slot");
@@ -148,18 +172,20 @@
       };
     }
 
-    async function loadUserForm() {
+    async function loadUserCard() {
       const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
       if (!snapshot.empty) {
-        const docRef = snapshot.docs[0].ref;
         const data = snapshot.docs[0].data();
-        form['team'].value = data.team ?? "";
-        form['dls-rating'].value = data.dlsRating ?? "";
-        form['age'].value = data.age ?? "";
-        form['years-played'].value = data.yearsPlayed ?? "";
+        teamDiv.textContent = data.team ?? "N/A";
+        ratingDiv.textContent = data.dlsRating ?? "N/A";
+        ageDiv.textContent = data.age ?? "N/A";
+        yearsPlayedDiv.textContent = data.yearsPlayed ?? "N/A";
         typeDisplay.textContent = data.type ?? "N/A";
-        form.dataset.docRef = docRef.path;
       } else {
+        teamDiv.textContent = "N/A";
+        ratingDiv.textContent = "N/A";
+        ageDiv.textContent = "N/A";
+        yearsPlayedDiv.textContent = "N/A";
         typeDisplay.textContent = "N/A";
       }
     }
@@ -169,11 +195,10 @@
       currentUser = user;
       await loadSlotInfo();
       await loadJoiningFee();
-      await loadUserForm();
+      await loadUserCard();
     });
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    document.getElementById("joinBtn").addEventListener("click", async () => {
       Swal.fire({
         title: 'Processing...',
         text: 'Please wait...',
@@ -182,60 +207,10 @@
         didOpen: () => Swal.showLoading()
       });
 
-      const team = form['team'].value.trim();
-      const dlsRating = form['dls-rating'].value.trim();
-      const age = form['age'].value.trim();
-      const yearsPlayed = form['years-played'].value.trim();
-
-      if (!team || !dlsRating || !age || !yearsPlayed) {
-        Swal.close();
-        return Swal.fire({ icon: 'warning', text: 'All fields are required.', confirmButtonColor: '#F59E0B' });
-      }
-
       const userData = await getUserInfo(currentUser.uid);
       if (userData.balance < joiningFee) {
         Swal.close();
         return Swal.fire({ icon: 'error', title: 'Insufficient Balance', text: `Current balance: ৳${userData.balance}`, confirmButtonColor: '#EF4444' });
-      }
-
-      const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
-      if (!snapshot.empty) {
-        const docRef = snapshot.docs[0].ref;
-        const data = snapshot.docs[0].data();
-        if (data.type === "free") {
-          try {
-            await updateDoc(docRef, { type: "paid" });
-            typeDisplay.textContent = "paid";
-
-            await runTransaction(db, async (transaction) => {
-              const userRef = doc(db, "users", currentUser.uid);
-              const slotRef = doc(db, "settings", "slot");
-              const slotSnap = await transaction.get(slotRef);
-              const slotData = slotSnap.data();
-              if (slotData.slotUsed >= slotData.slot) throw new Error("Slot full.");
-              transaction.update(userRef, { balance: userData.balance - joiningFee, tour: (userData.tour || 0) + 1 });
-              transaction.update(slotRef, { slotUsed: slotData.slotUsed + 1 });
-              slotUsed = slotData.slotUsed + 1;
-              joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
-            });
-
-            Swal.close();
-            return Swal.fire({ icon: 'success', title: 'Success', text: 'Your registration is now paid!', confirmButtonColor: '#F59E0B' });
-
-          } catch (err) {
-            Swal.close();
-            return Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Failed to update type.', confirmButtonColor: '#EF4444' });
-          }
-        } else {
-          Swal.close();
-          return Swal.fire({ icon: 'error', title: 'Already Registered', text: 'You have already registered.', confirmButtonColor: '#EF4444' });
-        }
-      }
-
-      const teamSnapshot = await getDocs(query(collection(db, "playersform"), where("team", "==", team)));
-      if (!teamSnapshot.empty) {
-        Swal.close();
-        return Swal.fire({ icon: 'error', title: 'Team Exists', text: 'Team name already used.', confirmButtonColor: '#EF4444' });
       }
 
       try {
@@ -244,18 +219,17 @@
           const slotSnap = await transaction.get(slotRef);
           const data = slotSnap.data();
           if (data.slotUsed >= data.slot) throw new Error("Slot full.");
-
           transaction.update(slotRef, { slotUsed: data.slotUsed + 1 });
-          transaction.update(doc(db, "users", currentUser.uid), { balance: userData.balance - joiningFee, tour: (userData.tour || 0) + 1 });
-
+          transaction.update(doc(db, "users", currentUser.uid), {
+            balance: userData.balance - joiningFee,
+            tour: (userData.tour || 0) + 1
+          });
           slotUsed = data.slotUsed + 1;
           joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
         });
 
         Swal.close();
         Swal.fire({ icon: 'success', title: 'Success', text: 'You have successfully joined!', confirmButtonColor: '#F59E0B' });
-        form.reset();
-        typeDisplay.textContent = "N/A";
 
       } catch (err) {
         Swal.close();
