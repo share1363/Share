@@ -8,6 +8,12 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    /* Hide form initially to prevent flicker */
+    #team-section {
+      display: none;
+    }
+  </style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col items-center pb-20">
 
@@ -142,9 +148,8 @@
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        // Team exists, hide form and show info
         const teamData = querySnapshot.docs[0].data();
-        teamSection.classList.add("hidden");
+        teamSection.style.display = "none";
         infoUsername.textContent = teamData.username || "";
         infoTeam.textContent = teamData.team || "";
         infoRating.textContent = teamData.dlsRating || "";
@@ -152,6 +157,9 @@
         infoYears.textContent = teamData.yearsPlayed || "";
         infoPhoto.src = teamData.photoUrl || 'dcl1.jpeg';
         teamInfo.classList.remove("hidden");
+      } else {
+        // User has no team, show form
+        teamSection.style.display = "block";
       }
     });
 
@@ -204,8 +212,7 @@
         Swal.close();
         Swal.fire({ icon: 'success', title: 'Success', text: 'Team setup successfully!', confirmButtonColor: '#F59E0B' });
 
-        // Hide form and show info
-        teamSection.classList.add("hidden");
+        teamSection.style.display = "none";
         infoUsername.textContent = username;
         infoTeam.textContent = teamName;
         infoRating.textContent = dlsRating;
