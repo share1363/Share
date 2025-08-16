@@ -97,7 +97,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
       getFirestore, collection, getDocs, doc, getDoc,
-      runTransaction, query, where
+      runTransaction, query, where, updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -158,7 +158,7 @@
         form['years-played'].value = data.yearsPlayed ?? "";
         typeDisplay.textContent = data.type ?? "N/A";
       } else {
-        typeDisplay.textContent = "N/A";
+        typeDisplay.textContent = "free";
       }
     }
 
@@ -172,6 +172,11 @@
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      if (typeDisplay.textContent !== "free") {
+        return Swal.fire({ icon: 'error', title: 'Cannot Join', text: 'You have already joined.', confirmButtonColor: '#EF4444' });
+      }
+
       Swal.fire({
         title: 'Processing...',
         text: 'Please wait...',
@@ -193,12 +198,6 @@
       if (slotUsed >= slot) {
         Swal.close();
         return Swal.fire({ icon: 'error', title: 'Slot Full', text: 'All slots are already taken.', timer: 3000, timerProgressBar: true, showConfirmButton: false });
-      }
-
-      const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
-      if (!snapshot.empty) {
-        Swal.close();
-        return Swal.fire({ icon: 'error', title: 'Already Registered', text: 'You have already registered.', confirmButtonColor: '#EF4444' });
       }
 
       const teamSnapshot = await getDocs(query(collection(db, "playersform"), where("team", "==", team)));
@@ -229,6 +228,11 @@
             tour: (tour || 0) + 1
           });
 
+          // Update type to paid
+          typeDisplay.textContent = "paid";
+          const playerRef = doc(db, "playersform", currentUser.uid);
+          await updateDoc(playerRef, { type: "paid" });
+
           slotUsed = data.slotUsed + 1;
           joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
         });
@@ -236,7 +240,6 @@
         Swal.close();
         Swal.fire({ icon: 'success', title: 'Success', text: 'You have successfully joined!', confirmButtonColor: '#F59E0B' });
         form.reset();
-        typeDisplay.textContent = "N/A";
 
       } catch (err) {
         Swal.close();
