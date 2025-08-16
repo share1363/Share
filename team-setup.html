@@ -55,22 +55,8 @@
     </div>
 
     <!-- Team Info Card -->
-    <div id="team-info" class="hidden mt-6 bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-4 text-gray-200">
-      <h2 class="text-center text-xl font-semibold mb-2" style="font-family: 'Audiowide', cursive;">Your Team Info</h2>
-      <div class="flex items-center space-x-3 mb-3">
-        <img id="info-photo" src="" alt="User Photo" class="w-12 h-12 rounded-full border border-yellow-400">
-        <div>
-          <p id="info-username" class="font-semibold text-yellow-300"></p>
-          <p id="info-team" class="text-gray-300"></p>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-2 text-sm">
-        <p>DLS Rating: <span id="info-rating"></span></p>
-        <p>Age: <span id="info-age"></span></p>
-        <p>Years Played: <span id="info-years"></span></p>
-        <p>Type: <span id="info-type">free</span></p>
-        <p>Session: <span id="info-session">None</span></p>
-      </div>
+    <div id="team-info" class="mt-6 bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-4 text-gray-200">
+      <p class="text-center">Loading...</p>
     </div>
   </main>
 
@@ -132,34 +118,43 @@
     const form = document.getElementById("team-form");
     const teamSection = document.getElementById("team-section");
     const teamInfo = document.getElementById("team-info");
-    const infoUsername = document.getElementById("info-username");
-    const infoTeam = document.getElementById("info-team");
-    const infoRating = document.getElementById("info-rating");
-    const infoAge = document.getElementById("info-age");
-    const infoYears = document.getElementById("info-years");
-    const infoPhoto = document.getElementById("info-photo");
+
+    // Show Loading initially
+    teamInfo.classList.remove("hidden");
+    teamInfo.innerHTML = `<p class="text-center">Loading...</p>`;
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) return window.location.href = "login.html";
       currentUser = user;
 
-      // Check if the user already has a team
       const q = query(collection(db, "playersform"), where("uid", "==", currentUser.uid));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
         const teamData = querySnapshot.docs[0].data();
         teamSection.style.display = "none";
-        infoUsername.textContent = teamData.username || "";
-        infoTeam.textContent = teamData.team || "";
-        infoRating.textContent = teamData.dlsRating || "";
-        infoAge.textContent = teamData.age || "";
-        infoYears.textContent = teamData.yearsPlayed || "";
-        infoPhoto.src = teamData.photoUrl || 'dcl1.jpeg';
-        teamInfo.classList.remove("hidden");
+
+        // Populate team info
+        teamInfo.innerHTML = `
+          <h2 class="text-center text-xl font-semibold mb-2" style="font-family: 'Audiowide', cursive;">Your Team Info</h2>
+          <div class="flex items-center space-x-3 mb-3">
+            <img src="${teamData.photoUrl || 'dcl1.jpeg'}" alt="User Photo" class="w-12 h-12 rounded-full border border-yellow-400">
+            <div>
+              <p class="font-semibold text-yellow-300">${teamData.username || ''}</p>
+              <p class="text-gray-300">${teamData.team || ''}</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <p>DLS Rating: ${teamData.dlsRating || ''}</p>
+            <p>Age: ${teamData.age || ''}</p>
+            <p>Years Played: ${teamData.yearsPlayed || ''}</p>
+            <p>Type: ${teamData.type || 'free'}</p>
+            <p>Session: ${teamData.session || 'None'}</p>
+          </div>
+        `;
       } else {
-        // User has no team, show form
         teamSection.style.display = "block";
+        teamInfo.innerHTML = ""; // Clear loading if no team exists
       }
     });
 
@@ -213,14 +208,21 @@
         Swal.fire({ icon: 'success', title: 'Success', text: 'Team setup successfully!', confirmButtonColor: '#F59E0B' });
 
         teamSection.style.display = "none";
-        infoUsername.textContent = username;
-        infoTeam.textContent = teamName;
-        infoRating.textContent = dlsRating;
-        infoAge.textContent = age;
-        infoYears.textContent = yearsPlayed;
-        infoPhoto.src = photoUrl || 'dcl1.jpeg';
-        teamInfo.classList.remove("hidden");
-
+        teamInfo.innerHTML = `
+          <h2 class="text-center text-xl font-semibold mb-2" style="font-family: 'Audiowide', cursive;">Your Team Info</h2>
+          <div class="flex items-center space-x-3 mb-3">
+            <img src="${photoUrl || 'dcl1.jpeg'}" alt="User Photo" class="w-12 h-12 rounded-full border border-yellow-400">
+            <div>
+              <p class="font-semibold text-yellow-300">${username}</p>
+              <p class="text-gray-300">${teamName}</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <p>DLS Rating: ${dlsRating}</p>
+            <p>Age: ${age}</p>
+            <p>Years Played: ${yearsPlayed}</p>
+          </div>
+        `;
       } catch (err) {
         Swal.close();
         Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Failed to save team.', confirmButtonColor: '#EF4444' });
