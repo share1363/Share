@@ -113,7 +113,13 @@
         snapshot.forEach((doc) => {
           const data = doc.data();
           const photo = data.photoUrl && data.photoUrl.trim() !== "" ? data.photoUrl : "https://via.placeholder.com/100?text=No+Image";
-          const pts = data.pts || 0; // <-- Dynamically fetch pts from Firestore
+
+          const pts   = data.pts   || 0;
+          const goal  = data.goal  || 0;
+          const draw  = data.draw  || 0;
+          const lost  = data.lost  || 0;
+          const win   = data.win   || 0;
+          const played= data.played|| 0;
 
           const card = `
             <section class="player-card mb-6">
@@ -132,7 +138,9 @@
                     <div class="middle-card-content flex items-center justify-between gap-5">
                       <div class="uppercase">
                         <div class="text-xs text-gray-200 text-center">position</div>
-                        <div class="status-card flex justify-center gap-1 items-center text-sm font-bold text-gray-300"><i class="fa-solid fa-medal text-sm text-yellow-400"></i> <span class="text-xl">0</span></div>
+                        <div class="status-card flex justify-center gap-1 items-center text-sm font-bold text-gray-300">
+                          <i class="fa-solid fa-medal text-sm text-yellow-400"></i> <span class="text-xl">0</span>
+                        </div>
                       </div>
 
                       <div>
@@ -162,23 +170,23 @@
                   <div class="mt-2 grid grid-cols-5 gap-3 w-full uppercase">
                     <div class="stat-card">
                       <div class="flex justify-center items-center text-gray-300 text-xs">Draw</div>
-                      <div class="text-lg font-bold text-yellow-400">0</div>
+                      <div class="text-lg font-bold text-yellow-400">${draw}</div>
                     </div>
                     <div class="stat-card">
                       <div class="flex justify-center items-center text-gray-300 text-xs">Win</div>
-                      <div class="text-lg font-bold text-green-500">0</div>
+                      <div class="text-lg font-bold text-green-500">${win}</div>
                     </div>
                     <div class="stat-card">
                       <div class="flex justify-center items-center text-gray-300 text-xs">Lost</div>
-                      <div class="text-lg font-bold text-red-500">0</div>
+                      <div class="text-lg font-bold text-red-500">${lost}</div>
                     </div>
                     <div class="stat-card">
                       <div class="flex justify-center items-center text-gray-300 text-xs">Goal</div>
-                      <div class="text-lg font-bold text-blue-400">0</div>
+                      <div class="text-lg font-bold text-blue-400">${goal}</div>
                     </div>
                     <div class="stat-card">
-                      <div class="flex justify-center items-center text-gray-300 font text-xs">Match</div>
-                      <div class="text-lg font-bold text-purple-300">0</div>
+                      <div class="flex justify-center items-center text-gray-300 text-xs">Match</div>
+                      <div class="text-lg font-bold text-purple-300">${played}</div>
                     </div>
                   </div>
 
