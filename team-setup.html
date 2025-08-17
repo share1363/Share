@@ -12,6 +12,14 @@
     #team-section {
       display: none;
     }
+    #loading-text {
+      display: none;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-top: 50px;
+      color: yellow;
+    }
     .card {
       width: 330px;
       border-radius: 10px;
@@ -118,6 +126,8 @@
 </header>
 
 <main class="w-full max-w-md px-4 mx-auto">
+  <p id="loading-text">Loading...</p>
+
   <div id="team-section" class="bg-gray-900 rounded-lg shadow-xl border border-gray-700 bg-cover bg-center mt-14" style="background-image: url('863247.jpeg');">
     <div class="bg-black bg-opacity-50 p-4 rounded-md">
       <h1 style="font-family: 'Audiowide', cursive;" class="text-center text-xl font-semibold text-gray-200 mb-2">Setup Your Team</h1>
@@ -132,7 +142,7 @@
   </div>
 
   <div id="team-info" class="hidden mt-6 shadow-xl p-4 text-gray-200">
-    <p>Loading...</p>
+    
   </div>
 </main>
 
@@ -187,9 +197,11 @@ let currentUser = null;
 const form = document.getElementById("team-form");
 const teamSection = document.getElementById("team-section");
 const teamInfo = document.getElementById("team-info");
+const loadingText = document.getElementById("loading-text");
 
 // Helper function to render team card
 async function renderTeamCard(userId) {
+  loadingText.style.display = "block";
   const q = query(collection(db, "playersform"), where("uid", "==", userId));
   const querySnapshot = await getDocs(q);
   if (!querySnapshot.empty) {
@@ -233,9 +245,11 @@ async function renderTeamCard(userId) {
   } else {
     teamSection.style.display = "block";
   }
+  loadingText.style.display = "none";
 }
 
 onAuthStateChanged(auth, async (user) => {
+  loadingText.style.display = "block";
   if (!user) return window.location.href = "login.html";
   currentUser = user;
   await renderTeamCard(currentUser.uid);
