@@ -188,11 +188,11 @@
       });
     }
 
-    // 🔹 Updated with minus 2 pts for losing team
+    // ✅ Update stats in playersform db (not users)
     async function updateUserStats(uid, isWinner, goalsScored, isDraw) {
       if (!uid || uid === "UID N/A") return;
 
-      const userRef = doc(db, "users", uid);
+      const userRef = doc(db, "playersform", uid);
       const userSnap = await getDoc(userRef);
       if (!userSnap.exists()) return;
 
@@ -208,13 +208,13 @@
 
       if (isDraw) {
         updatedStats.draw += 1;
-        updatedStats.pts += 1; // ✅ 1 point for draw
+        updatedStats.pts += 1;
       } else if (isWinner) {
         updatedStats.win += 1;
-        updatedStats.pts += 3; // ✅ 3 points for win
+        updatedStats.pts += 3;
       } else {
         updatedStats.lost += 1;
-        updatedStats.pts -= 2; // ✅ -2 points for losing
+        updatedStats.pts -= 2;
       }
 
       await updateDoc(userRef, updatedStats);
