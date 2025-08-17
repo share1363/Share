@@ -212,8 +212,9 @@
 
     document.getElementById("email").textContent = user.email || "No Email";
 
-    const q = query(collection(db, "users"), where("uid", "==", user.uid));
-    onSnapshot(q, (querySnapshot) => {
+    // users collection
+    const qUsers = query(collection(db, "users"), where("uid", "==", user.uid));
+    onSnapshot(qUsers, (querySnapshot) => {
       if (!querySnapshot.empty) {
         const userData = querySnapshot.docs[0].data();
         document.getElementById("username").textContent = userData.username || "No Name";
@@ -222,14 +223,20 @@
         const userId = userData.userId || 'Unavailable';
         document.getElementById("userIdDisplay").textContent = `${userId}`;
         document.getElementById("userIdDisplay").setAttribute("data-userid", userId);
+      }
+    });
 
-        // Stats display
-        document.getElementById("totalTour").textContent = userData.tour ?? 0;
-        document.getElementById("matchPlayed").textContent = userData.played ?? 0;
-        document.getElementById("totalWinning").textContent = userData.win ?? 0;
-        document.getElementById("totaldraw").textContent = userData.draw ?? 0;
-        document.getElementById("totalLost").textContent = userData.lost ?? 0;
-        document.getElementById("totalGoal").textContent = userData.goal ?? 0;
+    // playersform collection (stats)
+    const qPlayers = query(collection(db, "playersform"), where("uid", "==", user.uid));
+    onSnapshot(qPlayers, (querySnapshot) => {
+      if (!querySnapshot.empty) {
+        const stats = querySnapshot.docs[0].data();
+        document.getElementById("totalTour").textContent = stats.tour ?? 0;
+        document.getElementById("matchPlayed").textContent = stats.played ?? 0;
+        document.getElementById("totalWinning").textContent = stats.win ?? 0;
+        document.getElementById("totaldraw").textContent = stats.draw ?? 0;
+        document.getElementById("totalLost").textContent = stats.lost ?? 0;
+        document.getElementById("totalGoal").textContent = stats.goal ?? 0;
       }
     });
   });
