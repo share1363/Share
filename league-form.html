@@ -117,7 +117,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
       getFirestore, collection, getDocs, doc, getDoc,
-      runTransaction, query, where, updateDoc
+      runTransaction, query, where, updateDoc, increment
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -237,7 +237,10 @@
 
         if (!snapshot.empty) {
           const playerDocRef = snapshot.docs[0].ref;
-          await updateDoc(playerDocRef, { type: "paid" });
+          await updateDoc(playerDocRef, { 
+            type: "paid",
+            tour: increment(1)   // ✅ এখানে টুর ফিল্ড count হচ্ছে
+          });
           typeDisplay.textContent = "paid";
         }
 
