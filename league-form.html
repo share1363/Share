@@ -167,8 +167,7 @@
       const docSnap = await getDoc(doc(db, "users", uid));
       const data = docSnap.data();
       return {
-        balance: data?.balance ?? 0,
-        tour: data?.tour ?? 0
+        balance: data?.balance ?? 0
       };
     }
 
@@ -207,7 +206,6 @@
         didOpen: () => Swal.showLoading()
       });
 
-      // Check playersform for current type
       const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
       if (!snapshot.empty) {
         const playerData = snapshot.docs[0].data();
@@ -231,14 +229,12 @@
           if (data.slotUsed >= data.slot) throw new Error("Slot full.");
           transaction.update(slotRef, { slotUsed: data.slotUsed + 1 });
           transaction.update(doc(db, "users", currentUser.uid), {
-            balance: userData.balance - joiningFee,
-            tour: (userData.tour || 0) + 1
+            balance: userData.balance - joiningFee
           });
           slotUsed = data.slotUsed + 1;
           joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
         });
 
-        // Update playersform type → paid
         if (!snapshot.empty) {
           const playerDocRef = snapshot.docs[0].ref;
           await updateDoc(playerDocRef, { type: "paid" });
