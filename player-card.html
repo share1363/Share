@@ -76,7 +76,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -101,8 +101,7 @@
         return;
       }
 
-      const q = query(collection(db, "playersform"), orderBy("createdAt", "desc"));
-      onSnapshot(q, (snapshot) => {
+      onSnapshot(collection(db, "playersform"), (snapshot) => {
         playersList.innerHTML = "";
 
         if (snapshot.empty) {
@@ -110,8 +109,15 @@
           return;
         }
 
+        // সব data collect করে pts দিয়ে sort করা হচ্ছে
+        let players = [];
         snapshot.forEach((doc) => {
-          const data = doc.data();
+          players.push({ id: doc.id, ...doc.data() });
+        });
+
+        players.sort((a, b) => b.pts - a.pts); // descending order
+
+        players.forEach((data, index) => {
           const photo = data.photoUrl && data.photoUrl.trim() !== "" ? data.photoUrl : "https://via.placeholder.com/100?text=No+Image";
 
           const pts   = data.pts   || 0;
@@ -120,6 +126,7 @@
           const lost  = data.lost  || 0;
           const win   = data.win   || 0;
           const played= data.played|| 0;
+          const position = index + 1; // position set
 
           const card = `
             <section class="player-card mb-6">
@@ -139,7 +146,7 @@
                       <div class="uppercase">
                         <div class="text-xs text-gray-200 text-center">position</div>
                         <div class="status-card flex justify-center gap-1 items-center text-sm font-bold text-gray-300">
-                          <i class="fa-solid fa-medal text-sm text-yellow-400"></i> <span class="text-xl">0</span>
+                          <i class="fa-solid fa-medal text-sm text-yellow-400"></i> <span class="text-xl">${position}</span>
                         </div>
                       </div>
 
