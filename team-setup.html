@@ -20,7 +20,6 @@
       background: linear-gradient(135deg, #1e3a8a, #2563eb);
       transition: transform 0.3s ease-in-out;
     }
-
     .card-header {
       background-color: #1e40af;
       padding: 5px;
@@ -29,34 +28,29 @@
       font-size: 1.1rem;
       font-weight: bold;
     }
-
     .card-img {
       background-color: rgba(0, 0, 0, 0.5);
       padding: 10px 25px 0px;
       text-align: center;
       position: relative;
     }
-
     .card-body {
       padding: 5px;
       text-align: center;
       background-color: rgba(0, 0, 0, 0.6);
     }
-
     .card-footer {
       background-color: #1e3a8a;
       padding: 10px;
       text-align: center;
       color: white;
     }
-
     .card img {
       width: 100%;
       height: 260px;
       border-radius: 5px;
       object-fit: cover;
     }
-
     .card-title {
       width: 250px;
       font-size: 1.1rem;
@@ -72,26 +66,22 @@
       padding: 2px, 2px;
       text-transform: uppercase;
     }
-
     .card-text {
       font-size: 1rem;
       margin-top: 10px;
       color: #e5e5e5;
     }
-
     .info {
       font-size: 1rem;
       color: #e5e5e5;
       margin-top: 5px;
     }
-
     .card-info {
       display: flex;
       align-items: center;
       margin-bottom: 5px;
       justify-content: space-between;
     }
-
     .card-item {
       background-color: #04585e;
       border-radius: 15px 0px 15px;
@@ -103,7 +93,6 @@
       text-align: center;
       text-transform: uppercase;
     }
-
     .card-item2 {
       background-color: #7c3aed;
       border-radius: 15px 0px;
@@ -265,9 +254,26 @@ form.addEventListener("submit", async (e) => {
     return Swal.fire({ icon: 'warning', text: 'All fields are required.', confirmButtonColor: '#F59E0B' });
   }
 
-  Swal.fire({ title: 'Submitting...', text: 'Please wait...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+  Swal.fire({ title: 'Checking...', text: 'Validating team name...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
 
   try {
+    // case-insensitive duplicate check
+    const q = query(collection(db, "playersform"));
+    const querySnapshot = await getDocs(q);
+    const lowerTeamName = teamName.toLowerCase();
+    let isDuplicate = false;
+    querySnapshot.forEach(doc => {
+      const existingTeam = doc.data().team || "";
+      if (existingTeam.toLowerCase() === lowerTeamName) {
+        isDuplicate = true;
+      }
+    });
+
+    if (isDuplicate) {
+      Swal.close();
+      return Swal.fire({ icon: 'error', title: 'Already used', text: 'This team name is already taken. Please choose another one.', confirmButtonColor: '#EF4444' });
+    }
+
     const userDoc = await getDoc(doc(db, "users", currentUser.uid));
     const username = userDoc.exists() ? userDoc.data()?.username || "" : "";
     const photoUrl = userDoc.exists() ? userDoc.data()?.photoUrl || "" : "";
@@ -289,7 +295,6 @@ form.addEventListener("submit", async (e) => {
     Swal.close();
     Swal.fire({ icon: 'success', title: 'Success', text: 'Team setup successfully!', confirmButtonColor: '#F59E0B' });
 
-    // Render the card using the same function
     await renderTeamCard(currentUser.uid);
 
   } catch (err) {
