@@ -27,7 +27,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, updateDoc, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDooTNeDHoWUU9nLxYxyBIhewydt7Xl_M0",
@@ -78,7 +78,7 @@
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
         if (data.team && data.uid) {
-          teamUidMap.set(data.team, docSnap.id); // doc id store
+          teamUidMap.set(data.team, data.uid);
         }
       });
     }
@@ -188,23 +188,12 @@
       });
     }
 
-    // ✅ update stats in playersform, fallback by team name
-    async function updateUserStats(uid, isWinner, goalsScored, isDraw, teamName) {
-      let playerRef;
+    // ✅ Update stats in playersform db (not users)
+    async function updateUserStats(uid, isWinner, goalsScored, isDraw) {
+      if (!uid || uid === "UID N/A") return;
 
-      if (uid && uid !== "UID N/A") {
-        playerRef = doc(db, "playersform", uid);
-      } else {
-        const q = query(collection(db, "playersform"), where("team", "==", teamName));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          playerRef = doc(db, "playersform", snap.docs[0].id);
-        }
-      }
-
-      if (!playerRef) return;
-
-      const userSnap = await getDoc(playerRef);
+      const userRef = doc(db, "playersform", uid);
+      const userSnap = await getDoc(userRef);
       if (!userSnap.exists()) return;
 
       const userData = userSnap.data();
@@ -228,7 +217,7 @@
         updatedStats.pts -= 2;
       }
 
-      await updateDoc(playerRef, updatedStats);
+      await updateDoc(userRef, updatedStats);
     }
 
     window.updateResult = async function (matchId, team1, team2) {
@@ -265,8 +254,8 @@
       const uid1 = teamUidMap.get(team1);
       const uid2 = teamUidMap.get(team2);
       await Promise.all([
-        updateUserStats(uid1, winner === team1, goal1, isDraw, team1),
-        updateUserStats(uid2, winner === team2, goal2, isDraw, team2)
+        updateUserStats(uid1, winner === team1, goal1, isDraw),
+        updateUserStats(uid2, winner === team2, goal2, isDraw)
       ]);
       Swal.fire({ icon: 'success', title: 'Result updated and stats counted!', position: 'top-end', toast: true, timer: 2000, showConfirmButton: false });
     };
