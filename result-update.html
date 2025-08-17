@@ -188,22 +188,22 @@
       });
     }
 
-    // ✅ Update stats in playersform db (not users)
+    // 🔹 Update stats in playersform instead of users
     async function updateUserStats(uid, isWinner, goalsScored, isDraw) {
       if (!uid || uid === "UID N/A") return;
 
-      const userRef = doc(db, "playersform", uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) return;
+      const playerRef = doc(db, "playersform", uid);
+      const playerSnap = await getDoc(playerRef);
+      if (!playerSnap.exists()) return;
 
-      const userData = userSnap.data();
+      const playerData = playerSnap.data();
       const updatedStats = {
-        played: (userData.played || 0) + 1,
-        win: userData.win || 0,
-        draw: userData.draw || 0,
-        lost: userData.lost || 0,
-        goal: (userData.goal || 0) + goalsScored,
-        pts: userData.pts || 0
+        played: (playerData.played || 0) + 1,
+        win: playerData.win || 0,
+        draw: playerData.draw || 0,
+        lost: playerData.lost || 0,
+        goal: (playerData.goal || 0) + goalsScored,
+        pts: playerData.pts || 0
       };
 
       if (isDraw) {
@@ -217,7 +217,7 @@
         updatedStats.pts -= 2;
       }
 
-      await updateDoc(userRef, updatedStats);
+      await updateDoc(playerRef, updatedStats);
     }
 
     window.updateResult = async function (matchId, team1, team2) {
