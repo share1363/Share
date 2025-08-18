@@ -95,6 +95,21 @@
 
     const playersList = document.getElementById("players-list");
 
+    // Badge calculation function
+    function getBadge(pts) {
+      if (pts >= 260) return "SILVER V";
+      if (pts >= 220) return "SILVER IV";
+      if (pts >= 190) return "SILVER III";
+      if (pts >= 160) return "SILVER II";
+      if (pts >= 130) return "SILVER I";
+      if (pts >= 100) return "BRONZE V";
+      if (pts >= 75) return "BRONZE IV";
+      if (pts >= 50) return "BRONZE III";
+      if (pts >= 25) return "BRONZE II";
+      if (pts >= 10) return "BRONZE I";
+      return "BRONZE"; // default
+    }
+
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         window.location.href = "login.html";
@@ -109,13 +124,12 @@
           return;
         }
 
-        // সব data collect করে pts দিয়ে sort করা হচ্ছে
         let players = [];
         snapshot.forEach((doc) => {
           players.push({ id: doc.id, ...doc.data() });
         });
 
-        players.sort((a, b) => b.pts - a.pts); // descending order
+        players.sort((a, b) => b.pts - a.pts); // sort by pts
 
         players.forEach((data, index) => {
           const photo = data.photoUrl && data.photoUrl.trim() !== "" ? data.photoUrl : "https://via.placeholder.com/100?text=No+Image";
@@ -126,7 +140,8 @@
           const lost  = data.lost  || 0;
           const win   = data.win   || 0;
           const played= data.played|| 0;
-          const position = index + 1; // position set
+          const position = index + 1;
+          const badge = getBadge(pts); // get badge
 
           const card = `
             <section class="player-card mb-6">
@@ -153,7 +168,7 @@
                       <div>
                         <div class="text-xs text-gray-200 text-center">CURRENT BADGE</div>
                         <div class="status-card">
-                          <h2 style="font-size: 16px;" class="py-0.5 font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent">MASTER II</h2>
+                          <h2 style="font-size: 16px;" class="py-0.5 font-bold bg-gradient-to-r from-yellow-400 via-green-300 to-yellow-400 bg-clip-text text-transparent">${badge}</h2>
                         </div>
                       </div>
 
