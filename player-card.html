@@ -95,19 +95,36 @@
 
     const playersList = document.getElementById("players-list");
 
-    // Badge calculation function
+    // Badge list (ascending order)
+    const badgeLevels = [
+      { name: "BRONZE", min: 0 },
+      { name: "BRONZE I", min: 10 },
+      { name: "BRONZE II", min: 25 },
+      { name: "BRONZE III", min: 50 },
+      { name: "BRONZE IV", min: 75 },
+      { name: "BRONZE V", min: 100 },
+      { name: "SILVER I", min: 130 },
+      { name: "SILVER II", min: 160 },
+      { name: "SILVER III", min: 190 },
+      { name: "SILVER IV", min: 220 },
+      { name: "SILVER V", min: 260 }
+    ];
+
     function getBadge(pts) {
-      if (pts >= 260) return "SILVER V";
-      if (pts >= 220) return "SILVER IV";
-      if (pts >= 190) return "SILVER III";
-      if (pts >= 160) return "SILVER II";
-      if (pts >= 130) return "SILVER I";
-      if (pts >= 100) return "BRONZE V";
-      if (pts >= 75) return "BRONZE IV";
-      if (pts >= 50) return "BRONZE III";
-      if (pts >= 25) return "BRONZE II";
-      if (pts >= 10) return "BRONZE I";
-      return "BRONZE"; // default
+      let current = badgeLevels[0].name;
+      badgeLevels.forEach(level => {
+        if (pts >= level.min) current = level.name;
+      });
+      return current;
+    }
+
+    function getNextBadgeInfo(pts) {
+      for (let i = 0; i < badgeLevels.length; i++) {
+        if (pts < badgeLevels[i].min) {
+          return badgeLevels[i];
+        }
+      }
+      return null; // already highest
     }
 
     onAuthStateChanged(auth, (user) => {
@@ -142,6 +159,16 @@
           const played= data.played|| 0;
           const position = index + 1;
           const badge = getBadge(pts); // get badge
+          const nextBadge = getNextBadgeInfo(pts);
+
+          let progress = 100;
+          let progressText = "Max Level";
+          if (nextBadge) {
+            const prevLevel = badgeLevels.find(l => l.name === badge);
+            const prevPts = prevLevel ? prevLevel.min : 0;
+            progress = ((pts - prevPts) / (nextBadge.min - prevPts)) * 100;
+            progressText = `${nextBadge.min - pts} pts to ${nextBadge.name}`;
+          }
 
           const card = `
             <section class="player-card mb-6">
@@ -182,10 +209,10 @@
                   </section>
                   
                   <div class="mt-2 mb-3 w-full">
-                    <div class="text-xs text-gray-400 mb-1">Level Rank</div>
+                    <div class="text-xs text-gray-400 mb-1">Level Rank - ${progressText}</div>
                     <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
                       <div class="h-2 rounded-full"
-                        style="width:90%; background: linear-gradient(90deg,#f6d365,#fda085);"></div>
+                        style="width:${progress}%; background: linear-gradient(90deg,#f6d365,#fda085);"></div>
                     </div>
                   </div>
 
