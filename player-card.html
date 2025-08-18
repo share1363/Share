@@ -76,7 +76,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -126,10 +126,15 @@
       return null;
     }
 
-    function renderLast5(last5) {
-      // ensure last5 is array of 5, pad with '-'
-      const arr = Array.isArray(last5) ? last5.slice(-5) : [];
-      while (arr.length < 5) arr.unshift("-");
+    function renderLast5(win, draw, lost) {
+      const arr = [];
+      let w = win || 0, d = draw || 0, l = lost || 0;
+      for (let i = 0; i < 5; i++) {
+        if (w > 0) { arr.push("W"); w--; }
+        else if (d > 0) { arr.push("D"); d--; }
+        else if (l > 0) { arr.push("L"); l--; }
+        else { arr.push("-"); }
+      }
       return arr.map(r => {
         let bg = "bg-gray-500 text-white";
         if (r === "W") bg = "bg-green-600";
@@ -145,7 +150,7 @@
         return;
       }
 
-      onSnapshot(collection(db, "playersform"), async (snapshot) => {
+      onSnapshot(collection(db, "playersform"), (snapshot) => {
         playersList.innerHTML = "";
 
         if (snapshot.empty) {
@@ -160,8 +165,7 @@
 
         players.sort((a, b) => b.pts - a.pts);
 
-        for (let index = 0; index < players.length; index++) {
-          const data = players[index];
+        players.forEach((data, index) => {
           const photo = data.photoUrl && data.photoUrl.trim() !== "" ? data.photoUrl : "https://via.placeholder.com/100?text=No+Image";
 
           const pts    = data.pts    || 0;
@@ -173,14 +177,6 @@
           const position = index + 1;
           const badge = getBadge(pts);
           const nextBadge = getNextBadgeInfo(pts);
-
-          // auto-create last5 if missing
-          let last5 = data.last5;
-          if (!Array.isArray(last5)) {
-            last5 = [];
-            const docRef = doc(db, "playersform", data.id);
-            await updateDoc(docRef, { last5 });
-          }
 
           let progress = 100;
           let progressText = "Max Level";
@@ -263,7 +259,7 @@
                   <div class="mt-2 w-full flex justify-center items-center gap-2">
                     <div class="text-sm text-gray-300 uppercase font-bold">Last 5 Matches</div>
                     <div class="flex gap-1">
-                      ${renderLast5(last5)}
+                      ${renderLast5(win, draw, lost)}
                     </div>
                   </div>
                 </div>
@@ -271,7 +267,7 @@
             </section>
           `;
           playersList.insertAdjacentHTML("beforeend", card);
-        }
+        });
       });
     });
   </script>
