@@ -71,6 +71,8 @@
       deleteDoc,
       doc,
       onSnapshot,
+      query,
+      where
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -98,8 +100,9 @@
       }
     });
 
+    // Only load teams where type === "paid"
     async function loadTeams() {
-      const snapshot = await getDocs(collection(db, "playersform"));
+      const snapshot = await getDocs(query(collection(db, "playersform"), where("type", "==", "paid")));
       const teams = new Set();
       teamUidMap.clear();
       snapshot.forEach(doc => {
@@ -152,7 +155,6 @@
               html += `
                 <div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
                   <div class="flex justify-between items-center px-2">
-                    <!-- Removed match.id display here -->
                   </div>
                   <div class="flex justify-between items-center px-2">
                     <div class="text-sm font-semibold text-gray-600 text-center">
