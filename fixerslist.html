@@ -100,6 +100,7 @@
       }
     });
 
+    // Only load teams where type === "paid"
     async function loadTeams() {
       const snapshot = await getDocs(query(collection(db, "playersform"), where("type", "==", "paid")));
       const teams = new Set();
@@ -146,20 +147,15 @@
           const dateMap = groupMap[group];
           const sortedDates = Object.keys(dateMap).sort();
           sortedDates.forEach((date, i) => {
-            html += `
-              <div class="bg-gray-100 px-3 py-2 rounded font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <input type="text" value="${group}" class="border border-gray-300 rounded p-1 text-sm w-28" data-group="${group}" />
-                <span>Matchday-${i + 1} ||</span>
-                <input type="date" value="${date}" class="border border-gray-300 rounded p-1 text-sm" data-date="${date}" />
-              </div>
-            `;
+            html += `<div class="bg-gray-100 px-3 py-2 rounded font-semibold text-gray-700 mb-2">${group} ll Matchday-${i + 1} || ${date}</div>`;
             dateMap[date].forEach(match => {
               const uid1 = teamUidMap.get(match.team1) ?? "UID N/A";
               const uid2 = teamUidMap.get(match.team2) ?? "UID N/A";
 
               html += `
                 <div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
-                  <div class="flex justify-between items-center px-2"></div>
+                  <div class="flex justify-between items-center px-2">
+                  </div>
                   <div class="flex justify-between items-center px-2">
                     <div class="text-sm font-semibold text-gray-600 text-center">
                       ${match.team1} <span class="text-black">(${match.team1Goal ?? "-"})</span><br/>
