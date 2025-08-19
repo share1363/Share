@@ -216,14 +216,7 @@
           role: "user",
           referCode: uid,
           referredBy: inputReferCode || null,
-          createdAt: serverTimestamp(),
-          played: 0,
-          win: 0,
-          draw: 0,
-          lost: 0,
-          tour: 0,
-          goal: 0,
-          pts: 0
+          createdAt: serverTimestamp()
         });
 
         if (inputReferCode && inputReferCode !== uid && referBonus > 0) {
