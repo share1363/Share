@@ -127,15 +127,11 @@
       return null;
     }
 
-    function renderLast5(win, draw, lost) {
-      const arr = [];
-      let w = win || 0, d = draw || 0, l = lost || 0;
-      for (let i = 0; i < 5; i++) {
-        if (w > 0) { arr.push("W"); w--; }
-        else if (d > 0) { arr.push("D"); d--; }
-        else if (l > 0) { arr.push("L"); l--; }
-        else { arr.push("-"); }
-      }
+    function renderLast5Matches(player) {
+      // Use lastMatches array if exists, otherwise fallback to win/draw/lost counts
+      const lastMatches = player.lastMatches || [];
+      const arr = lastMatches.slice(-5); // last 5 matches
+      while (arr.length < 5) arr.unshift("-"); // pad with "-"
       return arr.map(r => {
         let bg = "bg-gray-500 text-white";
         if (r === "W") bg = "bg-green-600";
@@ -260,7 +256,7 @@
                   <div class="mt-2 w-full flex justify-center items-center gap-2">
                     <div class="text-sm text-gray-300 uppercase font-bold">Last 5 Matches</div>
                     <div class="flex gap-1">
-                      ${renderLast5(win, draw, lost)}
+                      ${renderLast5Matches(data)}
                     </div>
                   </div>
                 </div>
