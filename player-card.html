@@ -4,13 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Team Ranking</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
   <link rel="stylesheet" href="team-rank.css">
 </head>
 <body class="bg-black text-white min-h-screen">
@@ -27,7 +25,6 @@
       <a href="#">
         <i class="fa-solid fa-bell text-yellow-300 text-shadow text-xl"></i>
       </a>
-      
       <a href="https://facebook.com" target="_blank">
         <i class="fa-brands fa-facebook text-white text-shadow text-xl"></i>
       </a>
@@ -93,7 +90,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-
     const playersList = document.getElementById("players-list");
 
     const badgeLevels = [
@@ -127,15 +123,24 @@
       return null;
     }
 
-    function renderRecently5Matches(win, draw, lost) {
+    function renderRecently5Matches(recentResults, win, draw, lost) {
       const arr = [];
-      let w = win || 0, d = draw || 0, l = lost || 0;
-      for (let i = 0; i < 5; i++) {
-        if (w > 0) { arr.push("W"); w--; }
-        else if (d > 0) { arr.push("D"); d--; }
-        else if (l > 0) { arr.push("L"); l--; }
-        else { arr.push("-"); }
+      // Use recentResults if exists
+      if (recentResults && recentResults.length) {
+        for (let i = 0; i < 5; i++) {
+          arr.push(recentResults[i] || "-");
+        }
+      } else {
+        // fallback to counts
+        let w = win || 0, d = draw || 0, l = lost || 0;
+        for (let i = 0; i < 5; i++) {
+          if (w > 0) { arr.push("W"); w--; }
+          else if (d > 0) { arr.push("D"); d--; }
+          else if (l > 0) { arr.push("L"); l--; }
+          else { arr.push("-"); }
+        }
       }
+
       return arr.map(r => {
         let bg = "bg-gray-500 text-white";
         if (r === "W") bg = "bg-green-600";
@@ -260,7 +265,7 @@
                   <div class="mt-2 w-full flex justify-center items-center gap-2">
                     <div class="text-sm text-gray-300 uppercase font-bold">Recently 5 Matches</div>
                     <div class="flex gap-1">
-                      ${renderRecently5Matches(win, draw, lost)}
+                      ${renderRecently5Matches(data.recentResults, win, draw, lost)}
                     </div>
                   </div>
                 </div>
