@@ -127,15 +127,15 @@
       return null;
     }
 
-    // Render last 5 matches based on recent match results stored in Firestore
-    function renderLast5Matches(player) {
-      let arr = [];
-      if (player.matches && player.matches.length) {
-        // Sort matches by date descending
-        const sorted = player.matches.sort((a, b) => new Date(b.date) - new Date(a.date));
-        arr = sorted.slice(0, 5).map(m => m.result || "-");
+    function renderLast5(win, draw, lost) {
+      const arr = [];
+      let w = win || 0, d = draw || 0, l = lost || 0;
+      for (let i = 0; i < 5; i++) {
+        if (w > 0) { arr.push("W"); w--; }
+        else if (d > 0) { arr.push("D"); d--; }
+        else if (l > 0) { arr.push("L"); l--; }
+        else { arr.push("-"); }
       }
-      while (arr.length < 5) arr.push("-"); // pad to 5 if less
       return arr.map(r => {
         let bg = "bg-gray-500 text-white";
         if (r === "W") bg = "bg-green-600";
@@ -260,7 +260,7 @@
                   <div class="mt-2 w-full flex justify-center items-center gap-2">
                     <div class="text-sm text-gray-300 uppercase font-bold">Last 5 Matches</div>
                     <div class="flex gap-1">
-                      ${renderLast5Matches(data)}
+                      ${renderLast5(win, draw, lost)}
                     </div>
                   </div>
                 </div>
