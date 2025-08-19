@@ -145,13 +145,14 @@
           const dateMap = groupMap[group];
           const sortedDates = Object.keys(dateMap).sort();
           sortedDates.forEach(date => {
-            const matchdayLabel = dateMap[date][0].matchday; // ✅ display matchday from Firestore
+            const matchdayLabel = dateMap[date][0].matchday; 
             html += `
               <div class="bg-gray-100 px-3 py-2 rounded font-semibold text-gray-700 mb-2 flex items-center justify-between gap-2">
-                <input type="text" value="${group}" data-group="${group}" class="border border-gray-300 rounded px-2 py-1 text-sm w-32" />
-                <input type="text" value="${matchdayLabel}" data-matchday="${matchdayLabel}" class="border border-gray-300 rounded px-2 py-1 text-sm w-24" />
-                <input type="date" value="${date}" data-date="${date}" class="border border-gray-300 rounded px-2 py-1 text-sm w-32" />
-                <button class="bg-blue-600 text-white px-2 py-1 rounded text-sm saveMatchBtn">Save</button>
+                <div class="flex items-center gap-2">
+                  <span>${group} || ${matchdayLabel} || ${date}</span>
+                  <i class="fas fa-edit cursor-pointer text-blue-600 editHeaderBtn" 
+                     data-group="${group}" data-matchday="${matchdayLabel}" data-date="${date}"></i>
+                </div>
               </div>
             `;
             dateMap[date].forEach(match => {
@@ -180,30 +181,39 @@
 
         fixersContainer.innerHTML = html;
 
-        // Save button functionality
-        document.querySelectorAll(".saveMatchBtn").forEach(btn => {
+        // Edit header icon
+        document.querySelectorAll(".editHeaderBtn").forEach(btn => {
           btn.addEventListener("click", async (e) => {
-            const parent = e.target.parentElement;
-            const groupInput = parent.querySelector('input[data-group]');
-            const matchdayInput = parent.querySelector('input[data-matchday]');
-            const dateInput = parent.querySelector('input[data-date]');
+            const { group, matchday, date } = e.target.dataset;
+            const { value: formValues } = await Swal.fire({
+              title: 'Edit Group/Matchday/Date',
+              html:
+                `<input id="swalGroup" class="swal2-input" placeholder="Group" value="${group}">` +
+                `<input id="swalMatchday" class="swal2-input" placeholder="Matchday" value="${matchday}">` +
+                `<input id="swalDate" type="date" class="swal2-input" value="${date}">`,
+              focusConfirm: false,
+              preConfirm: () => {
+                return {
+                  group: document.getElementById('swalGroup').value,
+                  matchday: document.getElementById('swalMatchday').value,
+                  date: document.getElementById('swalDate').value
+                }
+              }
+            });
 
-            const oldGroup = groupInput.dataset.group;
-            const oldDate = dateInput.dataset.date;
-
-            // Update all matches in this group & date
-            const q = query(collection(db, "fixers"), where("groupName", "==", oldGroup), where("date", "==", oldDate));
-            const snap = await getDocs(q);
-
-            const updates = snap.docs.map(d => updateDoc(doc(db, "fixers", d.id), {
-              groupName: groupInput.value,
-              date: dateInput.value,
-              matchday: matchdayInput.value
-            }));
-            await Promise.all(updates);
-
-            Swal.fire({ icon: 'success', title: 'Group, Matchday & Date updated.', position: 'top-end', toast: true, timer: 3000, showConfirmButton: false });
-            loadFixers();
+            if (formValues) {
+              // Update all matches with old group & date
+              const q = query(collection(db, "fixers"), where("groupName", "==", group), where("date", "==", date));
+              const snap = await getDocs(q);
+              const updates = snap.docs.map(d => updateDoc(doc(db, "fixers", d.id), {
+                groupName: formValues.group,
+                matchday: formValues.matchday,
+                date: formValues.date
+              }));
+              await Promise.all(updates);
+              Swal.fire({ icon: 'success', title: 'Updated successfully!', position: 'top-end', toast: true, timer: 3000, showConfirmButton: false });
+              loadFixers();
+            }
           });
         });
       });
@@ -245,7 +255,7 @@
             team1: groupTeams[i],
             team2: groupTeams[j],
             date,
-            matchday: `Matchday-${matchday+1}`, // ✅ saved in Firestore
+            matchday: `Matchday-${matchday+1}`,
             team1Goal: null,
             team2Goal: null,
             status: "Pending",
