@@ -24,11 +24,9 @@
   <main class="p-4 md:p-6 space-y-6 overflow-auto flex-grow">
     <!-- Players List Section -->
     <div class="bg-white shadow rounded p-4">
-      <div class="flex justify-between items-center mb-4">
-        <div class="flex justify-center items-center space-x-4">
-          <button id="allPlayerBtn" class="px-4 py-1.5 rounded bg-blue-600 text-white text-sm font-medium hover:bg-blue-700">All Player</button>
-          <button id="tourPlayerBtn" class="px-4 py-1.5 rounded bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300">Tour Player</button>
-        </div>
+      <div class="flex justify-center items-center mb-4 space-x-4">
+        <button id="allPlayerBtn" class="px-4 py-1.5 rounded bg-blue-600 text-white text-sm font-medium hover:bg-blue-700">All Player (0)</button>
+        <button id="tourPlayerBtn" class="px-4 py-1.5 rounded bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300">Tour Player (0)</button>
       </div>
       <div id="playersCardContainer" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <!-- Player cards will be inserted here -->
@@ -97,13 +95,29 @@
 
     async function loadPlayers() {
       const container = document.getElementById("playersCardContainer");
+      const allBtn = document.getElementById("allPlayerBtn");
+      const tourBtn = document.getElementById("tourPlayerBtn");
+
       container.innerHTML = `<div class="col-span-full text-center text-gray-500">Loading players...</div>`;
 
       try {
+        // Fetch all players for counting
+        const allPlayersSnapshot = await getDocs(collection(db, "playersform"));
+        const allPlayersCount = allPlayersSnapshot.size;
+
+        // Fetch tour players
+        const tourQuery = query(collection(db, "playersform"), where("type", "==", "paid"));
+        const tourPlayersSnapshot = await getDocs(tourQuery);
+        const tourPlayersCount = tourPlayersSnapshot.size;
+
+        // Update button text dynamically
+        allBtn.textContent = `All Player (${allPlayersCount})`;
+        tourBtn.textContent = `Tour Player (${tourPlayersCount})`;
+
+        // Fetch players according to current filter
         let q;
         if (currentFilter === "tour") {
-          // Show only players with type === "paid"
-          q = query(collection(db, "playersform"), where("type", "==", "paid"));
+          q = tourQuery;
         } else {
           q = collection(db, "playersform");
         }
