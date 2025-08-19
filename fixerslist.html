@@ -159,7 +159,10 @@
               const uid1 = teamUidMap.get(match.team1) ?? "UID N/A";
               const uid2 = teamUidMap.get(match.team2) ?? "UID N/A";
               html += `
-                <div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
+                <div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1 relative">
+                  <div class="absolute top-2 right-2 cursor-pointer text-red-600 deleteFixerBtn" data-id="${match.id}">
+                    <i class="fas fa-trash"></i>
+                  </div>
                   <div class="flex justify-between items-center px-2">
                     <div class="text-sm font-semibold text-gray-600 text-center">
                       ${match.team1} <span class="text-black">(${match.team1Goal ?? "-"})</span><br/>
@@ -202,7 +205,6 @@
             });
 
             if (formValues) {
-              // Update all matches with old group & date
               const q = query(collection(db, "fixers"), where("groupName", "==", group), where("date", "==", date));
               const snap = await getDocs(q);
               const updates = snap.docs.map(d => updateDoc(doc(db, "fixers", d.id), {
@@ -214,6 +216,22 @@
               Swal.fire({ icon: 'success', title: 'Updated successfully!', position: 'top-end', toast: true, timer: 3000, showConfirmButton: false });
               loadFixers();
             }
+          });
+        });
+
+        // Delete individual fixer
+        document.querySelectorAll(".deleteFixerBtn").forEach(btn => {
+          btn.addEventListener("click", async (e) => {
+            const fixerId = e.currentTarget.dataset.id;
+            const confirm = await Swal.fire({
+              title: 'Delete this match?',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Yes, delete!'
+            });
+            if (!confirm.isConfirmed) return;
+            await deleteDoc(doc(db, "fixers", fixerId));
+            Swal.fire({ icon: 'success', title: 'Match deleted.', position: 'top-end', toast: true, timer: 2000, showConfirmButton: false });
           });
         });
       });
