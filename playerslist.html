@@ -103,8 +103,8 @@
       try {
         let q;
         if (currentFilter === "tour") {
-          // ধরে নিচ্ছি tourPlayer গুলো type === "tour" ফিল্ড দিয়ে আলাদা করা আছে
-          q = query(collection(db, "playersform"), where("type", "==", "tour"));
+          // Show only players with type === "paid"
+          q = query(collection(db, "playersform"), where("type", "==", "paid"));
         } else {
           q = collection(db, "playersform");
         }
