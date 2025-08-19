@@ -105,74 +105,80 @@
           return;
         }
 
-        // matchday থেকে grouping
-        const matchdayMap = {};
+        const dateMap = {};
         snapshot.forEach(docSnap => {
           const data = { id: docSnap.id, ...docSnap.data() };
-          const matchday = data.matchday || "Matchday-1";
-          if (!matchdayMap[matchday]) matchdayMap[matchday] = [];
-          matchdayMap[matchday].push(data);
+          if (!dateMap[data.date]) dateMap[data.date] = {};
+          if (!dateMap[data.date][data.groupName]) dateMap[data.date][data.groupName] = [];
+          dateMap[data.date][data.groupName].push(data);
         });
 
         let html = "";
+        const sortedDates = Object.keys(dateMap).sort();
 
-        Object.keys(matchdayMap).sort().forEach((matchday, index) => {
-          const isHidden = userSettings.hiddenMatchdays[matchday] === true;
+        sortedDates.forEach((date, index) => {
+          const formattedDate = formatDate(date);
+          const matchdayId = `matchday-${index + 1}`;
+
+          const isHidden = userSettings.hiddenMatchdays[matchdayId] === true;
 
           html += `
             <div class="flex justify-between items-center bg-green-600 uppercase text-white px-4 py-2 rounded-lg shadow font-semibold mt-6">
-              <span>${matchday}</span>
-              <button id="${matchday}-btn" onclick="toggleMatchday('${matchday}')" class="bg-white text-red-500 px-3 py-1 rounded text-xs font-medium hover:bg-gray-100 flex items-center gap-1">
+              <span>Match-day-${index + 1} | ${formattedDate}</span>
+              <button id="${matchdayId}-btn" onclick="toggleMatchday('${matchdayId}')" class="bg-white text-red-500 px-3 py-1 rounded text-xs font-medium hover:bg-gray-100 flex items-center gap-1">
                 ${isHidden ? '<i class="fa-solid fa-lock"></i>' : '<i class="fa-solid fa-lock-open"></i>'}
               </button>
             </div>
-            <div id="${matchday}" class="space-y-4 ${isHidden ? 'hidden' : ''}">
+            <div id="${matchdayId}" class="space-y-4 ${isHidden ? 'hidden' : ''}">
           `;
 
-          matchdayMap[matchday].forEach(match => {
-            let resultText = "Result: ";
-            if (match.winner && match.winner !== "None") {
-              resultText += match.winner === "Draw" ? "Draw" : match.winner;
-            } else {
-              resultText += "N/A";
-            }
+          const groups = dateMap[date];
+          Object.keys(groups).sort().forEach(groupName => {
+            groups[groupName].forEach(match => {
+              let resultText = "Result: ";
+              if (match.winner && match.winner !== "None") {
+                resultText += match.winner === "Draw" ? "Draw" : match.winner;
+              } else {
+                resultText += "N/A";
+              }
 
-            const uid1 = teamUidMap.get(match.team1) ?? "UID N/A";
-            const uid2 = teamUidMap.get(match.team2) ?? "UID N/A";
+              const uid1 = teamUidMap.get(match.team1) ?? "UID N/A";
+              const uid2 = teamUidMap.get(match.team2) ?? "UID N/A";
 
-            html += `
-              <div class="matchCard bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition space-y-4 text-sm">
-                <div class="uppercase flex justify-center items-center text-sm w-full text-center font-semibold bg-green-100 text-green-700 rounded-md py-1 mb-2 select-none">
-                  ${match.groupName}
-                </div>
-                <div class="flex justify-between items-center gap-10">
-                  <div class="flex flex-col items-center gap-1 w-28">
-                    <span class="font-bold text-gray-700">${match.team1}</span>
-                    <span class="hidden text-gray-400 text-[10px] select-none">UID: ${uid1}</span>
-                    <input type="number" min="0" id="goal1-${match.id}" value="${match.team1Goal ?? ''}" class="w-full border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
+              html += `
+                <div class="matchCard bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition space-y-4 text-sm">
+                  <div class="uppercase flex justify-center items-center text-sm w-full text-center font-semibold bg-green-100 text-green-700 rounded-md py-1 mb-2 select-none">
+                    ${groupName}
                   </div>
-                  <span class="text-red-500 font-extrabold text-xl select-none">VS</span>
-                  <div class="flex flex-col items-center gap-1 w-28">
-                    <span class="font-bold text-gray-700">${match.team2}</span>
-                    <span class="hidden text-gray-400 text-[10px] select-none">UID: ${uid2}</span>
-                    <input type="number" min="0" id="goal2-${match.id}" value="${match.team2Goal ?? ''}" class="w-full border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
+                  <div class="flex justify-between items-center gap-10">
+                    <div class="flex flex-col items-center gap-1 w-28">
+                      <span class="font-bold text-gray-700">${match.team1}</span>
+                      <span class="hidden text-gray-400 text-[10px] select-none">UID: ${uid1}</span>
+                      <input type="number" min="0" id="goal1-${match.id}" value="${match.team1Goal ?? ''}" class="w-full border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
+                    </div>
+                    <span class="text-red-500 font-extrabold text-xl select-none">VS</span>
+                    <div class="flex flex-col items-center gap-1 w-28">
+                      <span class="font-bold text-gray-700">${match.team2}</span>
+                      <span class="hidden text-gray-400 text-[10px] select-none">UID: ${uid2}</span>
+                      <input type="number" min="0" id="goal2-${match.id}" value="${match.team2Goal ?? ''}" class="w-full border p-1 rounded text-center focus:ring-2 focus:ring-green-400" />
+                    </div>
+                  </div>
+                  <div class="flex justify-between">
+                    <p class="text-xs font-medium px-2 py-1 rounded ${match.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                      Status: ${match.status || 'Pending'}
+                    </p>
+                    <p class="text-xs font-semibold px-2 py-1 rounded bg-blue-100 text-blue-700">
+                      ${resultText}
+                    </p>
+                  </div>
+                  <div class="flex justify-center">
+                    <button onclick="updateResult('${match.id}', '${match.team1}', '${match.team2}')" class="bg-green-600 text-white px-4 py-1.5 rounded-lg shadow hover:bg-green-700 transition text-sm font-medium">
+                      <i class="fas fa-save"></i> Update
+                    </button>
                   </div>
                 </div>
-                <div class="flex justify-between">
-                  <p class="text-xs font-medium px-2 py-1 rounded ${match.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
-                    Status: ${match.status || 'Pending'}
-                  </p>
-                  <p class="text-xs font-semibold px-2 py-1 rounded bg-blue-100 text-blue-700">
-                    ${resultText}
-                  </p>
-                </div>
-                <div class="flex justify-center">
-                  <button onclick="updateResult('${match.id}', '${match.team1}', '${match.team2}')" class="bg-green-600 text-white px-4 py-1.5 rounded-lg shadow hover:bg-green-700 transition text-sm font-medium">
-                    <i class="fas fa-save"></i> Update
-                  </button>
-                </div>
-              </div>
-            `;
+              `;
+            });
           });
 
           html += `</div>`;
@@ -182,7 +188,7 @@
       });
     }
 
-    // ✅ playersform update function
+    // ✅ এখন playersform এ update হবে (uid ফিল্ড দিয়ে খুঁজে)
     async function updateUserStats(uid, isWinner, goalsScored, isDraw) {
       if (!uid || uid === "UID N/A") return;
 
