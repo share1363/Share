@@ -127,24 +127,6 @@
       return null;
     }
 
-    function renderLast5(win, draw, lost) {
-      const arr = [];
-      let w = win || 0, d = draw || 0, l = lost || 0;
-      for (let i = 0; i < 5; i++) {
-        if (w > 0) { arr.push("W"); w--; }
-        else if (d > 0) { arr.push("D"); d--; }
-        else if (l > 0) { arr.push("L"); l--; }
-        else { arr.push("-"); }
-      }
-      return arr.map(r => {
-        let bg = "bg-gray-500 text-white";
-        if (r === "W") bg = "bg-green-600";
-        else if (r === "L") bg = "bg-red-600";
-        else if (r === "D") bg = "bg-yellow-500 text-black";
-        return `<span class="px-1 h-4 text-xs rounded-sm font-semibold ${bg}">${r}</span>`;
-      }).join("");
-    }
-
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         window.location.href = "login.html";
@@ -258,11 +240,16 @@
                   </div>
 
                   <div class="mt-2 w-full flex justify-center items-center gap-2">
-                    <div class="text-sm text-gray-300 uppercase font-bold">Recently 5 Matches</div>
-                    <div class="flex gap-1">
-                      ${renderLast5(win, draw, lost)}
-                    </div>
-                  </div>
+            <div class="text-sm text-gray-300 uppercase font-bold">Last 5 Matches</div>
+            <div class="flex gap-1">
+              <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
+              <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
+              <span class="px-1 h-4 text-xs rounded-sm bg-red-600 font-semibold">L</span>
+              <span class="px-1 h-4 text-xs rounded-sm bg-yellow-500 text-black font-semibold">D</span>
+              <span class="px-1 h-4 text-xs rounded-sm bg-green-600 font-semibold">W</span>
+            </div>
+          </div>
+
                 </div>
               </div>
             </section>
