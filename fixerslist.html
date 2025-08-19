@@ -72,7 +72,8 @@
       doc,
       onSnapshot,
       query,
-      where
+      where,
+      updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -100,7 +101,6 @@
       }
     });
 
-    // Only load teams where type === "paid"
     async function loadTeams() {
       const snapshot = await getDocs(query(collection(db, "playersform"), where("type", "==", "paid")));
       const teams = new Set();
@@ -131,9 +131,7 @@
         }
 
         const fixers = [];
-        for (const docSnap of snapshot.docs) {
-          fixers.push({ id: docSnap.id, ...docSnap.data() });
-        }
+        snapshot.forEach(docSnap => fixers.push({ id: docSnap.id, ...docSnap.data() }));
 
         const groupMap = {};
         fixers.forEach(match => {
@@ -147,15 +145,20 @@
           const dateMap = groupMap[group];
           const sortedDates = Object.keys(dateMap).sort();
           sortedDates.forEach((date, i) => {
-            html += `<div class="bg-gray-100 px-3 py-2 rounded font-semibold text-gray-700 mb-2">${group} ll Matchday-${i + 1} || ${date}</div>`;
+            const matchdayLabel = `Matchday-${i+1}`;
+            html += `
+              <div class="bg-gray-100 px-3 py-2 rounded font-semibold text-gray-700 mb-2 flex items-center justify-between gap-2">
+                <input type="text" value="${group}" data-group="${group}" class="border border-gray-300 rounded px-2 py-1 text-sm w-32" />
+                <input type="text" value="${matchdayLabel}" data-matchday="${matchdayLabel}" class="border border-gray-300 rounded px-2 py-1 text-sm w-24" />
+                <input type="date" value="${date}" data-date="${date}" class="border border-gray-300 rounded px-2 py-1 text-sm w-32" />
+                <button class="bg-blue-600 text-white px-2 py-1 rounded text-sm saveMatchBtn">Save</button>
+              </div>
+            `;
             dateMap[date].forEach(match => {
               const uid1 = teamUidMap.get(match.team1) ?? "UID N/A";
               const uid2 = teamUidMap.get(match.team2) ?? "UID N/A";
-
               html += `
                 <div class="border p-2 rounded shadow-sm text-xs space-y-1 bg-white mb-1">
-                  <div class="flex justify-between items-center px-2">
-                  </div>
                   <div class="flex justify-between items-center px-2">
                     <div class="text-sm font-semibold text-gray-600 text-center">
                       ${match.team1} <span class="text-black">(${match.team1Goal ?? "-"})</span><br/>
@@ -169,12 +172,40 @@
                   </div>
                   <div class="text-center text-green-600 text-xs font-medium">Winner: ${match.winner}</div>
                   <div class="text-center text-blue-600 text-xs font-medium">Status: ${match.status}</div>
-                </div>`;
+                </div>
+              `;
             });
           });
         });
 
         fixersContainer.innerHTML = html;
+
+        // Save button functionality
+        document.querySelectorAll(".saveMatchBtn").forEach(btn => {
+          btn.addEventListener("click", async (e) => {
+            const parent = e.target.parentElement;
+            const groupInput = parent.querySelector('input[data-group]');
+            const matchdayInput = parent.querySelector('input[data-matchday]');
+            const dateInput = parent.querySelector('input[data-date]');
+
+            const oldGroup = groupInput.dataset.group;
+            const oldDate = dateInput.dataset.date;
+
+            // Update all matches in this group & date
+            const q = query(collection(db, "fixers"), where("groupName", "==", oldGroup), where("date", "==", oldDate));
+            const snap = await getDocs(q);
+
+            const updates = snap.docs.map(d => updateDoc(doc(db, "fixers", d.id), {
+              groupName: groupInput.value,
+              date: dateInput.value,
+              matchday: matchdayInput.value // store matchday separately
+            }));
+            await Promise.all(updates);
+
+            Swal.fire({ icon: 'success', title: 'Group, Matchday & Date updated.', position: 'top-end', toast: true, timer: 3000, showConfirmButton: false });
+            loadFixers();
+          });
+        });
       });
     }
 
@@ -214,6 +245,7 @@
             team1: groupTeams[i],
             team2: groupTeams[j],
             date,
+            matchday: `Matchday-${matchday+1}`, // add matchday field
             team1Goal: null,
             team2Goal: null,
             status: "Pending",
