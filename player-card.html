@@ -127,7 +127,7 @@
       return null;
     }
 
-    function renderLast5(win, draw, lost) {
+    function renderRecently5Matches(win, draw, lost) {
       const arr = [];
       let w = win || 0, d = draw || 0, l = lost || 0;
       for (let i = 0; i < 5; i++) {
@@ -260,7 +260,7 @@
                   <div class="mt-2 w-full flex justify-center items-center gap-2">
                     <div class="text-sm text-gray-300 uppercase font-bold">Recently 5 Matches</div>
                     <div class="flex gap-1">
-                      ${renderLast5(win, draw, lost)}
+                      ${renderRecently5Matches(win, draw, lost)}
                     </div>
                   </div>
                 </div>
