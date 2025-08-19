@@ -198,7 +198,7 @@
             const updates = snap.docs.map(d => updateDoc(doc(db, "fixers", d.id), {
               groupName: groupInput.value,
               date: dateInput.value,
-              matchday: matchdayInput.value // store matchday separately
+              matchday: matchdayInput.value
             }));
             await Promise.all(updates);
 
@@ -245,7 +245,7 @@
             team1: groupTeams[i],
             team2: groupTeams[j],
             date,
-            matchday: `Matchday-${matchday+1}`, // add matchday field
+            matchday: `Matchday-${matchday+1}`, // ✅ automatically saved
             team1Goal: null,
             team2Goal: null,
             status: "Pending",
