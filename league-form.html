@@ -42,12 +42,10 @@
         <img id="playerPhoto" src="1753957600122.jpg" alt="Player"
           class="w-full h-72 object-cover border-b border-yellow-400" />
         <div class="flex justify-between">
-          <span
-            class="hidden absolute bottom-2 left-2 bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg">Current Balance:<span id="balance" class="ml-1"></span></span>
-          <span id="type"
-            class="hidden absolute bottom-2 right-2 bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg">...</span>
         </div>
       </div>
+     
+     <span id="type" class="hidden absolute bottom-2 right-2 bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg">...</span>
 
       <!-- Player Info -->
       <div class="p-4">
@@ -65,18 +63,17 @@
         <!-- Joining Fee and Progress Bar -->
         <div class="flex justify-between">
           <div class="mt-1">
-            <p id="joiningSlot" class="text-gray-400 text-sm mb-1">...</p>
-            <div class="w-40 bg-gray-800 rounded-full h-2 border border-gray-600">
-              <div class="bg-yellow-400 h-2 rounded-full w-1/2 transition-all"></div>
-            </div>
+          <p id="joiningSlot" class="text-gray-400 text-sm mb-1">...</p>
+          <div class="w-40 bg-gray-800 rounded-full h-2 border border-gray-600">
+            <div class="bg-yellow-400 h-2 rounded-full w-1/2 transition-all"></div>
           </div>
-
+        </div>
+          
           <div class="mt-2 text-right">
-            <p id="joiningFee"
-              class="text-xs font-semibold text-yellow-300 bg-gray-800 inline-block px-3 py-1 rounded-lg border border-yellow-400 shadow-md">
-              ...
-            </p>
-          </div>
+          <p id="joiningFee" class="text-xs font-semibold text-yellow-300 bg-gray-800 inline-block px-3 py-1 rounded-lg border border-yellow-400 shadow-md">
+             ...
+          </p>
+        </div>
         </div>
 
         <!-- Stats Info -->
@@ -98,42 +95,36 @@
       </div>
     </div>
   </main>
-
+  
   <!-- Bottom Nav -->
-  <nav
-    class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 z-40">
+  <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 z-40">
     <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold">
-      <div
-        class="bg-gray-900 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <div class="bg-gray-900 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
       </div>Home
     </a>
     <a href="match.html" class="nav-item flex flex-col items-center text-xs font-semibold">
-      <div
-        class="bg-gray-900 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <div class="bg-gray-900 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-gamepad text-lg text-gray-300 hover:text-yellow-400"></i>
       </div>Matches
     </a>
     <a href="league.html" class="nav-item flex flex-col items-center text-xs font-semibold">
-      <div
-        class="bg-gray-900 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <div class="bg-gray-900 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-trophy text-lg text-gray-300 hover:text-yellow-400"></i>
       </div>League
     </a>
     <a href="rank.html" class="nav-item flex flex-col items-center text-xs font-semibold">
-      <div
-        class="bg-gray-900 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
+      <div class="bg-gray-900 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-ranking-star text-lg text-gray-300 hover:text-yellow-400"></i>
       </div>Ranking
     </a>
     <a href="profile.html" class="nav-item flex flex-col items-center text-xs font-semibold">
-      <div
-        class="bg-gray-900 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
+      <div class="bg-gray-900 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-400">
         <i class="fa-solid fa-user text-lg text-gray-400 hover:text-yellow-400"></i>
       </div>Profile
     </a>
   </nav>
-
+  
   <!-- Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -161,7 +152,6 @@
     const joiningSlot = document.getElementById("joiningSlot");
     const joiningFeeDisplay = document.getElementById("joiningFee");
     const typeDisplay = document.getElementById("type");
-    const balanceDisplay = document.getElementById("balance");
 
     const usernameDiv = document.getElementById("username");
     const playerPhoto = document.getElementById("playerPhoto");
@@ -217,11 +207,6 @@
         typeDisplay.textContent = "N/A";
         typeDisplay.classList.remove("hidden");
       }
-
-      // 🔹 Balance load & show
-      const userData = await getUserInfo(currentUser.uid);
-      balanceDisplay.textContent = `৳${userData.balance}`;
-      balanceDisplay.classList.remove("hidden");
     }
 
     onAuthStateChanged(auth, async (user) => {
@@ -279,10 +264,6 @@
           typeDisplay.textContent = "paid";
         }
 
-        // ✅ balance refresh
-        const refreshed = await getUserInfo(currentUser.uid);
-        balanceDisplay.textContent = `৳${refreshed.balance}`;
-
         Swal.close();
         Swal.fire({ icon: 'success', title: 'Success', text: 'You have successfully joined!', confirmButtonColor: '#F59E0B' });
 
@@ -292,6 +273,6 @@
       }
     });
   </script>
-
+  
 </body>
 </html>
