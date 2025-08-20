@@ -39,7 +39,7 @@
       class="bg-gradient-to-b from-gray-900 via-black to-gray-900 rounded-xl shadow-xl border border-yellow-400 overflow-hidden">
       <!-- Player Image -->
       <div class="relative">
-        <img src="1753957600122.jpg" alt="Player"
+        <img id="playerPhoto" src="1753957600122.jpg" alt="Player"
           class="w-full h-72 object-cover border-b border-yellow-400" />
         <span id="type"
           class="hidden absolute bottom-2 right-2 bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg">...</span>
@@ -151,6 +151,8 @@
     const joiningFeeDisplay = document.getElementById("joiningFee");
     const typeDisplay = document.getElementById("type");
 
+    const usernameDiv = document.getElementById("username");
+    const playerPhoto = document.getElementById("playerPhoto");
     const teamDiv = document.getElementById("team");
     const ratingDiv = document.getElementById("dls-rating");
     const ageDiv = document.getElementById("age");
@@ -186,17 +188,22 @@
       const snapshot = await getDocs(query(collection(db, "playersform"), where("uid", "==", currentUser.uid)));
       if (!snapshot.empty) {
         const data = snapshot.docs[0].data();
+        usernameDiv.textContent = data.username ?? "Unknown";
+        playerPhoto.src = data.photoUrl ?? "1753957600122.jpg";
         teamDiv.textContent = data.team ?? "N/A";
         ratingDiv.textContent = data.dlsRating ?? "N/A";
         ageDiv.textContent = data.age ?? "N/A";
         yearsPlayedDiv.textContent = data.yearsPlayed ?? "N/A";
         typeDisplay.textContent = data.type ?? "N/A";
+        typeDisplay.classList.remove("hidden");
       } else {
+        usernameDiv.textContent = "Unknown";
         teamDiv.textContent = "N/A";
         ratingDiv.textContent = "N/A";
         ageDiv.textContent = "N/A";
         yearsPlayedDiv.textContent = "N/A";
         typeDisplay.textContent = "N/A";
+        typeDisplay.classList.remove("hidden");
       }
     }
 
@@ -250,7 +257,7 @@
           const playerDocRef = snapshot.docs[0].ref;
           await updateDoc(playerDocRef, { 
             type: "paid",
-            tour: increment(1)   // ✅ এখানে টুর ফিল্ড count হচ্ছে
+            tour: increment(1)
           });
           typeDisplay.textContent = "paid";
         }
