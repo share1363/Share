@@ -41,8 +41,6 @@
       <div class="relative">
         <img id="playerPhoto" src="1753957600122.jpg" alt="Player"
           class="w-full h-72 object-cover border-b border-yellow-400" />
-        <div class="flex justify-between">
-        </div>
       </div>
      
      <span id="type" class="hidden absolute bottom-2 right-2 bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg">...</span>
@@ -61,19 +59,16 @@
         </div>
 
         <!-- Joining Fee and Progress Bar -->
-        <div class="flex justify-between">
-          <div class="mt-1">
-          <p id="joiningSlot" class="text-gray-400 text-sm mb-1">...</p>
-          <div class="w-40 bg-gray-800 rounded-full h-2 border border-gray-600">
-            <div class="bg-yellow-400 h-2 rounded-full w-1/2 transition-all"></div>
+        <div class="mt-4">
+          <div class="flex justify-between items-center mb-1">
+            <p id="joiningSlot" class="text-gray-400 text-sm">...</p>
+            <p id="joiningFee" class="text-xs font-semibold text-yellow-300 bg-gray-800 inline-block px-3 py-1 rounded-lg border border-yellow-400 shadow-md">
+              ...
+            </p>
           </div>
-        </div>
-          
-          <div class="mt-2 text-right">
-          <p id="joiningFee" class="text-xs font-semibold text-yellow-300 bg-gray-800 inline-block px-3 py-1 rounded-lg border border-yellow-400 shadow-md">
-             ...
-          </p>
-        </div>
+          <div class="w-full bg-gray-800 rounded-full h-3 border border-gray-600 overflow-hidden">
+            <div id="slotProgress" class="bg-yellow-400 h-3 rounded-full w-0 transition-all duration-500"></div>
+          </div>
         </div>
 
         <!-- Stats Info -->
@@ -152,6 +147,7 @@
     const joiningSlot = document.getElementById("joiningSlot");
     const joiningFeeDisplay = document.getElementById("joiningFee");
     const typeDisplay = document.getElementById("type");
+    const slotProgress = document.getElementById("slotProgress");
 
     const usernameDiv = document.getElementById("username");
     const playerPhoto = document.getElementById("playerPhoto");
@@ -168,7 +164,17 @@
         slot = data?.slot ?? 0;
         slotUsed = data?.slotUsed ?? 0;
         joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
+        updateProgressBar();
       }
+    }
+
+    function updateProgressBar() {
+      if (!slot || slot <= 0) {
+        slotProgress.style.width = "0%";
+        return;
+      }
+      const percent = Math.min((slotUsed / slot) * 100, 100);
+      slotProgress.style.width = percent + "%";
     }
 
     async function loadJoiningFee() {
@@ -253,6 +259,7 @@
           });
           slotUsed = data.slotUsed + 1;
           joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
+          updateProgressBar();
         });
 
         if (!snapshot.empty) {
