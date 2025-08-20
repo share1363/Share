@@ -13,9 +13,13 @@
 </head>
 
 <body class="bg-black text-white">
+  <!-- Loading Text -->
+  <p id="loadingText" class="text-center text-gray-300 mt-5">Loading...</p>
+
   <!-- Header -->
   <header
-    class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-6 mx-auto border-b border-gray-700 flex items-center justify-between rounded-b-xl">
+    class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-6 mx-auto border-b border-gray-700 flex items-center justify-between rounded-b-xl hidden"
+    id="header">
     <div class="flex items-center space-x-2">
       <img src="dcl1.jpeg" alt="Logo" class="w-8 h-8 rounded-full border border-yellow-400" />
       <h2 class="text-xl font-bold bg-gradient-to-r from-yellow-300 via-blue-200 to-yellow-300 bg-clip-text text-transparent"
@@ -34,7 +38,7 @@
   </header>
 
   <!-- Player Card -->
-  <main class="max-w-sm mx-auto px-4">
+  <main class="max-w-sm mx-auto px-4 hidden" id="mainContent">
     <div
       class="bg-gradient-to-b from-gray-900 via-black to-gray-900 rounded-xl shadow-xl border border-yellow-400 overflow-hidden">
       <!-- Player Image -->
@@ -43,8 +47,9 @@
           class="w-full h-72 object-cover border-b border-yellow-400" />
         <div class="flex justify-between"></div>
       </div>
-     
-     <span id="type" class="hidden absolute bottom-2 right-2 bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg">...</span>
+
+      <span id="type"
+        class="hidden absolute bottom-2 right-2 bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg">...</span>
 
       <!-- Player Info -->
       <div class="p-4">
@@ -69,7 +74,8 @@
             </div>
           </div>
           <div>
-            <p id="joiningFee" class="text-xs font-semibold text-yellow-300 bg-gray-800 inline-block px-3 py-1 rounded-lg border border-yellow-400 shadow-md">
+            <p id="joiningFee"
+              class="text-xs font-semibold text-yellow-300 bg-gray-800 inline-block px-3 py-1 rounded-lg border border-yellow-400 shadow-md">
               ...
             </p>
           </div>
@@ -94,9 +100,10 @@
       </div>
     </div>
   </main>
-  
+
   <!-- Bottom Nav -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 z-40">
+  <nav id="bottomNav"
+    class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 z-40 hidden">
     <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold">
       <div class="bg-gray-900 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
@@ -123,7 +130,7 @@
       </div>Profile
     </a>
   </nav>
-  
+
   <!-- Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -218,6 +225,12 @@
       await loadSlotInfo();
       await loadJoiningFee();
       await loadUserCard();
+
+      // Hide loading text, show content
+      document.getElementById("loadingText").style.display = "none";
+      document.getElementById("header").classList.remove("hidden");
+      document.getElementById("mainContent").classList.remove("hidden");
+      document.getElementById("bottomNav").classList.remove("hidden");
     });
 
     document.getElementById("joinBtn").addEventListener("click", async () => {
@@ -234,14 +247,24 @@
         const playerData = snapshot.docs[0].data();
         if (playerData.type === "paid") {
           Swal.close();
-          return Swal.fire({ icon: 'info', title: 'Already Registered', text: 'You have already completed registration.', confirmButtonColor: '#3B82F6' });
+          return Swal.fire({
+            icon: 'info',
+            title: 'Already Registered',
+            text: 'You have already completed registration.',
+            confirmButtonColor: '#3B82F6'
+          });
         }
       }
 
       const userData = await getUserInfo(currentUser.uid);
       if (userData.balance < joiningFee) {
         Swal.close();
-        return Swal.fire({ icon: 'error', title: 'Insufficient Balance', text: `Current balance: ৳${userData.balance}`, confirmButtonColor: '#EF4444' });
+        return Swal.fire({
+          icon: 'error',
+          title: 'Insufficient Balance',
+          text: `Current balance: ৳${userData.balance}`,
+          confirmButtonColor: '#EF4444'
+        });
       }
 
       try {
@@ -261,7 +284,7 @@
 
         if (!snapshot.empty) {
           const playerDocRef = snapshot.docs[0].ref;
-          await updateDoc(playerDocRef, { 
+          await updateDoc(playerDocRef, {
             type: "paid",
             tour: increment(1)
           });
@@ -269,14 +292,24 @@
         }
 
         Swal.close();
-        Swal.fire({ icon: 'success', title: 'Success', text: 'You have successfully joined!', confirmButtonColor: '#F59E0B' });
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'You have successfully joined!',
+          confirmButtonColor: '#F59E0B'
+        });
 
       } catch (err) {
         Swal.close();
-        Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Failed to join.', confirmButtonColor: '#EF4444' });
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: err.message || 'Failed to join.',
+          confirmButtonColor: '#EF4444'
+        });
       }
     });
   </script>
-  
+
 </body>
-</html>
+        </html>
