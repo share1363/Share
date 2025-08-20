@@ -18,7 +18,7 @@
 
   <!-- Header -->
   <header
-    class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-6 mx-auto border-b border-gray-700 flex items-center justify-between rounded-b-xl hidden"
+    class="bg-gradient-to-r from-black via-gray-900 to-black w-full max-w-md shadow-md py-2 px-3 mb-6 mx-auto border-b border-gray-700 flex items-center justify-between rounded-b-xl"
     id="header">
     <div class="flex items-center space-x-2">
       <img src="dcl1.jpeg" alt="Logo" class="w-8 h-8 rounded-full border border-yellow-400" />
@@ -103,7 +103,7 @@
 
   <!-- Bottom Nav -->
   <nav id="bottomNav"
-    class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 z-40 hidden">
+    class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around items-center py-2 rounded-t-2xl shadow-inner text-white h-16 z-40">
     <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs font-semibold">
       <div class="bg-gray-900 w-9 h-9 rounded-full mb-1 flex items-center justify-center border border-gray-500">
         <i class="fa-solid fa-house text-lg text-gray-300 hover:text-yellow-400"></i>
@@ -175,7 +175,6 @@
         slot = data?.slot ?? 0;
         slotUsed = data?.slotUsed ?? 0;
         joiningSlot.textContent = `Joining slot: ${slotUsed}/${slot}`;
-        // progress bar update
         const percent = slot > 0 ? (slotUsed / slot) * 100 : 0;
         slotProgress.style.width = percent + "%";
       }
@@ -226,11 +225,9 @@
       await loadJoiningFee();
       await loadUserCard();
 
-      // Hide loading text, show content
+      // Hide only the loading text
       document.getElementById("loadingText").style.display = "none";
-      document.getElementById("header").classList.remove("hidden");
       document.getElementById("mainContent").classList.remove("hidden");
-      document.getElementById("bottomNav").classList.remove("hidden");
     });
 
     document.getElementById("joinBtn").addEventListener("click", async () => {
@@ -312,4 +309,4 @@
   </script>
 
 </body>
-        </html>
+</html>
