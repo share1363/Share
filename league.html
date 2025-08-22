@@ -100,7 +100,7 @@
 
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, query, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, onSnapshot, query, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -119,6 +119,7 @@
 
   let teamPhotos = {};
   let hiddenMatchdays = {};
+  let currentUserId = null;
 
   async function loadTeamPhotos() {
     const snap = await getDocs(collection(db, "playersform"));
@@ -128,16 +129,6 @@
         teamPhotos[data.team.trim().toLowerCase()] = data.photoUrl;
       }
     });
-  }
-
-  async function loadHiddenMatchdays(uid) {
-    const userRef = doc(db, "users", uid);
-    const snap = await getDoc(userRef);
-    if (snap.exists()) {
-      hiddenMatchdays = snap.data().hiddenMatchdays || {};
-    } else {
-      hiddenMatchdays = {};
-    }
   }
 
   function formatDateAndTime(dateStr) {
@@ -150,91 +141,109 @@
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
+      currentUserId = user.uid;
       await loadTeamPhotos();
-      await loadHiddenMatchdays(user.uid);
-      subscribeFixers(); // 🔥 Real-time listener
+      subscribeHiddenMatchdays(user.uid); // 🔥 user hiddenMatchdays real-time
+      subscribeFixers(); // 🔥 fixers real-time
     } else {
       window.location.href = "login.html";
     }
   });
 
+  function subscribeHiddenMatchdays(uid) {
+    const userRef = doc(db, "users", uid);
+    onSnapshot(userRef, (snap) => {
+      if (snap.exists()) {
+        hiddenMatchdays = snap.data().hiddenMatchdays || {};
+      } else {
+        hiddenMatchdays = {};
+      }
+      renderFixers(); // 🔄 hidden change হলে সাথে সাথে redraw
+    });
+  }
+
+  let fixersData = [];
+
   function subscribeFixers() {
     const fixersRef = collection(db, "fixers");
     onSnapshot(query(fixersRef), (snapshot) => {
-      const fixersContainer = document.getElementById("fixers-list");
-      if (snapshot.empty) {
-        fixersContainer.innerHTML = `<p class="text-center text-gray-400">No fixers available.</p>`;
-        return;
-      }
-
-      const fixers = [];
-      snapshot.forEach(docSnap => fixers.push(docSnap.data()));
-
-      const matchdaysMap = {};
-      fixers.forEach(fix => {
-        const md = fix.matchday || "Matchday-Unknown";
-        if (!matchdaysMap[md]) matchdaysMap[md] = [];
-        matchdaysMap[md].push(fix);
-      });
-
-      const sortedMatchdays = Object.keys(matchdaysMap).sort();
-      let html = "";
-
-      sortedMatchdays.forEach((md, index) => {
-        const matchdayId = `matchday-${index + 1}`;
-        if (hiddenMatchdays[matchdayId]) return;
-
-        const firstDate = matchdaysMap[md][0]?.date || "";
-        html += `<div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-lg font-semibold uppercase text-yellow-300 mb-2 flex justify-center items-center">
-                  ${md} || ${firstDate ? formatDateAndTime(firstDate) : ""}
-                </div>`;
-
-        matchdaysMap[md].sort((a,b) => a.groupName.localeCompare(b.groupName) || a.team1.localeCompare(b.team1))
-        .forEach(match => {
-          const team1Img = teamPhotos[match.team1.trim().toLowerCase()] || "";
-          const team2Img = teamPhotos[match.team2.trim().toLowerCase()] || "";
-          const t1GoalVal = match.team1Goal ?? "-";
-          const t2GoalVal = match.team2Goal ?? "-";
-
-          html += `
-          <section class="mx-auto py-10 flex justify-center items-center relative rounded-lg px-4 border border-gray-500" style="background-image: url('stadium.jpeg'); background-size: cover; background-position: center; height: 207px;">
-            <div class="absolute inset-0 bg-black opacity-60"></div>
-            <div style="background: #af1f42;" class="absolute top-0 left-1/8 w-full py-1 px-4 rounded-t-lg uppercase text-lg font-extrabold z-10 opacity-70 bg-gray-800 text-center border-b border-gray-400">
-              DCL CHAMPIONS LEAGUE S-3
-            </div>
-            <div style="background: #af1f42; top: 36px;" class="flex justify-center items-center w-2/4 py-1 px-4 absolute left-1/8 rounded-b-xl uppercase text-xs font-extrabold border-b border-l border-r border-gray-400 z-10 opacity-70">
-              <div>${match.groupName}</div>
-            </div>
-            <div style="background: #af1f42; top: 82px;" class="flex justify-between w-3/4 py-1.5 px-3 absolute left-1/8 rounded-t-xl uppercase text-xs font-extrabold border-t border-l border-r border-gray-400 z-10 opacity-70">
-              <div>${formatDateAndTime(match.date)}</div>
-              <div>Time 24 Hours</div>
-            </div>
-            <div style="background: #a81d3f; top: 35px;" class="rounded-lg shadow-lg w-full max-w-lg relative h-14 border-t border-l border-r border-gray-400 opacity-80">
-              <div class="flex justify-between p-2 uppercase mb-1">
-                <div class="text-left w-full"><h2 class="text-xs font-semibold">${match.team1}</h2></div>
-                <div class="text-right w-full"><h2 class="text-xs font-semibold">${match.team2}</h2></div>
-              </div>
-              <div class="flex justify-center items-center space-x-6 bg-white py-3 px-2 rounded-b-lg h-10 border-b border-gray-400 opacity-80">
-                <div class="text-center"><p class="text-4xl font-medium text-black">${t1GoalVal}</p></div>
-                <div class="text-center" style="position: relative; top: -16px; color: #7f152e;">
-                  <i class="fas fa-futbol text-6xl bg-white rounded-full border border-gray-400"></i>
-                </div>
-                <div class="text-center"><p class="text-4xl font-medium text-black">${t2GoalVal}</p></div>
-              </div>
-              <div style="position: relative; top: -50px; right: 10px;" class="flex justify-between">
-                ${team1Img ? `<img style="border: 4px solid #f34871;" src="${team1Img}" class="w-14 h-14 rounded-full" alt="${match.team1}" />` : ""}
-              </div>
-              <div style="position: absolute; right: -10px; top: 26px;" class="text-center">
-                ${team2Img ? `<img style="border: 4px solid #f34871;" src="${team2Img}" class="w-14 h-14 rounded-full" alt="${match.team2}" />` : ""}
-              </div>
-            </div>
-          </section>
-          `;
-        });
-      });
-
-      fixersContainer.innerHTML = html;
+      fixersData = [];
+      snapshot.forEach(docSnap => fixersData.push(docSnap.data()));
+      renderFixers(); // 🔄 fixers change হলে redraw
     });
+  }
+
+  function renderFixers() {
+    const fixersContainer = document.getElementById("fixers-list");
+    if (!fixersData.length) {
+      fixersContainer.innerHTML = `<p class="text-center text-gray-400">No fixers available.</p>`;
+      return;
+    }
+
+    const matchdaysMap = {};
+    fixersData.forEach(fix => {
+      const md = fix.matchday || "Matchday-Unknown";
+      if (!matchdaysMap[md]) matchdaysMap[md] = [];
+      matchdaysMap[md].push(fix);
+    });
+
+    const sortedMatchdays = Object.keys(matchdaysMap).sort();
+    let html = "";
+
+    sortedMatchdays.forEach((md, index) => {
+      const matchdayId = `matchday-${index + 1}`;
+      if (hiddenMatchdays[matchdayId]) return; // hide করলে show হবে না
+
+      const firstDate = matchdaysMap[md][0]?.date || "";
+      html += `<div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-lg font-semibold uppercase text-yellow-300 mb-2 flex justify-center items-center">
+                ${md} || ${firstDate ? formatDateAndTime(firstDate) : ""}
+              </div>`;
+
+      matchdaysMap[md].sort((a,b) => a.groupName.localeCompare(b.groupName) || a.team1.localeCompare(b.team1))
+      .forEach(match => {
+        const team1Img = teamPhotos[match.team1.trim().toLowerCase()] || "";
+        const team2Img = teamPhotos[match.team2.trim().toLowerCase()] || "";
+        const t1GoalVal = match.team1Goal ?? "-";
+        const t2GoalVal = match.team2Goal ?? "-";
+
+        html += `
+        <section class="mx-auto py-10 flex justify-center items-center relative rounded-lg px-4 border border-gray-500" style="background-image: url('stadium.jpeg'); background-size: cover; background-position: center; height: 207px;">
+          <div class="absolute inset-0 bg-black opacity-60"></div>
+          <div style="background: #af1f42;" class="absolute top-0 left-1/8 w-full py-1 px-4 rounded-t-lg uppercase text-lg font-extrabold z-10 opacity-70 bg-gray-800 text-center border-b border-gray-400">
+            DCL CHAMPIONS LEAGUE S-3
+          </div>
+          <div style="background: #af1f42; top: 36px;" class="flex justify-center items-center w-2/4 py-1 px-4 absolute left-1/8 rounded-b-xl uppercase text-xs font-extrabold border-b border-l border-r border-gray-400 z-10 opacity-70">
+            <div>${match.groupName}</div>
+          </div>
+          <div style="background: #af1f42; top: 82px;" class="flex justify-between w-3/4 py-1.5 px-3 absolute left-1/8 rounded-t-xl uppercase text-xs font-extrabold border-t border-l border-r border-gray-400 z-10 opacity-70">
+            <div>${formatDateAndTime(match.date)}</div>
+            <div>Time 24 Hours</div>
+          </div>
+          <div style="background: #a81d3f; top: 35px;" class="rounded-lg shadow-lg w-full max-w-lg relative h-14 border-t border-l border-r border-gray-400 opacity-80">
+            <div class="flex justify-between p-2 uppercase mb-1">
+              <div class="text-left w-full"><h2 class="text-xs font-semibold">${match.team1}</h2></div>
+              <div class="text-right w-full"><h2 class="text-xs font-semibold">${match.team2}</h2></div>
+            </div>
+            <div class="flex justify-center items-center space-x-6 bg-white py-3 px-2 rounded-b-lg h-10 border-b border-gray-400 opacity-80">
+              <div class="text-center"><p class="text-4xl font-medium text-black">${t1GoalVal}</p></div>
+              <div class="text-center" style="position: relative; top: -16px; color: #7f152e;">
+                <i class="fas fa-futbol text-6xl bg-white rounded-full border border-gray-400"></i>
+              </div>
+              <div class="text-center"><p class="text-4xl font-medium text-black">${t2GoalVal}</p></div>
+            </div>
+            <div style="position: relative; top: -50px; right: 10px;" class="flex justify-between">
+              ${team1Img ? `<img style="border: 4px solid #f34871;" src="${team1Img}" class="w-14 h-14 rounded-full" alt="${match.team1}" />` : ""}
+            </div>
+            <div style="position: absolute; right: -10px; top: 26px;" class="text-center">
+              ${team2Img ? `<img style="border: 4px solid #f34871;" src="${team2Img}" class="w-14 h-14 rounded-full" alt="${match.team2}" />` : ""}
+            </div>
+          </div>
+        </section>
+        `;
+      });
+    });
+
+    fixersContainer.innerHTML = html;
   }
 </script>
 </body>
