@@ -180,8 +180,9 @@
       const sortedMatchdays = Object.keys(matchdaysMap).sort();
       let html = "";
 
-      sortedMatchdays.forEach(md => {
-        if (hiddenMatchdays[md]) return; // skip hidden matchdays
+      sortedMatchdays.forEach((md, index) => {
+        const matchdayId = `matchday-${index + 1}`; // ✅ Same as Admin panel key
+        if (hiddenMatchdays[matchdayId]) return;   // ✅ Hide if user marked hidden
 
         const firstDate = matchdaysMap[md][0]?.date || "";
         html += `<div class="bg-yellow-400 rounded-lg bg-opacity-40 py-1 px-3 text-lg font-semibold uppercase text-yellow-300 mb-2 flex justify-center items-center">
