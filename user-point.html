@@ -103,7 +103,6 @@
     let photoMap = {};
 
     async function loadPlayersPhotos() {
-      // Load photoUrl of each team/player from playersform collection into photoMap
       const playersSnap = await getDocs(collection(db, "playersform"));
       photoMap = {};
       playersSnap.forEach(doc => {
@@ -135,7 +134,6 @@
         const fixers = [];
         snapshot.forEach(doc => fixers.push(doc.data()));
 
-        // Group by groupName dynamically
         const groupsMap = {};
         fixers.forEach(fix => {
           if (!groupsMap[fix.groupName]) groupsMap[fix.groupName] = [];
@@ -192,7 +190,6 @@
           allGroupsPoints.push({ groupName, sortedTeams });
         });
 
-        // Render group tables with very small font size (text-xs)
         let allPointsHTML = "";
         if (allGroupsPoints.length === 0) {
           allPointsHTML = `<p class="text-gray-500 text-center">No point tables to show.</p>`;
@@ -214,14 +211,20 @@
                   </tr>
                 </thead>
                 <tbody>
-                  ${sortedTeams.map((team, i) => {
+                  ${sortedTeams.map((team) => {
                     const photoUrl = photoMap[team.team.trim().toLowerCase()] || "default-player.png";
+                    const qualifiedBadge = team.win >= 2 
+                      ? `<span class="absolute -top-1 -right-1 bg-yellow-400 text-black text-[8px] font-bold px-1 rounded">Q</span>` 
+                      : "";
                     return `
                       <tr class="even:bg-gray-900 odd:bg-gray-800 hover:bg-yellow-900 hover:text-yellow-300">
                         <td class="px-1 py-1 border border-gray-700 text-center">
                           <img src="${photoUrl}" alt="${team.team}" class="inline-block w-6 h-6 rounded-full object-cover border border-gray-500 p-[1px]" />
                         </td>
-                        <td class="px-1 py-1 border border-gray-700">${team.team}</td>
+                        <td class="px-1 py-1 border border-gray-700 relative">
+                          ${team.team}
+                          ${qualifiedBadge}
+                        </td>
                         <td class="px-1 py-1 border border-gray-700 text-center font-semibold">${team.played}</td>
                         <td class="px-1 py-1 border border-gray-700 text-center">${team.win}</td>
                         <td class="px-1 py-1 border border-gray-700 text-center">${team.loss}</td>
