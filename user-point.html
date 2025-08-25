@@ -26,7 +26,6 @@
       <a href="#">
         <i class="fa-solid fa-bell text-yellow-300 text-shadow text-xl"></i>
       </a>
-      
       <a href="https://facebook.com" target="_blank">
         <i class="fa-brands fa-facebook text-gray-300 hover:text-yellow-400 text-shadow text-xl"></i>
       </a>
@@ -211,9 +210,9 @@
                   </tr>
                 </thead>
                 <tbody>
-                  ${sortedTeams.map((team) => {
+                  ${sortedTeams.map((team, index) => {
                     const photoUrl = photoMap[team.team.trim().toLowerCase()] || "default-player.png";
-                    const qualifiedBadge = team.win >= 2 
+                    const qualifiedBadge = (team.played === 3 && (index === 0 || index === 1)) 
                       ? `<span class="absolute -top-0 -right-0 bg-red-600 text-white font-semibold text-[10px] font-bold px-1 rounded">Q</span>` 
                       : "";
                     return `
