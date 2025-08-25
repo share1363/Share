@@ -213,7 +213,7 @@
                   ${sortedTeams.map((team, index) => {
                     const photoUrl = photoMap[team.team.trim().toLowerCase()] || "default-player.png";
                     const qualifiedBadge = (team.played === 3 && (index === 0 || index === 1)) 
-                      ? `<span class="absolute -top-0 -right-0 bg-red-600 text-white font-semibold text-[8px] font-bold w-3 h-3 flex justify-center items-center rounded-sm">Q</span>` 
+                      ? `<span class="absolute -top-0 -right-0 bg-red-600 text-white font-semibold text-[10px] font-bold w-3 h-3 flex justify-center items-center rounded-sm">Q</span>` 
                       : "";
                     return `
                       <tr class="even:bg-gray-900 odd:bg-gray-800 hover:bg-yellow-900 hover:text-yellow-300">
